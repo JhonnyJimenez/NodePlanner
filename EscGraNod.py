@@ -1,8 +1,8 @@
-# Escena gráfica de los nodos
+# Escena gráfica de los nodos.
 import math
-from PyQt6.QtWidgets import *
-from PyQt6.QtCore import *
-from PyQt6.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 
 class QDMGraphicsScene(QGraphicsScene):
@@ -37,7 +37,7 @@ class QDMGraphicsScene(QGraphicsScene):
         piso = int(math.ceil(rect.bottom()))
 
         marizq = izq - (izq % self.gridSize)
-        martecho = techo - (techo & self.gridSize)
+        martecho = techo - (techo % self.gridSize)
 
         # Cálculo las líneas a dibujar.
         lineasclaras, lineasoscuras = [], []

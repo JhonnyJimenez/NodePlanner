@@ -1,5 +1,5 @@
 import sys
-from PyQt6.QtWidgets import *
+from PyQt5.QtWidgets import *
 from Ventanas import EditorDeNodos
 
 if __name__ == '__main__':
