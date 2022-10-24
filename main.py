@@ -1,10 +1,8 @@
 import sys
 from PyQt6.QtWidgets import *
+from Ventanas import EditorDeNodos
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-
-    label = QLabel("¡Hola, mundo!")
-    label.show()
-
+    wnd = EditorDeNodos()
     sys.exit(app.exec())
