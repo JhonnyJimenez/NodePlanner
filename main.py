@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import *
-from Ventanas import EditorDeNodos
+from Ventana_principal import EditorDeNodos
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

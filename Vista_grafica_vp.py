@@ -1,23 +1,23 @@
-# Vista gráfica de los nodos.
+# Vista gráfica (Ventana principal).
 from PyQt5.QtWidgets import QGraphicsView
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 
 class QDMGraphicsView(QGraphicsView):
-    def __init__(self, grScene, parent=None):
+    def __init__(self, Esc_grafica, parent=None):
         super().__init__(parent)
-        self.grScene = grScene
+        self.Esc_grafica = Esc_grafica
 
         self.initUI()
 
-        self.setScene(self.grScene)
+        self.setScene(self.Esc_grafica)
 
-        self.zoomInFactor = 1.25
-        self.zoomClamp = True
-        self.zoom = 10
-        self.zoomStep = 1
-        self.zoomRange = [0, 10]
+        self.FactorAcercamiento = 1.25
+        self.ZoomClamp = True
+        self.Zoom = 10
+        self.NiveldeZoom = 1
+        self.RangodeZoom = [0, 10]
 
     def initUI(self):
         self.setRenderHints(QPainter.Antialiasing | QPainter.HighQualityAntialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
@@ -79,22 +79,22 @@ class QDMGraphicsView(QGraphicsView):
 
     def wheelEvent(self, event):
         #Cálculo del factor de zoom.
-        zoomOutFactor = 1 / self.zoomInFactor
+        FactorAlejamiento = 1 / self.FactorAcercamiento
 
         #Cálculo del zoom
         if event.angleDelta().y() > 0:
-            zoomFactor = self.zoomInFactor
-            self.zoom += self.zoomStep
+            FactordeZoom = self.FactorAcercamiento
+            self.Zoom += self.NiveldeZoom
         else:
-            zoomFactor = zoomOutFactor
-            self.zoom -= self.zoomStep
+            FactordeZoom = FactorAlejamiento
+            self.Zoom -= self.NiveldeZoom
 
         clamped = False
-        if self.zoom < self.zoomRange[0]:
-            self.zoom, clamped = self.zoomRange[0], True
-        if self.zoom > self.zoomRange[1]:
-            self.zoom, clamped = self.zoomRange[1], True
+        if self.Zoom < self.RangodeZoom[0]:
+            self.Zoom, clamped = self.RangodeZoom[0], True
+        if self.Zoom > self.RangodeZoom[1]:
+            self.Zoom, clamped = self.RangodeZoom[1], True
 
         # Configuración de la escala de la escena.
-        if not clamped or self.zoomClamp is False:
-            self.scale(zoomFactor, zoomFactor)
+        if not clamped or self.ZoomClamp is False:
+            self.scale(FactordeZoom, FactordeZoom)
