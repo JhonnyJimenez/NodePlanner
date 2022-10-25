@@ -1,6 +1,6 @@
 from Escena_grafica_vp import QDMGraphicsScene
 
-class Escena:
+class Escena ():
     def __init__(self):
         self.Nodos = []
         self.Bordes = []

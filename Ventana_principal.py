@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from Escena import Escena
+from Nodo import Nodo
 from Vista_grafica_vp import QDMGraphicsView
 
 
@@ -21,16 +22,18 @@ class EditorDeNodos(QWidget):
 
         # Crear escena de gráficos
         self.scene = Escena()
-        self.Esc_grafica = self.scene.Esc_grafica
+        # self.Esc_grafica = self.scene.Esc_grafica
+
+        Nodos = Nodo(self.scene, "Nodo de personaje")
 
         # Crear vista de gráficos
-        self.Vista_grafica = QDMGraphicsView(self.Esc_grafica, self)
+        self.Vista_grafica = QDMGraphicsView(self.scene.Esc_grafica, self)
         self.AdminDeEspEnPan.addWidget(self.Vista_grafica)
 
         self.setWindowTitle("NodePlanner - Versión alpha")
         self.show()
 
-        self.AddDebugContent()
+        # self.AddDebugContent()
 
     def AddDebugContent(self):
         lverde = QBrush(Qt.green)
