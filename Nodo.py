@@ -1,15 +1,18 @@
-from GraficosdelNodo import QDMGraphicsNode
+from GraficosdelNodo import GraficosdelNodo
+from ContenidodelNodo import ContenidoDelNodo
 
 
 class Nodo:
-	def __init__(self, scene, title="Nodo desconocido"):
-		self.scene = scene
-		self.title = title
+	def __init__(self, escena, titulo="Nodo desconocido"):
+		self.escena = escena
+		self.titulo = titulo
 		
-		self.Nodograficas = QDMGraphicsNode(self, self.title)
+		self.contenido = ContenidoDelNodo()
 		
-		self.scene.agregarnodo(self)
-		self.scene.GraficosEsc.addItem(self.Nodograficas)
+		self.Nodograficas = GraficosdelNodo(self)
+		
+		self.escena.agregarnodo(self)
+		self.escena.GraficosEsc.addItem(self.Nodograficas)
 		
 		self.inputs = []
 		self.outputs = []

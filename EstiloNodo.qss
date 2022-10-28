@@ -1,0 +1,2 @@
+ContenidoDelNodo { background: transparent; }
+ContenidoDelNodo QLabel { color: #e0e0e0; }
