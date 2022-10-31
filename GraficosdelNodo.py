@@ -29,6 +29,7 @@ class GraficosdelNodo(QGraphicsItem):
 		self.nombre = self.nodo.titulo
 		
 		# init entradas y salidas
+		self.initconectores()
 		
 		# init contenido
 		self.initContenido()
@@ -47,8 +48,8 @@ class GraficosdelNodo(QGraphicsItem):
 		return QRectF(
 			0,
 			0,
-			2 * self.redondezNodo + self.anchoNodo,
-			2 * self.redondezNodo + self.altoNodo
+			self.anchoNodo,
+			self.altoNodo
 		).normalized()
 	
 	def initui(self):
@@ -69,6 +70,9 @@ class GraficosdelNodo(QGraphicsItem):
 		self.GraficosContenidoNodo = QGraphicsProxyWidget(self)
 		self.contenido.setGeometry(int(self.redondezNodo), int(self.alturaTituloNodo + self.redondezNodo), self.anchoNodo - int((2 * self.redondezNodo)), self.altoNodo - int((2 * self.redondezNodo) + self.alturaTituloNodo))
 		self.GraficosContenidoNodo.setWidget(self.contenido)
+		
+	def initconectores(self):
+		pass
 		
 	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
 		

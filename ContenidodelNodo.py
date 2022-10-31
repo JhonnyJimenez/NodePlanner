@@ -15,3 +15,4 @@ class ContenidoDelNodo(QWidget):
 		self.wdg_label = QLabel("Some title")
 		self.lienzo.addWidget(self.wdg_label)
 		self.lienzo.addWidget(QTextEdit("Mira, un texto"))
+		

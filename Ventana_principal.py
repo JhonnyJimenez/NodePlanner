@@ -1,8 +1,10 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+
 from GraficosdelaVista_vp import GraficosdelaVistaVP
 from Escena import Escena
 from Nodo import Nodo
+from Conectores import Conector
 
 
 class EditorDeNodos(QWidget):
@@ -26,7 +28,7 @@ class EditorDeNodos(QWidget):
 		self.Vista = GraficosdelaVistaVP(self.escena.GraficosEsc, self)
 		self.AdminDeEspEnPan.addWidget(self.Vista)
 		
-		Nodo(self.escena, "Nodo de personaje")
+		nodo = Nodo(self.escena, "Nodo de personaje", entradas=[1, 2, 3], salidas=[1])
 		
 		self.setWindowTitle("NodePlanner - Versión alpha")
 		self.show()
@@ -37,3 +39,4 @@ class EditorDeNodos(QWidget):
 		file.open(QFile.ReadOnly | QFile.Text)
 		stylesheet = file.readAll()
 		QApplication.instance().setStyleSheet(str(stylesheet, encoding='utf-8'))
+		
