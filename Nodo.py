@@ -32,6 +32,12 @@ class Nodo:
 			contador += 1
 			self.salidas.append(conector)
 			
+	@property
+	def pos(self):
+		return self.Nodograficas.pos()		#QPoint
+	def definirposicion(self, x, y):
+		self.Nodograficas.setPos(x, y)
+			
 	def obtenerposicionconector(self, indice, posicion):
 		x = 0 if (posicion in (Izquierda_arriba, Izquierda_abajo)) else self.Nodograficas.anchoNodo
 		
