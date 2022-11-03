@@ -22,13 +22,13 @@ class Nodo:
 		self.salidas = []
 		contador = 0
 		for item in entradas:
-			zocalos = Zocalo(nodo=self, indice=contador, posicion=Izquierda_abajo)
+			zocalos = Zocalo(nodo=self, indice=contador, posicion=Izquierda_abajo, tipo_zocalo=item)
 			contador += 1
 			self.entradas.append(zocalos)
 			
 		contador = 0
 		for item in salidas:
-			zocalos = Zocalo(nodo=self, indice=contador, posicion=Derecha_arriba)
+			zocalos = Zocalo(nodo=self, indice=contador, posicion=Derecha_arriba, tipo_zocalo=item)
 			contador += 1
 			self.salidas.append(zocalos)
 			
@@ -49,3 +49,8 @@ class Nodo:
 			y = self.Nodograficas.alturaTituloNodo + self.Nodograficas._sangria + self.Nodograficas.redondezNodo + (indice * self.espaciadoconectores)
 		
 		return [x, y]
+	
+	def actualizarconexiones(self):
+		for zocalo in self.entradas + self.salidas:
+			if zocalo.tieneconexiones():
+				zocalo.conexion.posiciones_actualizadas()

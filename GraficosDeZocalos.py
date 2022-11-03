@@ -4,13 +4,21 @@ from PyQt5.QtCore import *
 
 
 class GraficosDeZocalos(QGraphicsItem):
-	def __init__(self, parent=None):
+	def __init__(self, parent=None, tipo_zocalo=1):
 		super().__init__(parent)
 		
 		#Usa números enteros, porque con decimales, el programa no funcionará (Y PyCharm no te dará ninguna pista de porqué falla.
 		self.radio = 6
 		self.grosor_contorno = 1
-		self._color_de_fondo = QColor("#FFFF7700")
+		self._colors = [
+			QColor("#FFFF7700"),
+			QColor("#FF52e220"),
+			QColor("#FF0056a6"),
+			QColor("#FFa86db1"),
+			QColor("#FFb54747"),
+			QColor("#FFdbe220"),
+		]
+		self._color_de_fondo = self._colors[tipo_zocalo]
 		self._color_contorno = QColor("#FF000000")
 		
 		self._pen = QPen(self._color_contorno)

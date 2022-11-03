@@ -4,7 +4,7 @@ from PyQt5.QtCore import *
 from GraficosdelaVista_vp import GraficosdelaVistaVP
 from Escena import Escena
 from Nodo import Nodo
-from Conexiones import Conexion
+from Conexiones import Conexion, recta, bezier
 
 
 class EditorDeNodos(QWidget):
@@ -41,12 +41,12 @@ class EditorDeNodos(QWidget):
 		QApplication.instance().setStyleSheet(str(stylesheet, encoding='utf-8'))
 		
 	def agregadodenodos(self):
-		nodo1 = Nodo(self.escena, "Nodo cronista", entradas=[1, 2, 3], salidas=[1])
-		nodo2 = Nodo(self.escena, "Nodo de personaje", entradas=[1, 2, 3], salidas=[1])
-		nodo3 = Nodo(self.escena, "Nodo de juguete", entradas=[1, 2, 3], salidas=[1])
+		nodo1 = Nodo(self.escena, "Nodo cronista", entradas=[0, 2, 3], salidas=[1])
+		nodo2 = Nodo(self.escena, "Nodo de personaje", entradas=[0, 4, 5], salidas=[1])
+		nodo3 = Nodo(self.escena, "Nodo de juguete", entradas=[0, 0, 2], salidas=[1])
 		nodo1.definirposicion(-350, -250)
 		nodo2.definirposicion(-75, 0)
 		nodo3.definirposicion(200, -150)
 		
 		conexion1 = Conexion(self.escena, nodo1.salidas[0], nodo2.entradas[0])
-		conexion2 = Conexion(self.escena, nodo2.salidas[0], nodo3.entradas[2], tipo=2)
+		conexion2 = Conexion(self.escena, nodo2.salidas[0], nodo3.entradas[2])

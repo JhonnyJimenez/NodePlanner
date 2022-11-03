@@ -1,20 +1,24 @@
 from GraficosdeConexion import *
 
-conexion_recta = 1
-conexion_bezier = 2
+recta = 1
+bezier = 2
 
-DEBUG = True
+DEBUG = False
 DEBUGZOCALOS = False
 
 class Conexion:
-	def __init__(self, escena, zocalo_origen, zocalo_final, tipo=conexion_recta):
+	def __init__(self, escena, zocalo_origen, zocalo_final, tipo_de_conexion=bezier):
 		
 		self.escena = escena
 		
 		self.zocalo_origen = zocalo_origen
 		self.zocalo_final = zocalo_final
 		
-		self.GraficosDeConexion = ConexionLRecta(self) if tipo==conexion_recta else ConexionLBezier(self)
+		self.zocalo_origen.conexion = self
+		if self.zocalo_final is not None:
+			self.zocalo_final.conexion = self
+		
+		self.GraficosDeConexion = ConexionLRecta(self) if tipo_de_conexion == recta else ConexionLBezier(self)
 		
 		self.posiciones_actualizadas()
 		

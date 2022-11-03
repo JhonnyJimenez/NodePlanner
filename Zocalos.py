@@ -9,16 +9,18 @@ Derecha_abajo = 4
 DEBUG = False
 
 class Zocalo:
-	def __init__(self, nodo, indice, posicion):
+	def __init__(self, nodo, indice, posicion, tipo_zocalo=1):
 		
 		self.nodo = nodo
 		self.indice = indice
 		self.posicion = posicion
+		self.tipo_zocalo = tipo_zocalo
+		
 		if DEBUG:
 			self.debugnames(posicion)
 			print("Zócalo", self.indice, "ubicado", self.nposition, "del", self.nodo.titulo, self.nodo, )
 		
-		self.GraficosZocalos = GraficosDeZocalos(self.nodo.Nodograficas)
+		self.GraficosZocalos = GraficosDeZocalos(self.nodo.Nodograficas, self.tipo_zocalo)
 		
 		self.GraficosZocalos.setPos(*self.nodo.obtener_posicion_zocalo(indice, posicion))
 		
@@ -45,3 +47,6 @@ class Zocalo:
 				self.nposition = "abajo a la derecha"
 			else:
 				self.nposition = "en una posición desconocida"
+				
+	def tieneconexiones(self):
+		return self.conexion is not None

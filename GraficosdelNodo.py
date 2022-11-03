@@ -35,6 +35,10 @@ class GraficosdelNodo(QGraphicsItem):
 		self.initContenido()
 		
 		self.initui()
+		
+	def mouseMoveEvent(self, evento):
+		super().mouseMoveEvent(evento)
+		self.nodo.actualizarconexiones()
 	
 	@property
 	def nombre(self): return self.nombre
