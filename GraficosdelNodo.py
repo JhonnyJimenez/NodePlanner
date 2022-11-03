@@ -29,7 +29,7 @@ class GraficosdelNodo(QGraphicsItem):
 		self.nombre = self.nodo.titulo
 		
 		# init entradas y salidas
-		self.initconectores()
+		self.initzocalos()
 		
 		# init contenido
 		self.initContenido()
@@ -71,7 +71,7 @@ class GraficosdelNodo(QGraphicsItem):
 		self.contenido.setGeometry(int(self.redondezNodo), int(self.alturaTituloNodo + self.redondezNodo), self.anchoNodo - int((2 * self.redondezNodo)), self.altoNodo - int((2 * self.redondezNodo) + self.alturaTituloNodo))
 		self.GraficosContenidoNodo.setWidget(self.contenido)
 		
-	def initconectores(self):
+	def initzocalos(self):
 		pass
 		
 	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):

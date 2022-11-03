@@ -42,11 +42,11 @@ class EditorDeNodos(QWidget):
 		
 	def agregadodenodos(self):
 		nodo1 = Nodo(self.escena, "Nodo cronista", entradas=[1, 2, 3], salidas=[1])
-		nodo2 = Nodo(self.escena, "Nodo de personaje", entradas=[1], salidas=[1, 2, 3])
+		nodo2 = Nodo(self.escena, "Nodo de personaje", entradas=[1, 2, 3], salidas=[1])
 		nodo3 = Nodo(self.escena, "Nodo de juguete", entradas=[1, 2, 3], salidas=[1])
 		nodo1.definirposicion(-350, -250)
 		nodo2.definirposicion(-75, 0)
 		nodo3.definirposicion(200, -150)
 		
 		conexion1 = Conexion(self.escena, nodo1.salidas[0], nodo2.entradas[0])
-		conexion2 = Conexion(self.escena, nodo2.salidas[0], nodo3.entradas[0], tipo=2)
+		conexion2 = Conexion(self.escena, nodo2.salidas[0], nodo3.entradas[2], tipo=2)

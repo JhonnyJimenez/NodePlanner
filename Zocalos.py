@@ -1,0 +1,47 @@
+from GraficosDeZocalos import GraficosDeZocalos
+
+
+Izquierda_arriba = 1
+Izquierda_abajo = 2
+Derecha_arriba = 3
+Derecha_abajo = 4
+
+DEBUG = False
+
+class Zocalo:
+	def __init__(self, nodo, indice, posicion):
+		
+		self.nodo = nodo
+		self.indice = indice
+		self.posicion = posicion
+		if DEBUG:
+			self.debugnames(posicion)
+			print("Zócalo", self.indice, "ubicado", self.nposition, "del", self.nodo.titulo, self.nodo, )
+		
+		self.GraficosZocalos = GraficosDeZocalos(self.nodo.Nodograficas)
+		
+		self.GraficosZocalos.setPos(*self.nodo.obtener_posicion_zocalo(indice, posicion))
+		
+		self.conexion = None
+		
+	def posicion_zocalo(self):
+		if DEBUG: print("   GSP:", self.indice, self.posicion, "Nodo:", self.nodo)
+		res =  self.nodo.obtener_posicion_zocalo(self.indice, self.posicion)
+		if DEBUG: print("   res:", res)
+		return res
+		
+	def conexion_conectada(self, conexion=None):
+		self.conexion = conexion
+		
+	if DEBUG:
+		def debugnames(self, posicion):
+			if self.posicion == 1:
+				self.nposition = "arriba a la izquierda"
+			elif posicion == 2:
+				self.nposition = "abajo a la izquierda"
+			elif self.posicion == 3:
+				self.nposition = "arriba a la derecha"
+			elif self.posicion == 4:
+				self.nposition = "abajo a la derecha"
+			else:
+				self.nposition = "en una posición desconocida"

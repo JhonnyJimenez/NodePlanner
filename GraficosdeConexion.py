@@ -23,6 +23,12 @@ class GraficosdeConexion(QGraphicsPathItem):
 		self.posicion_origen = [0, 0]
 		self.posicion_destino = [200, 100]
 		
+	def punto_origen(self, x, y):
+		self.posicion_origen = [x, y]
+	
+	def punto_destino(self, x, y):
+		self.posicion_destino = [x, y]
+		
 	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
 		self.ruta_actualizada()
 		

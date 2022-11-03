@@ -1,6 +1,6 @@
 from GraficosdelNodo import GraficosdelNodo
 from ContenidodelNodo import ContenidoDelNodo
-from Conectores import *
+from Zocalos import *
 
 
 class Nodo:
@@ -22,15 +22,15 @@ class Nodo:
 		self.salidas = []
 		contador = 0
 		for item in entradas:
-			conector = Conector(nodo=self, indice=contador, posicion=Izquierda_abajo)
+			zocalos = Zocalo(nodo=self, indice=contador, posicion=Izquierda_abajo)
 			contador += 1
-			self.entradas.append(conector)
+			self.entradas.append(zocalos)
 			
 		contador = 0
 		for item in salidas:
-			conector = Conector(nodo=self, indice=contador, posicion=Derecha_arriba)
+			zocalos = Zocalo(nodo=self, indice=contador, posicion=Derecha_arriba)
 			contador += 1
-			self.salidas.append(conector)
+			self.salidas.append(zocalos)
 			
 	@property
 	def pos(self):
@@ -38,7 +38,7 @@ class Nodo:
 	def definirposicion(self, x, y):
 		self.Nodograficas.setPos(x, y)
 			
-	def obtenerposicionconector(self, indice, posicion):
+	def obtener_posicion_zocalo(self, indice, posicion):
 		x = 0 if (posicion in (Izquierda_arriba, Izquierda_abajo)) else self.Nodograficas.anchoNodo
 		
 		if posicion in (Izquierda_abajo, Derecha_abajo):
@@ -48,4 +48,4 @@ class Nodo:
 			# Comenzando desde arriba.
 			y = self.Nodograficas.alturaTituloNodo + self.Nodograficas._sangria + self.Nodograficas.redondezNodo + (indice * self.espaciadoconectores)
 		
-		return x, y
+		return [x, y]
