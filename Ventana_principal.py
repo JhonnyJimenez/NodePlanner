@@ -6,7 +6,6 @@ from Escena import Escena
 from Nodo import Nodo
 from Conexiones import Conexion, recta, bezier
 
-
 class EditorDeNodos(QWidget):
 	def __init__(self, parent=None):
 		super().__init__(parent)

@@ -27,6 +27,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 		self.setScene(self.escena)
 		
 		self.modo = MODO_NORMAL
+		self.eventoedicion = False
 		
 		self.FactorAcercamiento = 1.25
 		self.ZoomClamp = True
@@ -48,6 +49,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 		
 		self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+		self.setDragMode(QGraphicsView.RubberBandDrag)
 
 	def mousePressEvent(self, event):
 		if event.button() == Qt.MiddleButton:
@@ -88,7 +90,23 @@ class GraficosdelaVistaVP(QGraphicsView):
 		# Almacenamiento de la posición del último click izquierdo.
 		self.ultimo_clic = self.mapToScene(event.pos())
 		
+		if DEBUG:
+			if self.debug_modifiers(event) == "":
+				print('Click izquierdo presionando', objeto)
+			else:
+				print(self.debug_modifiers(event),'click izquierdo presionando', objeto)
+		
 		# Lógica.
+		if hasattr(objeto, "nodo") or isinstance(objeto, GraficosdeConexion) or objeto is None:
+			if event.modifiers() & Qt.ShiftModifier:
+				event.ignore()
+				evento_falso = QMouseEvent(QEvent.MouseButtonPress, event.localPos(), event.screenPos(),
+										   Qt.LeftButton, event.buttons() | Qt.LeftButton,
+										   event.modifiers() | Qt.ControlModifier)
+				super().mousePressEvent(evento_falso)
+				return
+			
+				
 		if type(objeto) is GraficosDeZocalos:
 			if self.modo == MODO_NORMAL:
 				self.modo = MODO_DIBUJO
@@ -106,6 +124,15 @@ class GraficosdelaVistaVP(QGraphicsView):
 		objeto = self.ConseguirObjetoAlCliquear(event)
 		
 		# Lógica.
+		if hasattr(objeto, "nodo") or isinstance(objeto, GraficosdeConexion) or objeto is None:
+			if event.modifiers() & Qt.ShiftModifier:
+				event.ignore()
+				evento_falso = QMouseEvent(event.type(), event.localPos(), event.screenPos(),
+										   Qt.LeftButton, Qt.NoButton,
+										   event.modifiers() | Qt.ControlModifier)
+				super().mouseReleaseEvent(evento_falso)
+				return
+			
 		if self.modo == MODO_DIBUJO:
 			if self.DistanciaEntreClicksEsCero(event):
 				res = self.FinalizarDibujadoConexion(objeto)
@@ -141,6 +168,32 @@ class GraficosdelaVistaVP(QGraphicsView):
 		
 		super().mouseMoveEvent(event)
 		
+		
+	def keyPressEvent(self, event):
+		if event.key() == Qt.Key_Delete:
+			if not self.eventoedicion:
+				self.eliminarSeleccionado()
+			else:
+				super().keyPressEvent(event)
+		else:
+			super().keyPressEvent(event)
+			
+			
+	def eliminarSeleccionado(self):
+		for objeto in self.escena.selectedItems():
+			if isinstance(objeto, GraficosdeConexion):
+				objeto.linea.quitar()
+			elif hasattr(objeto, "nodo"):
+				objeto.nodo.quitar()
+		
+		
+	def debug_modifiers(self, event):
+		out = ""
+		if event.modifiers() & Qt.ShiftModifier: out += "Shift"
+		if event.modifiers() & Qt.ControlModifier: out += "Ctrl"
+		if event.modifiers() & Qt.AltModifier: out += "Alt"
+		return out
+		
 	def ConseguirObjetoAlCliquear(self, event):
 		# Devuelve el objeto sobre el que se ha clicado.
 		posicion = event.pos()
@@ -160,19 +213,20 @@ class GraficosdelaVistaVP(QGraphicsView):
 		self.modo = MODO_NORMAL
 		
 		if type(objeto) is GraficosDeZocalos:
-			if DEBUG: print('Vista: FDibujadoConexion -  conexion anterior', self.conexion_anterior)
-			if objeto.zocalo.tieneconexiones():
-				objeto.zocalo.conexion.quitar()
-			if DEBUG: print('Vista: FDibujadoConexion -  Zócalo final asignado', objeto.zocalo)
-			if self.conexion_anterior is not None: self.conexion_anterior.quitar()
-			if DEBUG: print('Vista: FDibujadoConexion - Conexion anterior eliminada')
-			self.dibujarconexion.zocalo_origen = self.ultimo_zocalo_inicial
-			self.dibujarconexion.zocalo_final = objeto.zocalo
-			self.dibujarconexion.zocalo_origen.conexion_conectada(self.dibujarconexion)
-			self.dibujarconexion.zocalo_final.conexion_conectada(self.dibujarconexion)
-			if DEBUG: print('Vista: FDibujadoConexion -  Zócalo inicial y final reasignados')
-			self.dibujarconexion.posiciones_actualizadas()
-			return True
+			if objeto.zocalo != self.ultimo_zocalo_inicial:
+				if DEBUG: print('Vista: FDibujadoConexion -  conexion anterior', self.conexion_anterior)
+				if objeto.zocalo.tieneconexiones():
+					objeto.zocalo.conexion.quitar()
+				if DEBUG: print('Vista: FDibujadoConexion -  Zócalo final asignado', objeto.zocalo)
+				if self.conexion_anterior is not None: self.conexion_anterior.quitar()
+				if DEBUG: print('Vista: FDibujadoConexion - Conexion anterior eliminada')
+				self.dibujarconexion.zocalo_origen = self.ultimo_zocalo_inicial
+				self.dibujarconexion.zocalo_final = objeto.zocalo
+				self.dibujarconexion.zocalo_origen.conexion_conectada(self.dibujarconexion)
+				self.dibujarconexion.zocalo_final.conexion_conectada(self.dibujarconexion)
+				if DEBUG: print('Vista: FDibujadoConexion -  Zócalo inicial y final reasignados')
+				self.dibujarconexion.posiciones_actualizadas()
+				return True
 		
 		if DEBUG: print('Vista: FDibujadoConexion - Termina de dibujar la conexión.')
 		self.dibujarconexion.quitar()

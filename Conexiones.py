@@ -4,7 +4,7 @@ recta = 1
 bezier = 2
 
 DEBUG = False
-DEBUGZOCALOS = False
+DEBUGZOCALOS = DEBUG
 
 class Conexion:
 	def __init__(self, escena, zocalo_origen, zocalo_final, tipo_de_conexion=bezier):
@@ -21,8 +21,6 @@ class Conexion:
 		self.GraficosDeConexion = ConexionLRecta(self) if tipo_de_conexion == recta else ConexionLBezier(self)
 		
 		self.posiciones_actualizadas()
-		
-		if DEBUG: print("Conexión:", self.GraficosDeConexion.posicion_origen, "a", self.GraficosDeConexion.posicion_destino)
 		
 		self.escena.GraficosEsc.addItem(self.GraficosDeConexion)
 		self.escena.agregarconexion(self)
@@ -58,7 +56,15 @@ class Conexion:
 		self.zocalo_origen = None
 		
 	def quitar(self):
+		if DEBUG: print('@ Quitando la conexión', self)
+		if DEBUG: print('	Quitando conexiones de todos los zócalos.')
 		self.quitar_de_zocalos()
+		if DEBUG: print('	Quitando los gráficos de las conexiones.')
 		self.escena.GraficosEsc.removeItem(self.GraficosDeConexion)
 		self.GraficosDeConexion = None
-		self.escena.eliminarconexion(self)
+		if DEBUG: print('	Quitando conexiones de la escena.')
+		try:
+			self.escena.eliminarconexion(self)
+		except ValueError:
+			pass
+		if DEBUG: print('	Todo salió bien.')

@@ -3,12 +3,15 @@ from ContenidodelNodo import ContenidoDelNodo
 from Zocalos import *
 
 
+DEBUG = False
+
+
 class Nodo:
 	def __init__(self, escena, titulo="Nodo desconocido", entradas=[], salidas=[]):
 		self.escena = escena
 		self.titulo = titulo
 		
-		self.contenido = ContenidoDelNodo()
+		self.contenido = ContenidoDelNodo(self)
 		
 		self.Nodograficas = GraficosdelNodo(self)
 		
@@ -57,3 +60,17 @@ class Nodo:
 		for zocalo in self.entradas + self.salidas:
 			if zocalo.tieneconexiones():
 				zocalo.conexion.posiciones_actualizadas()
+				
+	def quitar(self):
+		if DEBUG: print('> Quitando el nodo', self)
+		if DEBUG: print('	Quitando todos las conexiones de los zócalos.')
+		for zocalo in (self.entradas + self.salidas):
+			if zocalo.tieneconexiones():
+				if DEBUG: print('		Quitando', zocalo.conexion, 'del', zocalo)
+				zocalo.conexion.quitar()
+		if DEBUG: print('	Quitando los gráficos del nodo.')
+		self.escena.GraficosEsc.removeItem(self.Nodograficas)
+		self.Nodograficas = None
+		if DEBUG: print('	Quitando el nodo de la escena.')
+		self.escena.eliminarnodo(self)
+		if DEBUG: print('	Todo salió bien.')

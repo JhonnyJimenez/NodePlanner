@@ -38,7 +38,12 @@ class GraficosdelNodo(QGraphicsItem):
 		
 	def mouseMoveEvent(self, evento):
 		super().mouseMoveEvent(evento)
-		self.nodo.actualizarconexiones()
+
+		# ¡Optimízame! ¡Solo actualizo los nodos seleccionados!
+		for nodo in self.escena().escena.Nodos:
+			if nodo.Nodograficas.isSelected():
+				nodo.actualizarconexiones()
+			
 	
 	@property
 	def nombre(self): return self.nombre
@@ -62,6 +67,7 @@ class GraficosdelNodo(QGraphicsItem):
 	
 	def titulo_del_nodo(self):
 		self.titulo_del_objeto = QGraphicsTextItem(self)
+		self.titulo_del_objeto.nodo = self.nodo
 		self.titulo_del_objeto.setDefaultTextColor(self._ColorDelTitulo)
 		self.titulo_del_objeto.setFont(self._FuenteDelTitulo)
 		self.titulo_del_objeto.setPos(self._sangria, 0)
