@@ -4,8 +4,9 @@ from PyQt5.QtCore import *
 
 
 class GraficosDeZocalos(QGraphicsItem):
-	def __init__(self, parent=None, tipo_zocalo=1):
-		super().__init__(parent)
+	def __init__(self, zocalo, tipo_zocalo=1):
+		self.zocalo = zocalo
+		super().__init__(zocalo.nodo.Nodograficas)
 		
 		#Usa números enteros, porque con decimales, el programa no funcionará (Y PyCharm no te dará ninguna pista de porqué falla.
 		self.radio = 6
@@ -39,3 +40,6 @@ class GraficosDeZocalos(QGraphicsItem):
 			2 * (self.radio + self.grosor_contorno),
 		)
 	
+	def mousePressEvent(self, QGraphicsSceneMouseEvent):
+		pass
+		# print('El zócalo ha sido presionado')

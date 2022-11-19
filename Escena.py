@@ -4,7 +4,7 @@ from GraficosdelaEscena_vp import GraficosdelaEscenaVP
 class Escena:
 	def __init__(self):
 		self.Nodos = []
-		self.Bordes = []
+		self.Conexiones = []
 		
 		self.Escena_Ancho = 64000
 		self.Escena_Alto = 64000
@@ -15,11 +15,11 @@ class Escena:
 	def agregarnodo(self, nodo):
 		self.Nodos.append(nodo)
 	
-	def agregarborde(self, borde):
-		self.Bordes.append(borde)
+	def agregarconexion(self, conexion):
+		self.Conexiones.append(conexion)
 	
 	def eliminarnodo(self, nodo):
 		self.Nodos.remove(nodo)
 	
-	def eliminarborde(self, borde):
-		self.Bordes.remove(borde)
+	def eliminarconexion(self, conexion):
+		self.Conexiones.remove(conexion)

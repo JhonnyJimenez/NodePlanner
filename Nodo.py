@@ -31,7 +31,10 @@ class Nodo:
 			zocalos = Zocalo(nodo=self, indice=contador, posicion=Derecha_arriba, tipo_zocalo=item)
 			contador += 1
 			self.salidas.append(zocalos)
-			
+	
+	def __str__(self):
+		return "<Nodo %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
+	
 	@property
 	def pos(self):
 		return self.Nodograficas.pos()		#QPoint

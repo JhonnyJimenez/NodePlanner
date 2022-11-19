@@ -25,7 +25,11 @@ class Conexion:
 		if DEBUG: print("Conexión:", self.GraficosDeConexion.posicion_origen, "a", self.GraficosDeConexion.posicion_destino)
 		
 		self.escena.GraficosEsc.addItem(self.GraficosDeConexion)
-		
+		self.escena.agregarconexion(self)
+	
+	def __str__(self):
+		return "<Conexion %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
+	
 	def posiciones_actualizadas(self):
 		posicion_base = self.zocalo_origen.posicion_zocalo()
 		posicion_base[0] += self.zocalo_origen.nodo.Nodograficas.pos().x()
@@ -36,6 +40,8 @@ class Conexion:
 			posicion_final[0] += self.zocalo_final.nodo.Nodograficas.pos().x()
 			posicion_final[1] += self.zocalo_final.nodo.Nodograficas.pos().y()
 			self.GraficosDeConexion.punto_destino(*posicion_final)
+		else:
+			self.GraficosDeConexion.punto_destino(*posicion_base)
 			
 		if DEBUGZOCALOS:
 			print(" Origen:", self.zocalo_origen)
@@ -55,4 +61,4 @@ class Conexion:
 		self.quitar_de_zocalos()
 		self.escena.GraficosEsc.removeItem(self.GraficosDeConexion)
 		self.GraficosDeConexion = None
-		self.escena.quitarconexion(self)
+		self.escena.eliminarconexion(self)

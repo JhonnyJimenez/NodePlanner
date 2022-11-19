@@ -20,12 +20,15 @@ class Zocalo:
 			self.debugnames(posicion)
 			print("Zócalo", self.indice, "ubicado", self.nposition, "del", self.nodo.titulo, self.nodo, )
 		
-		self.GraficosZocalos = GraficosDeZocalos(self.nodo.Nodograficas, self.tipo_zocalo)
+		self.GraficosZocalos = GraficosDeZocalos(self, self.tipo_zocalo)
 		
 		self.GraficosZocalos.setPos(*self.nodo.obtener_posicion_zocalo(indice, posicion))
 		
 		self.conexion = None
-		
+	
+	def __str__(self):
+		return "<Zócalo %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
+	
 	def posicion_zocalo(self):
 		if DEBUG: print("   GSP:", self.indice, self.posicion, "Nodo:", self.nodo)
 		res =  self.nodo.obtener_posicion_zocalo(self.indice, self.posicion)
