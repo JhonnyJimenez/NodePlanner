@@ -1,5 +1,5 @@
 # Vista gráfica (Ventana principal).
-from PyQt5.QtWidgets import QGraphicsView
+from PyQt5.QtWidgets import QGraphicsView, QApplication
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
@@ -7,10 +7,12 @@ from PyQt5.QtGui import *
 from GraficosDeZocalos import GraficosDeZocalos
 from GraficosdeConexion import GraficosdeConexion
 from Conexiones import Conexion, bezier
+from GraficosdeCortado import Recortado
 
 
 MODO_NORMAL = 1
 MODO_DIBUJO = 2
+MODO_CORTE = 3
 
 EDGE_DRAG_START_THRESHOLD = 10
 
@@ -34,6 +36,10 @@ class GraficosdelaVistaVP(QGraphicsView):
 		self.Zoom = 10
 		self.NiveldeZoom = 1
 		self.RangodeZoom = [0, 10]
+		
+		# outline
+		self.linea_de_recorte = Recortado()
+		self.escena.addItem(self.linea_de_recorte)
 		
 	def initui(self):
 		self.setRenderHints(
@@ -116,6 +122,15 @@ class GraficosdelaVistaVP(QGraphicsView):
 		if self.modo == MODO_DIBUJO:
 			res = self.FinalizarDibujadoConexion(objeto)
 			if res: return
+			
+		if objeto is None:
+			if event.modifiers() & Qt.ControlModifier:
+				self.modo = MODO_CORTE
+				evento_falso = QMouseEvent(QEvent.MouseButtonRelease, event.localPos(), event.screenPos(),
+										   Qt.LeftButton, Qt.NoButton, event.modifiers())
+				super().mouseReleaseEvent(evento_falso)
+				QApplication.setOverrideCursor(Qt.CrossCursor)
+				return
 		
 		super().mousePressEvent(event)
 	
@@ -137,6 +152,14 @@ class GraficosdelaVistaVP(QGraphicsView):
 			if self.DistanciaEntreClicksEsCero(event):
 				res = self.FinalizarDibujadoConexion(objeto)
 				if res: return
+				
+		if self.modo == MODO_CORTE:
+			self.ConexionesCortadas()
+			self.linea_de_recorte.linea_puntos = []
+			self.linea_de_recorte.update()
+			QApplication.setOverrideCursor(Qt.ArrowCursor)
+			self.modo = MODO_NORMAL
+			return
 		
 		super().mouseReleaseEvent(event)
 
@@ -165,6 +188,11 @@ class GraficosdelaVistaVP(QGraphicsView):
 			pos = self.mapToScene(event.pos())
 			self.dibujarconexion.GraficosDeConexion.punto_destino(pos.x(), pos.y())
 			self.dibujarconexion.GraficosDeConexion.update()
+			
+		if self.modo == MODO_CORTE:
+			pos = self.mapToScene(event.pos())
+			self.linea_de_recorte.linea_puntos.append(pos)
+			self.linea_de_recorte.update()
 		
 		super().mouseMoveEvent(event)
 		
@@ -177,7 +205,16 @@ class GraficosdelaVistaVP(QGraphicsView):
 				super().keyPressEvent(event)
 		else:
 			super().keyPressEvent(event)
-			
+
+
+	def ConexionesCortadas(self):
+		for ix in range(len(self.linea_de_recorte.linea_puntos) - 1):
+			p1 = self.linea_de_recorte.linea_puntos[ix]
+			p2 = self.linea_de_recorte.linea_puntos[ix + 1]
+		
+			for conexion in self.escena.escena.Conexiones:
+				if conexion.GraficosDeConexion.cruzadocon(p1, p2):
+					conexion.quitar()
 			
 	def eliminarSeleccionado(self):
 		for objeto in self.escena.selectedItems():

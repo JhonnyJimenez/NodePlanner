@@ -40,7 +40,7 @@ class GraficosdelNodo(QGraphicsItem):
 		super().mouseMoveEvent(evento)
 
 		# ¡Optimízame! ¡Solo actualizo los nodos seleccionados!
-		for nodo in self.escena().escena.Nodos:
+		for nodo in self.scene().escena.Nodos:
 			if nodo.Nodograficas.isSelected():
 				nodo.actualizarconexiones()
 			

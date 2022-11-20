@@ -39,7 +39,7 @@ class GraficosdeConexion(QGraphicsPathItem):
 		self.posicion_destino = [x, y]
 		
 	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
-		self.ruta_actualizada()
+		self.setPath(self.calculo_de_ruta())
 		
 		if self.linea.zocalo_final is None:
 			painter.setPen(self._pen_dibujo)
@@ -48,18 +48,24 @@ class GraficosdeConexion(QGraphicsPathItem):
 		painter.setBrush(Qt.NoBrush)
 		painter.drawPath(self.path())
 		
-	def ruta_actualizada(self):
+	def cruzadocon(self, p1, p2):
+		ruta_de_recorte = QPainterPath(p1)
+		ruta_de_recorte.lineTo(p2)
+		ruta = self.calculo_de_ruta()
+		return ruta_de_recorte.intersects(ruta)
+		
+	def calculo_de_ruta(self):
 		# Para controlar el dibujo de las conexiones entre nodos.
 		raise NotImplemented("Este metodo tiene que ser sobreescrito en las clases hijas")
 	
 class ConexionLRecta(GraficosdeConexion):
-	def ruta_actualizada(self):
+	def calculo_de_ruta(self):
 		ruta = QPainterPath(QPointF(self.posicion_origen[0], self.posicion_origen[1]))
 		ruta.lineTo(self.posicion_destino[0], self.posicion_destino[1])
-		self.setPath(ruta)
+		return ruta
 	
 class ConexionLBezier(GraficosdeConexion):
-	def ruta_actualizada(self):
+	def calculo_de_ruta(self):
 		o = self.posicion_origen
 		d = self.posicion_destino
 		dist = (d[0] - o[0]) * 0.5
@@ -88,5 +94,5 @@ class ConexionLBezier(GraficosdeConexion):
 		
 		ruta = QPainterPath(QPointF(self.posicion_origen[0], self.posicion_origen[1]))
 		ruta.cubicTo(o[0] + cpx_o, o[1] + cpy_o, d[0] + cpx_d, d[1] + cpy_d, self.posicion_destino[0], self.posicion_destino[1])
-		self.setPath(ruta)
+		return ruta
 	
