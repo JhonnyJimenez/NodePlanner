@@ -1,3 +1,5 @@
+from collections import OrderedDict
+from Seriabilizador import Serializable
 from GraficosdeConexion import *
 
 recta = 1
@@ -6,13 +8,14 @@ bezier = 2
 DEBUG = False
 DEBUGZOCALOS = DEBUG
 
-class Conexion:
+class Conexion(Serializable):
 	def __init__(self, escena, zocalo_origen, zocalo_final, tipo_de_conexion=bezier):
-		
+		super().__init__()
 		self.escena = escena
 		
 		self.zocalo_origen = zocalo_origen
 		self.zocalo_final = zocalo_final
+		self.tipo_de_conexion = tipo_de_conexion
 		
 		self.zocalo_origen.conexion = self
 		if self.zocalo_final is not None:
@@ -68,3 +71,14 @@ class Conexion:
 		except ValueError:
 			pass
 		if DEBUG: print('	Todo salió bien.')
+	
+	def serializacion(self):
+		return OrderedDict([
+			('id', self.id),
+			('Tipo_de_conexion', self.tipo_de_conexion),
+			('Zocalo_de_origen', self.zocalo_origen.id),
+			('Zocalo_de_destino', self.zocalo_final.id),
+		])
+	
+	def deserializacion(self, data, hashmap=[]):
+		return False

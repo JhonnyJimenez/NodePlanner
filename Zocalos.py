@@ -1,3 +1,5 @@
+from collections import OrderedDict
+from Seriabilizador import Serializable
 from GraficosDeZocalos import GraficosDeZocalos
 
 
@@ -8,8 +10,9 @@ Derecha_abajo = 4
 
 DEBUG = False
 
-class Zocalo:
+class Zocalo(Serializable):
 	def __init__(self, nodo, indice, posicion, tipo_zocalo=1):
+		super().__init__()
 		
 		self.nodo = nodo
 		self.indice = indice
@@ -53,3 +56,14 @@ class Zocalo:
 				
 	def tieneconexiones(self):
 		return self.conexion is not None
+	
+	def serializacion(self):
+		return OrderedDict([
+			('id', self.id),
+			('Indice', self.indice),
+			('Posicion', self.posicion),
+			('Tipo_de_zocalo', self.tipo_zocalo),
+		])
+	
+	def deserializacion(self, data, hashmap=[]):
+		return False

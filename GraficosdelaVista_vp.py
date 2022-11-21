@@ -203,6 +203,10 @@ class GraficosdelaVistaVP(QGraphicsView):
 				self.eliminarSeleccionado()
 			else:
 				super().keyPressEvent(event)
+		elif event.key() == Qt.Key_S and event.modifiers() & Qt.ControlModifier:
+			self.escena.escena.guardarArchivo("graph.json.txt")
+		elif event.key() == Qt.Key_L and event.modifiers() & Qt.ControlModifier:
+			self.escena.escena.abrirArchivo("graph.json.txt")
 		else:
 			super().keyPressEvent(event)
 

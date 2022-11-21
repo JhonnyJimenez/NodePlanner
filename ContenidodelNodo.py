@@ -1,7 +1,9 @@
+from collections import OrderedDict
+from Seriabilizador import Serializable
 from PyQt5.QtWidgets import *
 
 
-class ContenidoDelNodo(QWidget):
+class ContenidoDelNodo(QWidget, Serializable):
 	def __init__(self, nodo, parent=None):
 		self.nodo = nodo
 		super().__init__(parent)
@@ -19,6 +21,14 @@ class ContenidoDelNodo(QWidget):
 		
 	def ConfigEdicion(self, value):
 		self.nodo.escena.GraficosEsc.views()[0].eventoedicion = value
+		
+	def serializacion(self):
+		return OrderedDict([
+		
+		])
+	
+	def deserializacion(self, data, hashmap=[]):
+		return False
 		
 class EditordeTexto(QTextEdit):
 	def focusInEvent(self, event):

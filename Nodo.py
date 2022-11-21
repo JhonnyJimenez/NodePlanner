@@ -1,3 +1,5 @@
+from collections import OrderedDict
+from Seriabilizador import Serializable
 from GraficosdelNodo import GraficosdelNodo
 from ContenidodelNodo import ContenidoDelNodo
 from Zocalos import *
@@ -6,8 +8,9 @@ from Zocalos import *
 DEBUG = False
 
 
-class Nodo:
+class Nodo(Serializable):
 	def __init__(self, escena, titulo="Nodo desconocido", entradas=[], salidas=[]):
+		super().__init__()
 		self.escena = escena
 		self.titulo = titulo
 		
@@ -74,3 +77,20 @@ class Nodo:
 		if DEBUG: print('	Quitando el nodo de la escena.')
 		self.escena.eliminarnodo(self)
 		if DEBUG: print('	Todo salió bien.')
+	
+	def serializacion(self):
+		entradas, salidas = [], []
+		for Zocalo in self.entradas: entradas.append(Zocalo.serializacion())
+		for Zocalo in self.salidas: salidas.append(Zocalo.serializacion())
+		return OrderedDict([
+			('id', self.id),
+			('Titulo', self.titulo),
+			('Pos_x', self.Nodograficas.scenePos().x()),
+			('Pos_y', self.Nodograficas.scenePos().y()),
+			('Entradas', entradas),
+			('Salidas', salidas),
+			('Contenido', self.contenido.serializacion()),
+		])
+	
+	def deserializacion(self, data, hashmap=[]):
+		return False
