@@ -46,7 +46,7 @@ class GraficosdelNodo(QGraphicsItem):
 			
 	
 	@property
-	def nombre(self): return self.nombre
+	def nombre(self): return self._titulo
 	
 	@nombre.setter
 	def nombre(self, valor):

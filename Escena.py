@@ -2,6 +2,8 @@ import json
 from collections import OrderedDict
 from Seriabilizador import Serializable
 from GraficosdelaEscena_vp import GraficosdelaEscenaVP
+from Nodo import Nodo
+from Conexiones import Conexion
 
 
 class Escena(Serializable):
@@ -27,6 +29,10 @@ class Escena(Serializable):
 	
 	def eliminarconexion(self, conexion):
 		self.Conexiones.remove(conexion)
+		
+	def limpiarEscena(self):
+		while len(self.Nodos) > 0:
+			self.Nodos[0].quitar()
 	
 	def guardarArchivo(self, archivo):
 		with open(archivo, "w") as file:
@@ -36,7 +42,10 @@ class Escena(Serializable):
 	def abrirArchivo(self, archivo):
 		with open(archivo, "r") as file:
 			raw_data = file.read()
-			data = json.loads(raw_data, encodings='utf-8')
+			data = json.loads(raw_data)
+			# En el tutorial en la linea 45 añade un «enconding='utf-8'», pero al añadirla yo,
+			# el parametro encoding no aparece, y ejecutar este codigo al presionar las respectivas
+			# teclas da error. Decidí eliminarlo y dejar esta nota por si surge algún error luego por esto.
 			self.deserializacion(data)
 	
 	
@@ -52,6 +61,18 @@ class Escena(Serializable):
 			('Conexiones', conexiones),
 		])
 	
-	def deserializacion(self, data, hashmap=[]):
+	def deserializacion(self, data, hashmap={}):
 		print("Deserializando datos de", data)
-		return False
+		
+		self.limpiarEscena()
+		hashmap = {}
+		
+		# Creación de nodos.
+		for nodo_data in data['Nodos']:
+			Nodo(self).deserializacion(nodo_data, hashmap)
+		
+		# Creación de conexiones.
+		for datos_conexion in data['Conexiones']:
+			Conexion(self).deserializacion(datos_conexion, hashmap)
+		
+		return True

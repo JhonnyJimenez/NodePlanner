@@ -5,6 +5,6 @@ class Serializable():
 	def serializacion(self):
 		raise NotImplemented()
 	
-	def deserializacion(self, data, hashmap=[]):
+	def deserializacion(self, data, hashmap={}):
 		raise NotImplemented()
 	

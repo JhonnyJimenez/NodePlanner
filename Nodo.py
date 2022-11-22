@@ -11,12 +11,12 @@ DEBUG = False
 class Nodo(Serializable):
 	def __init__(self, escena, titulo="Nodo desconocido", entradas=[], salidas=[]):
 		super().__init__()
+		self._titulo = titulo
 		self.escena = escena
-		self.titulo = titulo
 		
 		self.contenido = ContenidoDelNodo(self)
-		
 		self.Nodograficas = GraficosdelNodo(self)
+		self.titulo = titulo
 		
 		self.escena.agregarnodo(self)
 		self.escena.GraficosEsc.addItem(self.Nodograficas)
@@ -44,8 +44,18 @@ class Nodo(Serializable):
 	@property
 	def pos(self):
 		return self.Nodograficas.pos()		#QPoint
+	
 	def definirposicion(self, x, y):
 		self.Nodograficas.setPos(x, y)
+	
+	@property
+	def titulo(self):
+		return self._titulo
+
+	@titulo.setter
+	def titulo(self, valor):
+		self._titulo = valor
+		self.Nodograficas.nombre = self._titulo
 			
 	def obtener_posicion_zocalo(self, indice, posicion):
 		x = 0 if (posicion in (Izquierda_arriba, Izquierda_abajo)) else self.Nodograficas.anchoNodo
@@ -92,5 +102,28 @@ class Nodo(Serializable):
 			('Contenido', self.contenido.serializacion()),
 		])
 	
-	def deserializacion(self, data, hashmap=[]):
-		return False
+	def deserializacion(self, data, hashmap={}):
+		self.id = data['id']
+		hashmap[data['id']] = self
+		
+		self.definirposicion(data['Pos_x'], data['Pos_y'])
+		self.titulo =  data['Titulo']
+		
+		data['Entradas'].sort(key=lambda Zocalo: Zocalo['Indice'] + Zocalo['Posicion'] * 10000 )
+		data['Salidas'].sort(key=lambda Zocalo: Zocalo['Indice'] + Zocalo['Posicion'] * 10000 )
+		
+		self.entradas = []
+		for Zocalo_data in data['Entradas']:
+			nuevo_zocalo = Zocalo(nodo=self, indice=Zocalo_data['Indice'], posicion=Zocalo_data['Posicion'],
+								  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'])
+			nuevo_zocalo.deserializacion(Zocalo_data, hashmap)
+			self.entradas.append(nuevo_zocalo)
+		
+		self.salidas = []
+		for Zocalo_data in data['Salidas']:
+			nuevo_zocalo = Zocalo(nodo=self, indice=Zocalo_data['Indice'], posicion=Zocalo_data['Posicion'],
+								  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'])
+			nuevo_zocalo.deserializacion(Zocalo_data, hashmap)
+			self.salidas.append(nuevo_zocalo)
+			
+		return True
