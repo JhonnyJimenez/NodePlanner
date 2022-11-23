@@ -9,7 +9,6 @@ from GraficosdeConexion import GraficosdeConexion
 from Conexiones import Conexion, bezier
 from GraficosdeCortado import Recortado
 
-
 MODO_NORMAL = 1
 MODO_DIBUJO = 2
 MODO_CORTE = 3
@@ -96,11 +95,11 @@ class GraficosdelaVistaVP(QGraphicsView):
 		# Almacenamiento de la posición del último click izquierdo.
 		self.ultimo_clic = self.mapToScene(event.pos())
 		
-		if DEBUG:
-			if self.debug_modifiers(event) == "":
-				print('Click izquierdo presionando', objeto)
-			else:
-				print(self.debug_modifiers(event),'click izquierdo presionando', objeto)
+		#if DEBUG:
+		#	if self.debug_modifiers(event) == "":
+		#		print('Click izquierdo presionando', objeto)
+		#	else:
+		#		print(self.debug_modifiers(event),'click izquierdo presionando', objeto)
 		
 		# Lógica.
 		if hasattr(objeto, "nodo") or isinstance(objeto, GraficosdeConexion) or objeto is None:
@@ -207,6 +206,20 @@ class GraficosdelaVistaVP(QGraphicsView):
 			self.escena.escena.guardarArchivo("graph.json.txt")
 		elif event.key() == Qt.Key_A and event.modifiers() & Qt.ControlModifier:
 			self.escena.escena.abrirArchivo("graph.json.txt")
+		elif event.key() == Qt.Key_1:
+			self.escena.escena.historial.almacenarHistorial("Item A")
+		elif event.key() == Qt.Key_2:
+			self.escena.escena.historial.almacenarHistorial("Item B")
+		elif event.key() == Qt.Key_3:
+			self.escena.escena.historial.almacenarHistorial("Item C")
+		elif event.key() == Qt.Key_4:
+			self.escena.escena.historial.deshacer()
+		elif event.key() == Qt.Key_5:
+			self.escena.escena.historial.rehacer()
+		elif event.key() == Qt.Key_H:
+			print("Historial:    len(%d)" % len(self.escena.escena.historial.listado_historial),
+				  "    -- posicion actual", self.escena.escena.historial.pos_act_historial)
+			print(self.escena.escena.historial.listado_historial)
 		else:
 			super().keyPressEvent(event)
 
