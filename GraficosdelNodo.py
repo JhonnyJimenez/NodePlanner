@@ -35,6 +35,7 @@ class GraficosdelNodo(QGraphicsItem):
 		self.initContenido()
 		
 		self.initui()
+		self.elemento_movido = False
 		
 	def mouseMoveEvent(self, evento):
 		super().mouseMoveEvent(evento)
@@ -43,6 +44,14 @@ class GraficosdelNodo(QGraphicsItem):
 		for nodo in self.scene().escena.Nodos:
 			if nodo.Nodograficas.isSelected():
 				nodo.actualizarconexiones()
+		self.elemento_movido = True
+		
+	def mouseReleaseEvent(self, evento):
+		super().mouseReleaseEvent(evento)
+		
+		if self.elemento_movido:
+			self.elemento_movido = False
+			self.nodo.escena.historial.almacenarHistorial("Nodo movido")
 			
 	
 	@property

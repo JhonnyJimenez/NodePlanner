@@ -9,7 +9,6 @@ from GraficosdeConexion import GraficosdeConexion
 from Conexiones import Conexion, bezier
 from GraficosdeCortado import Recortado
 
-
 MODO_NORMAL = 1
 MODO_DIBUJO = 2
 MODO_CORTE = 3
@@ -96,11 +95,11 @@ class GraficosdelaVistaVP(QGraphicsView):
 		# Almacenamiento de la posición del último click izquierdo.
 		self.ultimo_clic = self.mapToScene(event.pos())
 		
-		if DEBUG:
-			if self.debug_modifiers(event) == "":
-				print('Click izquierdo presionando', objeto)
-			else:
-				print(self.debug_modifiers(event),'click izquierdo presionando', objeto)
+		#if DEBUG:
+		#	if self.debug_modifiers(event) == "":
+		#		print('Click izquierdo presionando', objeto)
+		#	else:
+		#		print(self.debug_modifiers(event),'click izquierdo presionando', objeto)
 		
 		# Lógica.
 		if hasattr(objeto, "nodo") or isinstance(objeto, GraficosdeConexion) or objeto is None:
@@ -161,6 +160,9 @@ class GraficosdelaVistaVP(QGraphicsView):
 			self.modo = MODO_NORMAL
 			return
 		
+		if self.dragMode() == QGraphicsView.RubberBandDrag:
+			self.escena.escena.historial.almacenarHistorial("Selection changed")
+		
 		super().mouseReleaseEvent(event)
 
 	def rightMouseButtonPress(self, event):
@@ -207,6 +209,23 @@ class GraficosdelaVistaVP(QGraphicsView):
 			self.escena.escena.guardarArchivo("graph.json.txt")
 		elif event.key() == Qt.Key_A and event.modifiers() & Qt.ControlModifier:
 			self.escena.escena.abrirArchivo("graph.json.txt")
+		elif event.key() == Qt.Key_1:
+			self.escena.escena.historial.almacenarHistorial("Item A")
+		# elif event.key() == Qt.Key_2:
+		#	self.escena.escena.historial.almacenarHistorial("Item B")
+		#elif event.key() == Qt.Key_3:
+		#	self.escena.escena.historial.almacenarHistorial("Item C")
+		elif event.key() == Qt.Key_Z and event.modifiers() & Qt.ControlModifier and not event.modifiers() & Qt.ShiftModifier:
+			self.escena.escena.historial.deshacer()
+		elif event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier and not event.modifiers() & Qt.ShiftModifier:
+			self.escena.escena.historial.rehacer()
+		elif event.key() == Qt.Key_H:
+			print("Historial:    len(%d)" % len(self.escena.escena.historial.listado_historial),
+				  "    -- posicion actual", self.escena.escena.historial.pos_act_historial)
+			ix = 0
+			for objeto in self.escena.escena.historial.listado_historial:
+				print("#", ix, "--", objeto['desc'])
+				ix += 1
 		else:
 			super().keyPressEvent(event)
 
@@ -219,6 +238,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 			for conexion in self.escena.escena.Conexiones:
 				if conexion.GraficosDeConexion.cruzadocon(p1, p2):
 					conexion.quitar()
+		self.escena.escena.historial.almacenarHistorial("Conexión cortada borrada")
 			
 	def eliminarSeleccionado(self):
 		for objeto in self.escena.selectedItems():
@@ -226,7 +246,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 				objeto.linea.quitar()
 			elif hasattr(objeto, "nodo"):
 				objeto.nodo.quitar()
-		
+		self.escena.escena.historial.almacenarHistorial("Objeto seleccionado borrado")
 		
 	def debug_modifiers(self, event):
 		out = ""
@@ -267,6 +287,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 				self.dibujarconexion.zocalo_final.conexion_conectada(self.dibujarconexion)
 				if DEBUG: print('Vista: FDibujadoConexion -  Zócalo inicial y final reasignados')
 				self.dibujarconexion.posiciones_actualizadas()
+				self.escena.escena.historial.almacenarHistorial("Conexion creada mediante dibujado")
 				return True
 		
 		if DEBUG: print('Vista: FDibujadoConexion - Termina de dibujar la conexión.')

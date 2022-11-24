@@ -4,6 +4,7 @@ from Seriabilizador import Serializable
 from GraficosdelaEscena_vp import GraficosdelaEscenaVP
 from Nodo import Nodo
 from Conexiones import Conexion
+from Historial_escena import HistorialEscena
 
 
 class Escena(Serializable):
@@ -17,6 +18,8 @@ class Escena(Serializable):
 		
 		self.GraficosEsc = GraficosdelaEscenaVP(self)
 		self.GraficosEsc.config_esc(self.Escena_Ancho, self.Escena_Alto)
+		
+		self.historial = HistorialEscena(self)
 	
 	def agregarnodo(self, nodo):
 		self.Nodos.append(nodo)

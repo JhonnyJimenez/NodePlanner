@@ -25,7 +25,7 @@ class GraficosdelaEscenaVP(QGraphicsScene):
 		self._LapizOscuro.setWidth(2)
 		
 		self.setBackgroundBrush(self._ColordeFondo)
-
+		
 	def config_esc(self, width, height):
 		self.setSceneRect(-width // 2, -height // 2, width, height)
 
