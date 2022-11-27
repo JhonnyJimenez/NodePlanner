@@ -19,6 +19,8 @@ DEBUG = True
 
 
 class GraficosdelaVistaVP(QGraphicsView):
+	cambioPosEscena = pyqtSignal(int, int)
+	
 	def __init__(self, escena, parent=None):
 		super().__init__(parent)
 		self.escena = escena
@@ -196,6 +198,12 @@ class GraficosdelaVistaVP(QGraphicsView):
 			self.linea_de_recorte.linea_puntos.append(pos)
 			self.linea_de_recorte.update()
 		
+		self.ultima_posicion_mouse_escena = self.mapToScene(event.pos())
+		
+		self.cambioPosEscena.emit(
+			int(self.ultima_posicion_mouse_escena.x()), int(self.ultima_posicion_mouse_escena.y()),
+		)
+		
 		super().mouseMoveEvent(event)
 		
 		
@@ -205,29 +213,25 @@ class GraficosdelaVistaVP(QGraphicsView):
 				self.eliminarSeleccionado()
 			else:
 				super().keyPressEvent(event)
-		elif event.key() == Qt.Key_S and event.modifiers() & Qt.ControlModifier:
-			self.escena.escena.guardarArchivo("graph.json.txt")
-		elif event.key() == Qt.Key_A and event.modifiers() & Qt.ControlModifier:
-			self.escena.escena.abrirArchivo("graph.json.txt")
-		elif event.key() == Qt.Key_1:
-			self.escena.escena.historial.almacenarHistorial("Item A")
-		# elif event.key() == Qt.Key_2:
-		#	self.escena.escena.historial.almacenarHistorial("Item B")
-		#elif event.key() == Qt.Key_3:
-		#	self.escena.escena.historial.almacenarHistorial("Item C")
-		elif event.key() == Qt.Key_Z and event.modifiers() & Qt.ControlModifier and not event.modifiers() & Qt.ShiftModifier:
-			self.escena.escena.historial.deshacer()
-		elif event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier and not event.modifiers() & Qt.ShiftModifier:
-			self.escena.escena.historial.rehacer()
-		elif event.key() == Qt.Key_H:
-			print("Historial:    len(%d)" % len(self.escena.escena.historial.listado_historial),
-				  "    -- posicion actual", self.escena.escena.historial.pos_act_historial)
-			ix = 0
-			for objeto in self.escena.escena.historial.listado_historial:
-				print("#", ix, "--", objeto['desc'])
-				ix += 1
-		else:
-			super().keyPressEvent(event)
+		# elif event.key() == Qt.Key_S and event.modifiers() & Qt.ControlModifier:
+		#	self.escena.escena.guardarArchivo("graph.json.txt")
+		# elif event.key() == Qt.Key_A and event.modifiers() & Qt.ControlModifier:
+		#	self.escena.escena.abrirArchivo("graph.json.txt")
+		# elif event.key() == Qt.Key_1:
+		#	self.escena.escena.historial.almacenarHistorial("Item A")
+		# elif event.key() == Qt.Key_Z and event.modifiers() & Qt.ControlModifier and not event.modifiers() & Qt.ShiftModifier:
+		#	self.escena.escena.historial.deshacer()
+		# elif event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier and not event.modifiers() & Qt.ShiftModifier:
+		#	self.escena.escena.historial.rehacer()
+		#elif event.key() == Qt.Key_H:
+		#	print("Historial:    len(%d)" % len(self.escena.escena.historial.listado_historial),
+		#		  "    -- posicion actual", self.escena.escena.historial.pos_act_historial)
+		#	ix = 0
+		#	for objeto in self.escena.escena.historial.listado_historial:
+		#		print("#", ix, "--", objeto['desc'])
+		#		ix += 1
+		#else:
+		super().keyPressEvent(event)
 
 
 	def ConexionesCortadas(self):

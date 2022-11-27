@@ -65,8 +65,6 @@ class Escena(Serializable):
 		])
 	
 	def deserializacion(self, data, hashmap={}):
-		print("Deserializando datos de", data)
-		
 		self.limpiarEscena()
 		hashmap = {}
 		

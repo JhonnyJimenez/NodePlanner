@@ -13,9 +13,6 @@ class EditorDeNodos(QWidget):
 		self.stylesheet_filename = 'EstiloNodo.qss'
 		self.loadStylesheet(self.stylesheet_filename)
 		
-		# Tamaño de la ventana
-		self.setGeometry(100, 100, 800, 600)
-		
 		# Administrador de espacio en pantalla
 		self.AdminDeEspEnPan = QVBoxLayout()
 		self.AdminDeEspEnPan.setContentsMargins(0, 0, 0, 0)
@@ -28,9 +25,7 @@ class EditorDeNodos(QWidget):
 		self.AdminDeEspEnPan.addWidget(self.Vista)
 		
 		self.agregadodenodos()
-		
-		self.setWindowTitle("NodePlanner - Versión alpha")
-		self.show()
+
 
 	def loadStylesheet(self, filename):
 		print('Style loading:', filename)

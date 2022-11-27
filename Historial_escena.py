@@ -1,7 +1,7 @@
 from GraficosdeConexion import GraficosdeConexion
 
 
-DEBUG = True
+DEBUG = False
 
 
 class HistorialEscena:
