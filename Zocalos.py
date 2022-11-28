@@ -65,7 +65,7 @@ class Zocalo(Serializable):
 			('Tipo_de_zocalo', self.tipo_zocalo),
 		])
 	
-	def deserializacion(self, data, hashmap={}):
-		self.id = data['id']
+	def deserializacion(self, data, hashmap={}, restaure_id=True):
+		if restaure_id: self.id = data['id']
 		hashmap[data['id']] = self
 		return True

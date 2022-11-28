@@ -5,6 +5,7 @@ from GraficosdelaEscena_vp import GraficosdelaEscenaVP
 from Nodo import Nodo
 from Conexiones import Conexion
 from Historial_escena import HistorialEscena
+from Portapapeles import PortapapelesEscena
 
 
 class Escena(Serializable):
@@ -20,6 +21,7 @@ class Escena(Serializable):
 		self.GraficosEsc.config_esc(self.Escena_Ancho, self.Escena_Alto)
 		
 		self.historial = HistorialEscena(self)
+		self.portapapeles = PortapapelesEscena(self)
 	
 	def agregarnodo(self, nodo):
 		self.Nodos.append(nodo)
@@ -64,16 +66,18 @@ class Escena(Serializable):
 			('Conexiones', conexiones),
 		])
 	
-	def deserializacion(self, data, hashmap={}):
+	def deserializacion(self, data, hashmap={}, restaure_id=True):
 		self.limpiarEscena()
 		hashmap = {}
 		
+		if restaure_id: self.id = data['id']
+		
 		# Creación de nodos.
 		for nodo_data in data['Nodos']:
-			Nodo(self).deserializacion(nodo_data, hashmap)
+			Nodo(self).deserializacion(nodo_data, hashmap, restaure_id)
 		
 		# Creación de conexiones.
 		for datos_conexion in data['Conexiones']:
-			Conexion(self).deserializacion(datos_conexion, hashmap)
+			Conexion(self).deserializacion(datos_conexion, hashmap, restaure_id)
 		
 		return True

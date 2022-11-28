@@ -110,8 +110,8 @@ class Conexion(Serializable):
 			('Zocalo_de_destino', self.zocalo_final.id),
 		])
 	
-	def deserializacion(self, data, hashmap={}):
-		self.id = data['id']
+	def deserializacion(self, data, hashmap={}, restaure_id=True):
+		if restaure_id: self.id = data['id']
 		self.zocalo_origen = hashmap[data['Zocalo_de_origen']]
 		self.zocalo_final = hashmap[data['Zocalo_de_destino']]
 		self.tipo_de_conexion = data['Tipo_de_conexion']

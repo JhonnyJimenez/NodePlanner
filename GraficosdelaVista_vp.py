@@ -88,7 +88,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 	def middleMouseButtonRelease(self, event):
 		click_falso = QMouseEvent(event.type(), event.localPos(), event.screenPos(), Qt.LeftButton, event.buttons() | Qt.LeftButton, event.modifiers())
 		super().mouseReleaseEvent(click_falso)
-		self.setDragMode(QGraphicsView.NoDrag)
+		self.setDragMode(QGraphicsView.RubberBandDrag)
 
 	def leftMouseButtonPress(self, event):
 		# Obtener el objeto donde se cliqueó.

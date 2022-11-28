@@ -1,4 +1,5 @@
 import os
+import json
 from PyQt5.QtWidgets import *
 from Editor_de_nodos_Widget import EditorDeNodos
 
@@ -9,6 +10,12 @@ class Ventana(QMainWindow):
 		self.initUI()
 		
 		self.filename = None
+		
+#		QApplication.instance().clipboard().dataChanged.connect(self.onClipboardChange)
+
+#	def onClipboardChange(self):
+#		clip = QApplication.instance().clipboard()
+#		print("Clipboard changed:", clip.text())
 		
 	def crearact(self, nombre, atajo, ayuda, metodo):
 		act = QAction(nombre, self)
@@ -36,10 +43,11 @@ class Ventana(QMainWindow):
 		menu_edicion.addAction(self.crearact('&Deshacer', 'Ctrl+Z', 'Deshace la última acción.', self.DeshacerMEditar))
 		menu_edicion.addAction(self.crearact('&Rehacer', 'Ctrl+Y', 'Rehace la última acción.', self.RehacerMEditar))
 		menu_edicion.addSeparator()
+		menu_edicion.addAction(self.crearact('&Cortar', 'Ctrl+X', 'Corta elementos seleccionados.', self.CortarMEditar))
+		menu_edicion.addAction(self.crearact('Cop&iar', 'Ctrl+C', 'Copia elementos seleccionados.', self.CopiarMEditar))
+		menu_edicion.addAction(self.crearact('&Pegar', 'Ctrl+V', 'Pega el último elemento del portapapeles', self.PegarMEditar))
+		menu_edicion.addSeparator()
 		menu_edicion.addAction(self.crearact('&Eliminar', 'Del', 'Elimina los elementos seleccionados.', self.EliminarMEditar))
-	#	menu_edicion.addAction(self.crearact('&Cortar', 'Ctrl+X', 'Corta elementos seleccionados.', self.NuevoArchivo))
-	#	menu_edicion.addAction(self.crearact('Cop&iar', 'Ctrl+C', 'Copia elementos seleccionados.', self.NuevoArchivo))
-	#	menu_edicion.addAction(self.crearact('&Pegar', 'Ctrl+P', 'Pega el último elemento del portapapeles', self.NuevoArchivo))
 		
 		Editor_de_nodos = EditorDeNodos(self)
 		self.setCentralWidget(Editor_de_nodos)
@@ -89,6 +97,29 @@ class Ventana(QMainWindow):
 	def EliminarMEditar(self):
 		self.centralWidget().escena.GraficosEsc.views()[0].eliminarSeleccionado()
 	
-	def random2(self):
-		print('Menú Guardar como presionado')
+	def CortarMEditar(self):
+		data = self.centralWidget().escena.portapapeles.serializacionSeleccionado(delete=True)
+		str_data = json.dumps(data, indent=4)
+		QApplication.instance().clipboard().setText(str_data)
 
+	def CopiarMEditar(self):
+		data = self.centralWidget().escena.portapapeles.serializacionSeleccionado(delete=False)
+		str_data = json.dumps(data, indent=4)
+		QApplication.instance().clipboard().setText(str_data)
+		
+	def PegarMEditar(self):
+		raw_data = QApplication.instance().clipboard().text()
+		
+		try:
+			data = json.loads(raw_data)
+		except ValueError as e:
+			print("¡Pegaste datos og inválidos!", e)
+			return
+
+		# Verificar si los datos json son correctos.
+		if "Nodos" not in data:
+			print("¡Los datos no contienen ningún nodo!")
+			return
+		
+		self.centralWidget().escena.portapapeles.deserializacionDesdePortapapeles(data)
+		
