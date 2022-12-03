@@ -51,7 +51,7 @@ class GraficosdelNodo(QGraphicsItem):
 		
 		if self.elemento_movido:
 			self.elemento_movido = False
-			self.nodo.escena.historial.almacenarHistorial("Nodo movido")
+			self.nodo.escena.historial.almacenarHistorial("Nodo movido", setModified=True)
 			
 	
 	@property

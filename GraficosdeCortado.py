@@ -16,7 +16,20 @@ class Recortado(QGraphicsItem):
 		self.setZValue(2)
 	
 	def boundingRect(self):
-		return QRectF(0, 0, 1, 1)
+		return self.shape().boundingRect()
+	
+	def shape(self):
+		poligono = QPolygonF(self.linea_puntos)
+		
+		if len(self.linea_puntos) > 1:
+			ruta = QPainterPath(self.linea_puntos[0])
+			for pt in self.linea_puntos[1:]:
+				ruta.lineTo(pt)
+		else:
+			ruta = QPainterPath(QPointF(0, 0))
+			ruta.lineTo(QPointF(1, 1))
+		
+		return ruta
 	
 	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
 		painter.setRenderHint(QPainter.Antialiasing)

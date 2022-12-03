@@ -31,6 +31,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 		
 		self.modo = MODO_NORMAL
 		self.eventoedicion = False
+		self.rubberBandDraggingRectangle = False
 		
 		self.FactorAcercamiento = 1.25
 		self.ZoomClamp = True
@@ -132,6 +133,8 @@ class GraficosdelaVistaVP(QGraphicsView):
 				super().mouseReleaseEvent(evento_falso)
 				QApplication.setOverrideCursor(Qt.CrossCursor)
 				return
+			else:
+				self.rubberBandDraggingRectangle = True
 		
 		super().mousePressEvent(event)
 	
@@ -162,8 +165,10 @@ class GraficosdelaVistaVP(QGraphicsView):
 			self.modo = MODO_NORMAL
 			return
 		
-		if self.dragMode() == QGraphicsView.RubberBandDrag:
+		# if self.dragMode() == QGraphicsView.RubberBandDrag:
+		if self.rubberBandDraggingRectangle:
 			self.escena.escena.historial.almacenarHistorial("Selection changed")
+			self.rubberBandDraggingRectangle = False
 		
 		super().mouseReleaseEvent(event)
 
@@ -242,7 +247,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 			for conexion in self.escena.escena.Conexiones:
 				if conexion.GraficosDeConexion.cruzadocon(p1, p2):
 					conexion.quitar()
-		self.escena.escena.historial.almacenarHistorial("Conexión cortada borrada")
+		self.escena.escena.historial.almacenarHistorial("Conexión cortada borrada", setModified=True)
 			
 	def eliminarSeleccionado(self):
 		for objeto in self.escena.selectedItems():
@@ -250,7 +255,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 				objeto.linea.quitar()
 			elif hasattr(objeto, "nodo"):
 				objeto.nodo.quitar()
-		self.escena.escena.historial.almacenarHistorial("Objeto seleccionado borrado")
+		self.escena.escena.historial.almacenarHistorial("Objeto seleccionado borrado", setModified=True)
 		
 	def debug_modifiers(self, event):
 		out = ""
@@ -291,7 +296,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 				self.dibujarconexion.zocalo_final.conexion_conectada(self.dibujarconexion)
 				if DEBUG: print('Vista: FDibujadoConexion -  Zócalo inicial y final reasignados')
 				self.dibujarconexion.posiciones_actualizadas()
-				self.escena.escena.historial.almacenarHistorial("Conexion creada mediante dibujado")
+				self.escena.escena.historial.almacenarHistorial("Conexion creada mediante dibujado", setModified=True)
 				return True
 		
 		if DEBUG: print('Vista: FDibujadoConexion - Termina de dibujar la conexión.')

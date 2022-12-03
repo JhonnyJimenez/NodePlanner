@@ -58,7 +58,7 @@ class PortapapelesEscena:
 		if delete:
 			self.escena.GraficosEsc.views()[0].eliminarSeleccionado()
 			# Guardado en el historial.
-			self.escena.historial.almacenarHistorial("Elementos cortados de la escena")
+			self.escena.historial.almacenarHistorial("Elementos cortados de la escena", setModified=True)
 		
 		return data
 	
@@ -103,5 +103,5 @@ class PortapapelesEscena:
 				nueva_conexion.deserializacion(data_conexion, hashmap, restaure_id=False)
 		
 		# Guardar historial.
-		self.escena.historial.almacenarHistorial("Elementos pegados del portapapeles.")
+		self.escena.historial.almacenarHistorial("Elementos pegados del portapapeles.", setModified=True)
 		

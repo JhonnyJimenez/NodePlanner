@@ -17,11 +17,32 @@ class Escena(Serializable):
 		self.Escena_Ancho = 64000
 		self.Escena_Alto = 64000
 		
+		self._elementos_modificados = False
+		self._elementos_modificados_listeners = []
+		
 		self.GraficosEsc = GraficosdelaEscenaVP(self)
 		self.GraficosEsc.config_esc(self.Escena_Ancho, self.Escena_Alto)
 		
 		self.historial = HistorialEscena(self)
 		self.portapapeles = PortapapelesEscena(self)
+		
+	@property
+	def elementos_modificados(self):
+		return self._elementos_modificados
+	
+	@elementos_modificados.setter
+	def elementos_modificados(self, value):
+		if not self._elementos_modificados and value:
+			self._elementos_modificados = value
+			
+			# llamar a todos los listeners
+			for callback in self._elementos_modificados_listeners:
+				callback()
+		
+		self._elementos_modificados = value
+		
+	def addelementosmodificadoslistener(self, callback):
+		self._elementos_modificados_listeners.append(callback)
 	
 	def agregarnodo(self, nodo):
 		self.Nodos.append(nodo)
@@ -38,11 +59,15 @@ class Escena(Serializable):
 	def limpiarEscena(self):
 		while len(self.Nodos) > 0:
 			self.Nodos[0].quitar()
+			
+		self.elementos_modificados = False
 	
 	def guardarArchivo(self, archivo):
 		with open(archivo, "w") as file:
 			file.write( json.dumps( self.serializacion(), indent=4 ) )
-		print("Guardado exitosamente en", archivo)
+			print("Guardado exitosamente en", archivo)
+			
+			self.elementos_modificados = False
 			
 	def abrirArchivo(self, archivo):
 		with open(archivo, "r") as file:
@@ -52,6 +77,8 @@ class Escena(Serializable):
 			# el parametro encoding no aparece, y ejecutar este codigo al presionar las respectivas
 			# teclas da error. Decidí eliminarlo y dejar esta nota por si surge algún error luego por esto.
 			self.deserializacion(data)
+			
+			self.elementos_modificados = False
 	
 	
 	def serializacion(self):

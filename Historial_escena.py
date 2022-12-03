@@ -33,7 +33,10 @@ class HistorialEscena:
 		self.MarcaRestaurarHistorial(self.listado_historial[self.pos_act_historial])
 
 
-	def almacenarHistorial(self, desc):
+	def almacenarHistorial(self, desc, setModified=False):
+		if setModified:
+			self.escena.elementos_modificados = True
+		
 		if DEBUG: print("Almacenando historial", '"%s"' % desc,
 						".... posición actual: @%d" % self.pos_act_historial,
 						"(%d)" % len(self.listado_historial))

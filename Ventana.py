@@ -2,14 +2,16 @@ import os
 import json
 from PyQt5.QtWidgets import *
 from Editor_de_nodos_Widget import EditorDeNodos
+from Botones import CuadroDialogo
+
 
 class Ventana(QMainWindow):
 	def __init__(self):
 		super().__init__()
 		
-		self.initUI()
-		
 		self.filename = None
+		
+		self.initUI()
 		
 #		QApplication.instance().clipboard().dataChanged.connect(self.onClipboardChange)
 
@@ -50,6 +52,7 @@ class Ventana(QMainWindow):
 		menu_edicion.addAction(self.crearact('&Eliminar', 'Del', 'Elimina los elementos seleccionados.', self.EliminarMEditar))
 		
 		Editor_de_nodos = EditorDeNodos(self)
+		Editor_de_nodos.escena.addelementosmodificadoslistener(self.cambiarTitulo)
 		self.setCentralWidget(Editor_de_nodos)
 		
 		# Barra de estado.
@@ -60,33 +63,81 @@ class Ventana(QMainWindow):
 
 		# Tamaño de la ventana
 		self.setGeometry(100, 100, 800, 600)
-		self.setWindowTitle("NodePlanner - Versión alpha")
+		self.cambiarTitulo()
 		self.show()
+		
+	def cambiarTitulo(self):
+		titulo = "NodePlanner - Versión alpha: "
+		if self.filename is None:
+			titulo += "Nuevo"
+		else:
+			titulo += os.path.basename(self.filename)
+		
+		if self.centralWidget().escena.elementos_modificados:
+			titulo += "*"
+			
+		self.setWindowTitle(titulo)
+
+	
+	def closeEvent(self, event):
+		if self.confirmacion():
+			event.accept()
+		else:
+			event.ignore()
+			
+	def ArchivoModificado(self):
+		return self.centralWidget().escena.elementos_modificados
+			
+	def confirmacion(self):
+		if not self.ArchivoModificado():
+			return True
+		
+		res = CuadroDialogo(self, "Warning", "¿Quiere guardar el documento?",
+							"¿Quiere guardar los cambios realizados en este documento?\nSe perderán sus cambios si no los guarda.",
+							None,
+							"Guardar", "No guardar", "Cancelar")
+
+		if res.checkout == "Guardar":
+			return self.GuardarArchivo()
+		elif res.checkout == "Cancelar":
+			return False
+		
+		return True
+
 		
 	def NuevaPosEscena(self, x, y):
 		self.status_mouse_pos.setText("Posición: [%d, %d]" % (x, y))
 		
 	def NuevoArchivo(self):
-		self.centralWidget().escena.limpiarEscena()
+		if self.confirmacion():
+			self.centralWidget().escena.limpiarEscena()
+			self.filename = None
+			self.cambiarTitulo()
+			
 		
 	def AbrirArchivo(self):
-		fname, filter = QFileDialog.getOpenFileName(self, 'Abrir')
-		if fname == '':
-			return
-		if os.path.isfile(fname):
-			self.centralWidget().escena.abrirArchivo(fname)
+		if self.confirmacion():
+			fname, filter = QFileDialog.getOpenFileName(self, 'Abrir')
+			if fname == '':
+				return
+			if os.path.isfile(fname):
+				self.centralWidget().escena.abrirArchivo(fname)
+				self.filename = fname
+				self.cambiarTitulo()
 	
 	def GuardarArchivo(self):
 		if self.filename is None: return self.GuardarArchivoComo()
 		self.centralWidget().escena.guardarArchivo(self.filename)
 		self.statusBar().showMessage("Guardado éxitosamente en %s" % self.filename)
+		return True
 	
 	def GuardarArchivoComo(self):
 		fname, filter = QFileDialog.getSaveFileName(self, 'Guardar como')
 		if fname == '':
-			return
+			return False
 		self.filename = fname
 		self.GuardarArchivo()
+		return True
 		
 	def DeshacerMEditar(self):
 		self.centralWidget().escena.historial.deshacer()
