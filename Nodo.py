@@ -28,13 +28,13 @@ class Nodo(Serializable):
 		self.salidas = []
 		contador = 0
 		for item in entradas:
-			zocalos = Zocalo(nodo=self, indice=contador, posicion=Izquierda_abajo, tipo_zocalo=item)
+			zocalos = Zocalo(nodo=self, indice=contador, posicion=Izquierda_abajo, tipo_zocalo=item, multiconexion=False)
 			contador += 1
 			self.entradas.append(zocalos)
 			
 		contador = 0
 		for item in salidas:
-			zocalos = Zocalo(nodo=self, indice=contador, posicion=Derecha_arriba, tipo_zocalo=item)
+			zocalos = Zocalo(nodo=self, indice=contador, posicion=Derecha_arriba, tipo_zocalo=item, multiconexion=True)
 			contador += 1
 			self.salidas.append(zocalos)
 	
@@ -71,16 +71,18 @@ class Nodo(Serializable):
 	
 	def actualizarconexiones(self):
 		for zocalo in self.entradas + self.salidas:
-			if zocalo.tieneconexiones():
-				zocalo.conexion.posiciones_actualizadas()
+			# if zocalo.tieneconexiones():
+			for conexion in zocalo.Zocaloconexiones:
+				conexion.posiciones_actualizadas()
 				
 	def quitar(self):
 		if DEBUG: print('> Quitando el nodo', self)
 		if DEBUG: print('	Quitando todos las conexiones de los zócalos.')
 		for zocalo in (self.entradas + self.salidas):
-			if zocalo.tieneconexiones():
-				if DEBUG: print('		Quitando', zocalo.conexion, 'del', zocalo)
-				zocalo.conexion.quitar()
+			# if zocalo.tieneconexiones():
+			for conexion in zocalo.Zocaloconexiones:
+				if DEBUG: print('		Quitando', conexion, 'del', zocalo)
+				conexion.quitar()
 		if DEBUG: print('	Quitando los gráficos del nodo.')
 		self.escena.GraficosEsc.removeItem(self.Nodograficas)
 		self.Nodograficas = None

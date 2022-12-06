@@ -13,6 +13,10 @@ class Conexion(Serializable):
 		super().__init__()
 		self.escena = escena
 		
+		# Ini por defecto
+		self._zocalo_origen = None
+		self._zocalo_final = None
+		
 		self.zocalo_origen = zocalo_origen
 		self.zocalo_final = zocalo_final
 		self.tipo_de_conexion = tipo_de_conexion
@@ -27,18 +31,30 @@ class Conexion(Serializable):
 	
 	@zocalo_origen.setter
 	def zocalo_origen(self, value):
+		# Si hemos asignado a algún zócalo antes, lo eliminamos de ese zócalo.
+		if self._zocalo_origen is not None:
+			self._zocalo_origen.quitar_conexiones(self)
+		
+		# Asignado de un nuevo zócalo inicial.
 		self._zocalo_origen = value
+		# Añadir una conexión a la clase Zócalo.
 		if self.zocalo_origen is not None:
-			self.zocalo_origen.conexion = self
+			self.zocalo_origen.agregar_conexion(self)
 			
 	@property
 	def zocalo_final(self): return self._zocalo_final
 	
 	@zocalo_final.setter
 	def zocalo_final(self, value):
+		# Si hemos asignado a algún zócalo antes, lo eliminamos de ese zócalo.
+		if self._zocalo_final is not None:
+			self._zocalo_final.quitar_conexiones(self)
+		
+		# Asignado de un nuevo zócalo final.
 		self._zocalo_final = value
+		# Añadir una conexión a la clase Zócalo.
 		if self.zocalo_final is not None:
-			self.zocalo_final.conexion = self
+			self.zocalo_final.agregar_conexion(self)
 			
 	@property
 	def tipo_de_conexion(self): return self._tipo_de_conexion
@@ -81,10 +97,10 @@ class Conexion(Serializable):
 		self.GraficosDeConexion.update()
 	
 	def quitar_de_zocalos(self):
-		if self.zocalo_origen is not None:
-			self.zocalo_origen.conexion = None
-		if self.zocalo_final is not None:
-			self.zocalo_final.conexion = None
+		# if self.zocalo_origen is not None:
+		#	self.zocalo_origen.quitar_conexiones(None)
+		#if self.zocalo_final is not None:
+		#	self.zocalo_final.quitar_conexiones(None)
 		self.zocalo_final = None
 		self.zocalo_origen = None
 		

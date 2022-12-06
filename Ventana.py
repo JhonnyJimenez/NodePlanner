@@ -1,7 +1,7 @@
 import os
 import json
 from PyQt5.QtWidgets import *
-from Editor_de_nodos_Widget import EditorDeNodos
+from Widget_de_nodos import EditorDeNodos
 from Botones import CuadroDialogo
 
 
