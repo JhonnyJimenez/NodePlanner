@@ -4,10 +4,10 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 
-from GraficosDeZocalos import GraficosDeZocalos
-from GraficosdeConexion import GraficosdeConexion
-from Conexiones import Conexion, bezier
-from GraficosdeCortado import Recortado
+from nodeeditor.GraficosDeZocalos import GraficosDeZocalos
+from nodeeditor.GraficosdeConexion import GraficosdeConexion
+from nodeeditor.Conexiones import Conexion, bezier
+from nodeeditor.GraficosdeCortado import Recortado
 
 MODO_NORMAL = 1
 MODO_DIBUJO = 2

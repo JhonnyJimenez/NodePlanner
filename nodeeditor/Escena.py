@@ -1,11 +1,11 @@
 import json
 from collections import OrderedDict
-from Seriabilizador import Serializable
-from GraficosdelaEscena_vp import GraficosdelaEscenaVP
-from Nodo import Nodo
-from Conexiones import Conexion
-from Historial_escena import HistorialEscena
-from Portapapeles import PortapapelesEscena
+from nodeeditor.Seriabilizador import Serializable
+from nodeeditor.GraficosdelaEscena_vp import GraficosdelaEscenaVP
+from nodeeditor.Nodo import Nodo
+from nodeeditor.Conexiones import Conexion
+from nodeeditor.Historial_escena import HistorialEscena
+from nodeeditor.Portapapeles import PortapapelesEscena
 
 
 class Escena(Serializable):

@@ -1,4 +1,4 @@
-from GraficosdeConexion import GraficosdeConexion
+from nodeeditor.GraficosdeConexion import GraficosdeConexion
 
 
 DEBUG = False

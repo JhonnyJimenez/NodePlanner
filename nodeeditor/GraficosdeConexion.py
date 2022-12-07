@@ -4,7 +4,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 
-from Zocalos import *
+from nodeeditor.Zocalos import *
 
 Conexion_CP_Redondez = 100
 

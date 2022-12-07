@@ -1,7 +1,7 @@
 from collections import OrderedDict
-from GraficosdeConexion import GraficosdeConexion
-from Nodo import Nodo
-from Conexiones import Conexion
+from nodeeditor.GraficosdeConexion import GraficosdeConexion
+from nodeeditor.Nodo import Nodo
+from nodeeditor.Conexiones import Conexion
 
 
 DEBUG = False

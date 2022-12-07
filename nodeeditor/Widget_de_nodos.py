@@ -1,16 +1,16 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-from GraficosdelaVista_vp import GraficosdelaVistaVP
-from Escena import Escena
-from Nodo import Nodo
-from Conexiones import Conexion, recta, bezier
+from nodeeditor.GraficosdelaVista_vp import GraficosdelaVistaVP
+from nodeeditor.Escena import Escena
+from nodeeditor.Nodo import Nodo
+from nodeeditor.Conexiones import Conexion, recta, bezier
 
 class EditorDeNodos(QWidget):
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		
-		self.stylesheet_filename = 'EstiloNodo.qss'
+		self.stylesheet_filename = 'nodeeditor/qss/EstiloNodo.qss'
 		self.loadStylesheet(self.stylesheet_filename)
 		
 		# Administrador de espacio en pantalla

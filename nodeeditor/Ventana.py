@@ -1,8 +1,8 @@
 import os
 import json
 from PyQt5.QtWidgets import *
-from Widget_de_nodos import EditorDeNodos
-from Botones import CuadroDialogo
+from nodeeditor.Widget_de_nodos import EditorDeNodos
+from nodeeditor.Botones import CuadroDialogo
 
 
 class Ventana(QMainWindow):

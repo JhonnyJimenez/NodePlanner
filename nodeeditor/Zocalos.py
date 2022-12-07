@@ -1,6 +1,6 @@
 from collections import OrderedDict
-from Seriabilizador import Serializable
-from GraficosDeZocalos import GraficosDeZocalos
+from nodeeditor.Seriabilizador import Serializable
+from nodeeditor.GraficosDeZocalos import GraficosDeZocalos
 
 
 Izquierda_arriba = 1

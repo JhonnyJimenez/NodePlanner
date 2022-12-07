@@ -1,8 +1,8 @@
 from collections import OrderedDict
-from Seriabilizador import Serializable
-from GraficosdelNodo import GraficosdelNodo
-from ContenidodelNodo import ContenidoDelNodo
-from Zocalos import *
+from nodeeditor.Seriabilizador import Serializable
+from nodeeditor.GraficosdelNodo import GraficosdelNodo
+from nodeeditor.ContenidodelNodo import ContenidoDelNodo
+from nodeeditor.Zocalos import *
 
 
 DEBUG = False

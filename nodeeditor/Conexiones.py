@@ -1,6 +1,6 @@
 from collections import OrderedDict
-from Seriabilizador import Serializable
-from GraficosdeConexion import *
+from nodeeditor.Seriabilizador import Serializable
+from nodeeditor.GraficosdeConexion import *
 
 recta = 1
 bezier = 2
