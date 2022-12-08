@@ -1,6 +1,7 @@
 import os
 import json
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 from nodeeditor.Widget_de_nodos import EditorDeNodos
 from nodeeditor.Botones import CuadroDialogo
 
@@ -8,6 +9,9 @@ from nodeeditor.Botones import CuadroDialogo
 class Ventana(QMainWindow):
 	def __init__(self):
 		super().__init__()
+		
+		self.compania = 'Blenderfreak'
+		self.nombre_del_producto = 'Editor de nodos'
 		
 		self.filename = None
 		
@@ -18,54 +22,67 @@ class Ventana(QMainWindow):
 #	def onClipboardChange(self):
 #		clip = QApplication.instance().clipboard()
 #		print("Clipboard changed:", clip.text())
-		
-	def crearact(self, nombre, atajo, ayuda, metodo):
-		act = QAction(nombre, self)
-		act.setShortcut(atajo)
-		act.setToolTip(ayuda)
-		act.triggered.connect(metodo)
-		return act
 	
 	def initUI(self):
-		menu_principal = self.menuBar()
+		self.crearAcciones()
+		self.crearMenus()
 		
-		# Inicialización del menú.
-		# Menú archivo.
-		menu_archivo = menu_principal.addMenu('&Archivo')
-		menu_archivo.addAction(self.crearact('&Nuevo', 'Ctrl+N', 'Crea nuevas gráficas', self.NuevoArchivo))
-		menu_archivo.addSeparator()
-		menu_archivo.addAction(self.crearact('&Abrir', 'Ctrl+A', 'Abre un archivo', self.AbrirArchivo))
-		menu_archivo.addAction(self.crearact('&Guardar', 'Ctrl+G', 'Guarda el proyecto actual', self.GuardarArchivo))
-		menu_archivo.addAction(self.crearact('G&uardar como...', 'Ctrl+Shift+G', 'Guarda el proyecto como...', self.GuardarArchivoComo))
-		menu_archivo.addSeparator()
-		menu_archivo.addAction(self.crearact('&Salir', 'Ctrl+Q', 'Crea nuevas gráficas', self.close))
+		self.Editor_de_nodos = EditorDeNodos(self)
+		self.Editor_de_nodos.escena.addelementosmodificadoslistener(self.cambiarTitulo)
+		self.setCentralWidget(self.Editor_de_nodos)
 		
-		# Menú edición.
-		menu_edicion = menu_principal.addMenu('&Edición')
-		menu_edicion.addAction(self.crearact('&Deshacer', 'Ctrl+Z', 'Deshace la última acción.', self.DeshacerMEditar))
-		menu_edicion.addAction(self.crearact('&Rehacer', 'Ctrl+Y', 'Rehace la última acción.', self.RehacerMEditar))
-		menu_edicion.addSeparator()
-		menu_edicion.addAction(self.crearact('&Cortar', 'Ctrl+X', 'Corta elementos seleccionados.', self.CortarMEditar))
-		menu_edicion.addAction(self.crearact('Cop&iar', 'Ctrl+C', 'Copia elementos seleccionados.', self.CopiarMEditar))
-		menu_edicion.addAction(self.crearact('&Pegar', 'Ctrl+V', 'Pega el último elemento del portapapeles', self.PegarMEditar))
-		menu_edicion.addSeparator()
-		menu_edicion.addAction(self.crearact('&Eliminar', 'Del', 'Elimina los elementos seleccionados.', self.EliminarMEditar))
-		
-		Editor_de_nodos = EditorDeNodos(self)
-		Editor_de_nodos.escena.addelementosmodificadoslistener(self.cambiarTitulo)
-		self.setCentralWidget(Editor_de_nodos)
-		
-		# Barra de estado.
-		self.statusBar().showMessage("")
-		self.status_mouse_pos = QLabel("")
-		self.statusBar().addPermanentWidget(self.status_mouse_pos)
-		Editor_de_nodos.Vista.cambioPosEscena.connect(self.NuevaPosEscena)
+		self.crearBarradeEstado()
 
 		# Tamaño de la ventana
 		self.setGeometry(100, 100, 800, 600)
 		self.cambiarTitulo()
 		self.show()
 		
+	def crearBarradeEstado(self):
+		self.statusBar().showMessage("")
+		self.status_mouse_pos = QLabel("")
+		self.statusBar().addPermanentWidget(self.status_mouse_pos)
+		self.Editor_de_nodos.Vista.cambioPosEscena.connect(self.NuevaPosEscena)
+		
+	def crearAcciones(self):
+		self.MNuevo = QAction('&Nuevo', self, shortcut='Ctrl+N', statusTip='Crea nuevas gráficas', triggered=self.NuevoArchivo)
+		self.MAbrir = QAction('&Abrir', self, shortcut='Ctrl+A', statusTip='Abre un archivo', triggered=self.AbrirArchivo)
+		self.MGuardar = QAction('&Guardar', self, shortcut='Ctrl+G', statusTip='Guarda el proyecto actual', triggered=self.GuardarArchivo)
+		self.MGuardarComo = QAction('G&uardar como...', self, shortcut='Ctrl+Shift+G', statusTip='Guarda el proyecto como...', triggered=self.GuardarArchivoComo)
+		self.MSalir = QAction('&Salir', self, shortcut='Ctrl+Q', statusTip='Crea nuevas gráficas', triggered=self.close)
+		
+		self.MDeshacer = QAction('&Deshacer', self, shortcut='Ctrl+Z', statusTip='Deshace la última acción.', triggered=self.DeshacerMEditar)
+		self.MRehacer = QAction('&Rehacer', self, shortcut='Ctrl+Y', statusTip='Rehace la última acción.', triggered=self.RehacerMEditar)
+		self.MCortar = QAction('&Cortar', self, shortcut='Ctrl+X', statusTip='Corta elementos seleccionados.', triggered=self.CortarMEditar)
+		self.MCopiar = QAction('Cop&iar', self, shortcut='Ctrl+C', statusTip='Copia elementos seleccionados.', triggered=self.CopiarMEditar)
+		self.MPegar = QAction('&Pegar', self, shortcut='Ctrl+V', statusTip='Pega el último elemento del portapapeles', triggered=self.PegarMEditar)
+		self.MEliminar = QAction('&Eliminar', self, shortcut='Del', statusTip='Elimina los elementos seleccionados.', triggered=self.EliminarMEditar)
+		
+	def crearMenus(self):
+		menu_principal = self.menuBar()
+		
+		# Inicialización del menú.
+		# Menú archivo.
+		self.menu_archivo = menu_principal.addMenu('&Archivo')
+		self.menu_archivo.addAction(self.MNuevo)
+		self.menu_archivo.addSeparator()
+		self.menu_archivo.addAction(self.MAbrir)
+		self.menu_archivo.addAction(self.MGuardar)
+		self.menu_archivo.addAction(self.MGuardarComo)
+		self.menu_archivo.addSeparator()
+		self.menu_archivo.addAction(self.MSalir)
+		
+		# Menú edición.
+		self.menu_edicion = menu_principal.addMenu('&Edición')
+		self.menu_edicion.addAction(self.MDeshacer)
+		self.menu_edicion.addAction(self.MRehacer)
+		self.menu_edicion.addSeparator()
+		self.menu_edicion.addAction(self.MCortar)
+		self.menu_edicion.addAction(self.MCopiar)
+		self.menu_edicion.addAction(self.MPegar)
+		self.menu_edicion.addSeparator()
+		self.menu_edicion.addAction(self.MEliminar)
+	
 	def cambiarTitulo(self):
 		titulo = "NodePlanner - Versión alpha: "
 		if self.filename is None:
@@ -173,4 +190,15 @@ class Ventana(QMainWindow):
 			return
 		
 		self.centralWidget().escena.portapapeles.deserializacionDesdePortapapeles(data)
-		
+	
+	def leerConfigs(self):
+		config = QSettings(self.compania, self.nombre_del_producto)
+		pos = config.value('pos', QPoint(200, 200))
+		size = config.value('size', QSize(400, 400))
+		self.move(pos)
+		self.resize(size)
+	
+	def escribirConfigs(self):
+		config = QSettings(self.compania, self.nombre_del_producto)
+		config.setValue('pos', self.pos())
+		config.setValue('size', self.size())
