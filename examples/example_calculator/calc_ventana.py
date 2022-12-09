@@ -1,16 +1,26 @@
+import os
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
+from nodeeditor.Utilidades import dump_exception, loadstylesheets
 from nodeeditor.Ventana import Ventana
 from examples.example_calculator.calc_subventana import SubVenCalc
-from nodeeditor.Utilidades import dumpException
+
+# Imágenes para la skin negra.
+import examples.example_calculator.qss.nodeeditor_dark_resources
 
 
 class VenCalc(Ventana):
 	def initUI(self):
 		self.compania = 'Blenderfreak'
 		self.nombre_del_producto = 'Calculadora de nodos'
+		
+		self.styleSheet_filename = os.path.join(os.path.dirname(__file__), "qss/editordenodos.qss")
+		loadstylesheets(
+			os.path.join(os.path.dirname(__file__), "qss/nodeeditor-dark.qss"),
+			self.styleSheet_filename,
+		)
 		
 		self.mdiArea = QMdiArea()
 		self.mdiArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)

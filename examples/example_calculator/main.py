@@ -9,6 +9,11 @@ from examples.example_calculator.calc_ventana import VenCalc
 
 if __name__ == '__main__':
 	programa = QApplication(sys.argv)
+	
+	# print(QStyleFactory.keys())
+	programa.setStyle("Fusion")
+	
 	ventana = VenCalc()
 	ventana.show()
+	
 	sys.exit(programa.exec())

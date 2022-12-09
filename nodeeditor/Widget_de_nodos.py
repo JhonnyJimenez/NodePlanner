@@ -7,12 +7,10 @@ from nodeeditor.Escena import Escena
 from nodeeditor.Nodo import Nodo
 from nodeeditor.Conexiones import Conexion, recta, bezier
 
+
 class EditorDeNodos(QWidget):
 	def __init__(self, parent=None):
 		super().__init__(parent)
-		
-		self.stylesheet_filename = 'nodeeditor/qss/EstiloNodo.qss'
-		self.loadStylesheet(self.stylesheet_filename)
 		
 		self.filename = None
 		
@@ -28,14 +26,6 @@ class EditorDeNodos(QWidget):
 		self.AdminDeEspEnPan.addWidget(self.Vista)
 		
 		self.agregadodenodos()
-
-
-	def loadStylesheet(self, filename):
-		print('Style loading:', filename)
-		file = QFile(filename)
-		file.open(QFile.ReadOnly | QFile.Text)
-		stylesheet = file.readAll()
-		QApplication.instance().setStyleSheet(str(stylesheet, encoding='utf-8'))
 
 	def haycambios(self):
 		return self.escena.elementos_modificados
@@ -57,3 +47,4 @@ class EditorDeNodos(QWidget):
 		
 		conexion1 = Conexion(self.escena, nodo1.salidas[0], nodo2.entradas[0])
 		conexion2 = Conexion(self.escena, nodo2.salidas[0], nodo3.entradas[0])
+		
