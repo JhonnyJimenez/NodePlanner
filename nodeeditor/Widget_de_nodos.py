@@ -1,3 +1,4 @@
+import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
@@ -12,6 +13,8 @@ class EditorDeNodos(QWidget):
 		
 		self.stylesheet_filename = 'nodeeditor/qss/EstiloNodo.qss'
 		self.loadStylesheet(self.stylesheet_filename)
+		
+		self.filename = None
 		
 		# Administrador de espacio en pantalla
 		self.AdminDeEspEnPan = QVBoxLayout()
@@ -33,7 +36,17 @@ class EditorDeNodos(QWidget):
 		file.open(QFile.ReadOnly | QFile.Text)
 		stylesheet = file.readAll()
 		QApplication.instance().setStyleSheet(str(stylesheet, encoding='utf-8'))
-		
+
+	def haycambios(self):
+		return self.escena.elementos_modificados
+
+	def confirmarsihaynombredearchivo(self):
+		return self.filename is not None
+	
+	def obtenerNombreAmigablealUsuario(self):
+		nombre = os.path.basename(self.filename) if self.confirmarsihaynombredearchivo() else "Nuevo archivo"
+		return nombre + ("*" if self.haycambios() else "")
+	
 	def agregadodenodos(self):
 		nodo1 = Nodo(self.escena, "Nodo cronista", entradas=[0, 0, 0], salidas=[1])
 		nodo2 = Nodo(self.escena, "Nodo de personaje", entradas=[3, 3, 3], salidas=[1])

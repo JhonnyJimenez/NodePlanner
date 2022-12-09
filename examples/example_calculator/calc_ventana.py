@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 from nodeeditor.Ventana import Ventana
+from examples.example_calculator.calc_subventana import SubVenCalc
 from nodeeditor.Utilidades import dumpException
 
 
@@ -59,18 +60,18 @@ class VenCalc(Ventana):
 		windows = self.mdiArea.subWindowList()
 		self.separatorAct.setVisible(len(windows) != 0)
 	
-	# for i, window in enumerate(windows):
-	#     child = window.widget()
-	#
-	#     text = "%d %s" % (i + 1, child.userFriendlyCurrentFile())
-	#     if i < 9:
-	#         text = '&' + text
-	#
-	#     action = self.MenuVentana.addAction(text)
-	#     action.setCheckable(True)
-	#     action.setChecked(child is self.activeMdiChild())
-	#     action.triggered.connect(self.windowMapper.map)
-	#     self.windowMapper.setMapping(action, window)
+		for i, window in enumerate(windows):
+			child = window.widget()
+			
+			text = "%d %s" % (i + 1, child.obtenerNombreAmigablealUsuario())
+			if i < 9:
+				text = '&' + text
+		
+			action = self.MenuVentana.addAction(text)
+			action.setCheckable(True)
+			action.setChecked(child is self.subVentanaActiva())
+			action.triggered.connect(self.windowMapper.map)
+			self.windowMapper.setMapping(action, window)
 
 	def crearAcciones(self):
 		super().crearAcciones()
@@ -85,6 +86,10 @@ class VenCalc(Ventana):
 		self.separatorAct.setSeparator(True)
 		
 		self.MSobre = QAction("&About", self, statusTip="Muestra una ventana con información de la aplicación.", triggered=self.sobre)
+	
+	def NuevoArchivo(self):
+		subven = self.crearSubVentana()
+		subven.show()
 	
 	def sobre(self):
 		QMessageBox.about(self, "Sobre el ejemplo \"Calculadora de nodos\"",
@@ -125,6 +130,18 @@ class VenCalc(Ventana):
 	
 	def crearBarradeEstado(self):
 		self.statusBar().showMessage("Listo")
+	
+	def crearSubVentana(self):
+		editor_de_nodos = SubVenCalc()
+		subven = self.mdiArea.addSubWindow(editor_de_nodos)
+		return subven
+	
+	def subVentanaActiva(self):
+		# Estamos devolviendo el widget de nodos aquí...
+		subventanaActiva = self.mdiArea.activeSubWindow()
+		if subventanaActiva:
+			return subventanaActiva.widget()
+		return None
 	
 	def configSubVentanaActiva(self):
 		if window:

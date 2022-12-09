@@ -13,8 +13,6 @@ class Ventana(QMainWindow):
 		self.compania = 'Blenderfreak'
 		self.nombre_del_producto = 'Editor de nodos'
 		
-		self.filename = None
-		
 		self.initUI()
 		
 #		QApplication.instance().clipboard().dataChanged.connect(self.onClipboardChange)
@@ -28,14 +26,14 @@ class Ventana(QMainWindow):
 		self.crearMenus()
 		
 		self.Editor_de_nodos = EditorDeNodos(self)
-		self.Editor_de_nodos.escena.addelementosmodificadoslistener(self.cambiarTitulo)
+		self.Editor_de_nodos.escena.addelementosmodificadoslistener(self.definirtitulo)
 		self.setCentralWidget(self.Editor_de_nodos)
 		
 		self.crearBarradeEstado()
 
 		# Tamaño de la ventana
 		self.setGeometry(100, 100, 800, 600)
-		self.cambiarTitulo()
+		self.definirtitulo()
 		self.show()
 		
 	def crearBarradeEstado(self):
@@ -45,18 +43,18 @@ class Ventana(QMainWindow):
 		self.Editor_de_nodos.Vista.cambioPosEscena.connect(self.NuevaPosEscena)
 		
 	def crearAcciones(self):
-		self.MNuevo = QAction('&Nuevo', self, shortcut='Ctrl+N', statusTip='Crea nuevas gráficas', triggered=self.NuevoArchivo)
-		self.MAbrir = QAction('&Abrir', self, shortcut='Ctrl+A', statusTip='Abre un archivo', triggered=self.AbrirArchivo)
-		self.MGuardar = QAction('&Guardar', self, shortcut='Ctrl+G', statusTip='Guarda el proyecto actual', triggered=self.GuardarArchivo)
-		self.MGuardarComo = QAction('G&uardar como...', self, shortcut='Ctrl+Shift+G', statusTip='Guarda el proyecto como...', triggered=self.GuardarArchivoComo)
-		self.MSalir = QAction('&Salir', self, shortcut='Ctrl+Q', statusTip='Crea nuevas gráficas', triggered=self.close)
+		self.ActNuevo = QAction('&Nuevo', self, shortcut='Ctrl+N', statusTip='Crea nuevas gráficas', triggered=self.NuevoArchivo)
+		self.ActAbrir = QAction('&Abrir', self, shortcut='Ctrl+A', statusTip='Abre un archivo', triggered=self.AbrirArchivo)
+		self.ActGuardar = QAction('&Guardar', self, shortcut='Ctrl+G', statusTip='Guarda el proyecto actual', triggered=self.GuardarArchivo)
+		self.ActGuardarComo = QAction('G&uardar como...', self, shortcut='Ctrl+Shift+G', statusTip='Guarda el proyecto como...', triggered=self.GuardarArchivoComo)
+		self.ActSalir = QAction('&Salir', self, shortcut='Ctrl+Q', statusTip='Crea nuevas gráficas', triggered=self.close)
 		
-		self.MDeshacer = QAction('&Deshacer', self, shortcut='Ctrl+Z', statusTip='Deshace la última acción.', triggered=self.DeshacerMEditar)
-		self.MRehacer = QAction('&Rehacer', self, shortcut='Ctrl+Y', statusTip='Rehace la última acción.', triggered=self.RehacerMEditar)
-		self.MCortar = QAction('&Cortar', self, shortcut='Ctrl+X', statusTip='Corta elementos seleccionados.', triggered=self.CortarMEditar)
-		self.MCopiar = QAction('Cop&iar', self, shortcut='Ctrl+C', statusTip='Copia elementos seleccionados.', triggered=self.CopiarMEditar)
-		self.MPegar = QAction('&Pegar', self, shortcut='Ctrl+V', statusTip='Pega el último elemento del portapapeles', triggered=self.PegarMEditar)
-		self.MEliminar = QAction('&Eliminar', self, shortcut='Del', statusTip='Elimina los elementos seleccionados.', triggered=self.EliminarMEditar)
+		self.ActDeshacer = QAction('&Deshacer', self, shortcut='Ctrl+Z', statusTip='Deshace la última acción.', triggered=self.DeshacerMEditar)
+		self.ActRehacer = QAction('&Rehacer', self, shortcut='Ctrl+Y', statusTip='Rehace la última acción.', triggered=self.RehacerMEditar)
+		self.ActCortar = QAction('&Cortar', self, shortcut='Ctrl+X', statusTip='Corta elementos seleccionados.', triggered=self.CortarMEditar)
+		self.ActCopiar = QAction('Cop&iar', self, shortcut='Ctrl+C', statusTip='Copia elementos seleccionados.', triggered=self.CopiarMEditar)
+		self.ActPegar = QAction('&Pegar', self, shortcut='Ctrl+V', statusTip='Pega el último elemento del portapapeles', triggered=self.PegarMEditar)
+		self.ActEliminar = QAction('&Eliminar', self, shortcut='Del', statusTip='Elimina los elementos seleccionados.', triggered=self.EliminarMEditar)
 		
 	def crearMenus(self):
 		menu_principal = self.menuBar()
@@ -64,35 +62,29 @@ class Ventana(QMainWindow):
 		# Inicialización del menú.
 		# Menú archivo.
 		self.menu_archivo = menu_principal.addMenu('&Archivo')
-		self.menu_archivo.addAction(self.MNuevo)
+		self.menu_archivo.addAction(self.ActNuevo)
 		self.menu_archivo.addSeparator()
-		self.menu_archivo.addAction(self.MAbrir)
-		self.menu_archivo.addAction(self.MGuardar)
-		self.menu_archivo.addAction(self.MGuardarComo)
+		self.menu_archivo.addAction(self.ActAbrir)
+		self.menu_archivo.addAction(self.ActGuardar)
+		self.menu_archivo.addAction(self.ActGuardarComo)
 		self.menu_archivo.addSeparator()
-		self.menu_archivo.addAction(self.MSalir)
+		self.menu_archivo.addAction(self.ActSalir)
 		
 		# Menú edición.
 		self.menu_edicion = menu_principal.addMenu('&Edición')
-		self.menu_edicion.addAction(self.MDeshacer)
-		self.menu_edicion.addAction(self.MRehacer)
+		self.menu_edicion.addAction(self.ActDeshacer)
+		self.menu_edicion.addAction(self.ActRehacer)
 		self.menu_edicion.addSeparator()
-		self.menu_edicion.addAction(self.MCortar)
-		self.menu_edicion.addAction(self.MCopiar)
-		self.menu_edicion.addAction(self.MPegar)
+		self.menu_edicion.addAction(self.ActCortar)
+		self.menu_edicion.addAction(self.ActCopiar)
+		self.menu_edicion.addAction(self.ActPegar)
 		self.menu_edicion.addSeparator()
-		self.menu_edicion.addAction(self.MEliminar)
+		self.menu_edicion.addAction(self.ActEliminar)
 	
-	def cambiarTitulo(self):
+	def definirtitulo(self):
 		titulo = "NodePlanner - Versión alpha: "
-		if self.filename is None:
-			titulo += "Nuevo"
-		else:
-			titulo += os.path.basename(self.filename)
+		titulo += self.obtenerActualEditordeNodos().obtenerNombreAmigablealUsuario()
 		
-		if self.centralWidget().escena.elementos_modificados:
-			titulo += "*"
-			
 		self.setWindowTitle(titulo)
 
 	
@@ -102,8 +94,11 @@ class Ventana(QMainWindow):
 		else:
 			event.ignore()
 			
+	def obtenerActualEditordeNodos(self):
+		return self.centralWidget()
+	
 	def ArchivoModificado(self):
-		return self.centralWidget().escena.elementos_modificados
+		return self.obtenerActualEditordeNodos().escena.elementos_modificados
 			
 	def confirmacion(self):
 		if not self.ArchivoModificado():
@@ -127,9 +122,9 @@ class Ventana(QMainWindow):
 		
 	def NuevoArchivo(self):
 		if self.confirmacion():
-			self.centralWidget().escena.limpiarEscena()
+			self.obtenerActualEditordeNodos().escena.limpiarEscena()
 			self.filename = None
-			self.cambiarTitulo()
+			self.definirtitulo()
 			
 		
 	def AbrirArchivo(self):
@@ -138,13 +133,13 @@ class Ventana(QMainWindow):
 			if fname == '':
 				return
 			if os.path.isfile(fname):
-				self.centralWidget().escena.abrirArchivo(fname)
+				self.obtenerActualEditordeNodos().escena.abrirArchivo(fname)
 				self.filename = fname
-				self.cambiarTitulo()
+				self.definirtitulo()
 	
 	def GuardarArchivo(self):
 		if self.filename is None: return self.GuardarArchivoComo()
-		self.centralWidget().escena.guardarArchivo(self.filename)
+		self.obtenerActualEditordeNodos().escena.guardarArchivo(self.filename)
 		self.statusBar().showMessage("Guardado éxitosamente en %s" % self.filename)
 		return True
 	
@@ -157,21 +152,21 @@ class Ventana(QMainWindow):
 		return True
 		
 	def DeshacerMEditar(self):
-		self.centralWidget().escena.historial.deshacer()
+		self.obtenerActualEditordeNodos().escena.historial.deshacer()
 		
 	def RehacerMEditar(self):
-		self.centralWidget().escena.historial.rehacer()
+		self.obtenerActualEditordeNodos().escena.historial.rehacer()
 	
 	def EliminarMEditar(self):
-		self.centralWidget().escena.GraficosEsc.views()[0].eliminarSeleccionado()
+		self.obtenerActualEditordeNodos().escena.GraficosEsc.views()[0].eliminarSeleccionado()
 	
 	def CortarMEditar(self):
-		data = self.centralWidget().escena.portapapeles.serializacionSeleccionado(delete=True)
+		data = self.obtenerActualEditordeNodos().escena.portapapeles.serializacionSeleccionado(delete=True)
 		str_data = json.dumps(data, indent=4)
 		QApplication.instance().clipboard().setText(str_data)
 
 	def CopiarMEditar(self):
-		data = self.centralWidget().escena.portapapeles.serializacionSeleccionado(delete=False)
+		data = self.obtenerActualEditordeNodos().escena.portapapeles.serializacionSeleccionado(delete=False)
 		str_data = json.dumps(data, indent=4)
 		QApplication.instance().clipboard().setText(str_data)
 		
@@ -189,7 +184,7 @@ class Ventana(QMainWindow):
 			print("¡Los datos no contienen ningún nodo!")
 			return
 		
-		self.centralWidget().escena.portapapeles.deserializacionDesdePortapapeles(data)
+		self.obtenerActualEditordeNodos().escena.portapapeles.deserializacionDesdePortapapeles(data)
 	
 	def leerConfigs(self):
 		config = QSettings(self.compania, self.nombre_del_producto)

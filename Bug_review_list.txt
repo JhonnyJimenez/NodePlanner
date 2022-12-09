@@ -1,0 +1,9 @@
+Lista de errores que noté y que espero se presente en próximos tutoriales su solución.
+Caso contrario tendré que revertir los commits, o sacar una nueva rama para solucionarlos.
+
+Versión previa al bug: e7ba6d86 (Calculadora de ejemplo: ventana) o 772eefc3 (Python Packages (Archivos nuevos)).
+    Al momento de limpiar el código y reemplazar el método para crear las acciones en los menús por QAction,
+la acción de deshacer deja de funcionar correctamente para la primera acción, la cual no reconoce y por ende no deshace.
+Sin embargo, tanto los callers para determinar si hubo cambios en el archivo como el debug del historial reconocen
+el movimiento y lo registran. ¿Por qué sucederá esto? Sabrá Dios...
+
