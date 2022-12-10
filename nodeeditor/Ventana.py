@@ -130,24 +130,36 @@ class Ventana(QMainWindow):
 	def AbrirArchivo(self):
 		if self.confirmacion():
 			fname, filter = QFileDialog.getOpenFileName(self, 'Abrir')
-			if fname == '':
-				return
-			if os.path.isfile(fname):
+			if fname != '' and os.path.isfile(fname):
 				self.obtenerActualEditordeNodos().leerarchivo(fname)
+				self.definirtitulo()
 	
 	def GuardarArchivo(self):
-		if self.obtenerActualEditordeNodos().filename is None: return self.GuardarArchivoComo()
-		self.obtenerActualEditordeNodos().guardararchivo()
-		self.statusBar().showMessage("Guardado éxitosamente en %s" % self.obtenerActualEditordeNodos().filename)
-		return True
+		actual_editor_de_nodos = self.obtenerActualEditordeNodos()
+		if actual_editor_de_nodos is not None:
+			if not actual_editor_de_nodos.confirmarsihaynombredearchivo(): return self.GuardarArchivoComo()
+	
+			actual_editor_de_nodos.guardararchivo()
+			self.statusBar().showMessage("Guardado éxitosamente en %s" % actual_editor_de_nodos.filename, 5000)
+			
+			# Soporte para aplicaciones MDI.
+			if hasattr(actual_editor_de_nodos, "definirtitulo"): actual_editor_de_nodos.definirtitulo()
+			else: self.definirtitulo()
+			return True
 	
 	def GuardarArchivoComo(self):
-		fname, filter = QFileDialog.getSaveFileName(self, 'Guardar como')
-		if fname == '':
-			return False
-		self.obtenerActualEditordeNodos().guardararchivo(fname)
-		self.statusBar().showMessage("Guardado éxitosamente en %s" % self.obtenerActualEditordeNodos().filename)
-		return True
+		actual_editor_de_nodos = self.obtenerActualEditordeNodos()
+		if actual_editor_de_nodos is not None:
+			fname, filter = QFileDialog.getSaveFileName(self, 'Guardar como')
+			if fname == '': return False
+
+			actual_editor_de_nodos.guardararchivo(fname)
+			self.statusBar().showMessage("Guardado éxitosamente en %s" % actual_editor_de_nodos.filename, 5000)
+
+			# Soporte para aplicaciones MDI.
+			if hasattr(actual_editor_de_nodos, "definirtitulo"): actual_editor_de_nodos.definirtitulo()
+			else: self.definirtitulo()
+			return True
 		
 	def DeshacerMEditar(self):
 		self.obtenerActualEditordeNodos().escena.historial.deshacer()

@@ -3,7 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-from nodeeditor.Utilidades import dump_exception, loadstylesheets
+from nodeeditor.Utilidades import dump_exception, loadstylesheets, pp
 from nodeeditor.Ventana import Ventana
 from examples.example_calculator.calc_subventana import SubVenCalc
 
@@ -54,49 +54,6 @@ class VenCalc(Ventana):
 		else:
 			self.escribirConfigs()
 			event.accept()
-	
-	def actualizarMenus(self):
-		print("Menús actualizados")
-		activo = self.subVentanaActiva()
-		haysubventanas = (activo is not None)
-		
-		self.ActGuardar.setEnabled(haysubventanas)
-		self.ActGuardarComo.setEnabled(haysubventanas)
-		self.ActCerrar.setEnabled(haysubventanas)
-		self.ActCerrarTodas.setEnabled(haysubventanas)
-		self.ActTile.setEnabled(haysubventanas)
-		self.ActCascade.setEnabled(haysubventanas)
-		self.ActVenSig.setEnabled(haysubventanas)
-		self.ActVenAnt.setEnabled(haysubventanas)
-		self.ActSeparator.setEnabled(haysubventanas)
-	
-	def actualizarMenuVentana(self):
-		self.MenuVentana.clear()
-		self.MenuVentana.addAction(self.ActCerrar)
-		self.MenuVentana.addAction(self.ActCerrarTodas)
-		self.MenuVentana.addSeparator()
-		self.MenuVentana.addAction(self.ActTile)
-		self.MenuVentana.addAction(self.ActCascade)
-		self.MenuVentana.addSeparator()
-		self.MenuVentana.addAction(self.ActVenSig)
-		self.MenuVentana.addAction(self.ActVenAnt)
-		self.MenuVentana.addAction(self.ActSeparator)
-		
-		windows = self.mdiArea.subWindowList()
-		self.ActSeparator.setVisible(len(windows) != 0)
-	
-		for i, window in enumerate(windows):
-			child = window.widget()
-			
-			text = "%d %s" % (i + 1, child.obtenerNombreAmigablealUsuario())
-			if i < 9:
-				text = '&' + text
-		
-			action = self.MenuVentana.addAction(text)
-			action.setCheckable(True)
-			action.setChecked(child is self.subVentanaActiva())
-			action.triggered.connect(self.windowMapper.map)
-			self.windowMapper.setMapping(action, window)
 
 	def crearAcciones(self):
 		super().crearAcciones()
@@ -112,33 +69,18 @@ class VenCalc(Ventana):
 		
 		self.MSobre = QAction("&About", self, statusTip="Muestra una ventana con información de la aplicación.", triggered=self.sobre)
 	
+	def obtenerActualEditordeNodos(self):
+		# Estamos devolviendo el widget de nodos aquí...
+		subventanaActiva = self.mdiArea.activeSubWindow()
+		if subventanaActiva:
+			return subventanaActiva.widget()
+		return None
+	
 	def NuevoArchivo(self):
 		try:
 			subven = self.crearSubVentana()
 			subven.show()
 		except Exception as e: dump_exception(e)
-		
-	def GuardarArchivo(self):
-		ActualEditordeNodos = self.subVentanaActiva()
-		if ActualEditordeNodos:
-			if not ActualEditordeNodos.confirmarsihaynombredearchivo():
-				return self.GuardarArchivoComo()
-			else:
-				ActualEditordeNodos.guardararchivo() # No pasamos el nombre, mantener el nombre.
-				self.statusBar().showMessage("Guardado satisfactoriamente en %s" % ActualEditordeNodos.filename, 5000)
-				ActualEditordeNodos.definirtitulo()
-				return True
-	
-	def GuardarArchivoComo(self):
-		ActualEditordeNodos = self.subVentanaActiva()
-		if ActualEditordeNodos:
-			fname, filter = QFileDialog.getSaveFileName(self, "Guarda el archivo actual.")
-			
-			if fname == '': return False
-			
-			ActualEditordeNodos.guardararchivo(fname)
-			ActualEditordeNodos.definirtitulo()
-			self.statusBar().showMessage("Guardado satisfactoriamente como %s" % fname, 5000)
 		
 	def AbrirArchivo(self):
 		fnames, filter = QFileDialog.getOpenFileNames(self, 'Abrir')
@@ -179,6 +121,49 @@ class VenCalc(Ventana):
 		self.MenuAyuda = self.menuBar().addMenu("&Ayuda")
 		self.MenuAyuda.addAction(self.MSobre)
 	
+	def actualizarMenus(self):
+		print("Menús actualizados")
+		activo = self.obtenerActualEditordeNodos()
+		haysubventanas = (activo is not None)
+		
+		self.ActGuardar.setEnabled(haysubventanas)
+		self.ActGuardarComo.setEnabled(haysubventanas)
+		self.ActCerrar.setEnabled(haysubventanas)
+		self.ActCerrarTodas.setEnabled(haysubventanas)
+		self.ActTile.setEnabled(haysubventanas)
+		self.ActCascade.setEnabled(haysubventanas)
+		self.ActVenSig.setEnabled(haysubventanas)
+		self.ActVenAnt.setEnabled(haysubventanas)
+		self.ActSeparator.setEnabled(haysubventanas)
+	
+	def actualizarMenuVentana(self):
+		self.MenuVentana.clear()
+		self.MenuVentana.addAction(self.ActCerrar)
+		self.MenuVentana.addAction(self.ActCerrarTodas)
+		self.MenuVentana.addSeparator()
+		self.MenuVentana.addAction(self.ActTile)
+		self.MenuVentana.addAction(self.ActCascade)
+		self.MenuVentana.addSeparator()
+		self.MenuVentana.addAction(self.ActVenSig)
+		self.MenuVentana.addAction(self.ActVenAnt)
+		self.MenuVentana.addAction(self.ActSeparator)
+		
+		windows = self.mdiArea.subWindowList()
+		self.ActSeparator.setVisible(len(windows) != 0)
+		
+		for i, window in enumerate(windows):
+			child = window.widget()
+			
+			text = "%d %s" % (i + 1, child.obtenerNombreAmigablealUsuario())
+			if i < 9:
+				text = '&' + text
+			
+			action = self.MenuVentana.addAction(text)
+			action.setCheckable(True)
+			action.setChecked(child is self.obtenerActualEditordeNodos())
+			action.triggered.connect(self.windowMapper.map)
+			self.windowMapper.setMapping(action, window)
+	
 	def crearBarradeHerramientas(self):
 		pass
 	
@@ -207,13 +192,6 @@ class VenCalc(Ventana):
 		for window in self.mdiArea.subWindowList():
 			if window.widget().filename == filename:
 				return window
-		return None
-	
-	def subVentanaActiva(self):
-		# Estamos devolviendo el widget de nodos aquí...
-		subventanaActiva = self.mdiArea.activeSubWindow()
-		if subventanaActiva:
-			return subventanaActiva.widget()
 		return None
 	
 	def configSubVentanaActiva(self):
