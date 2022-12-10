@@ -15,6 +15,7 @@ if __name__ == '__main__':
 	programa = QApplication(sys.argv)
 	
 	ventana = Ventana()
+	ventana.Editor_de_nodos.agregadodenodos()
 	module_path = os.path.dirname(inspect.getfile(ventana.__class__))
 	
 	loadstylesheets(os.path.join(module_path, 'qss/EstiloNodo.qss'))

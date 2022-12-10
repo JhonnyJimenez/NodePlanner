@@ -14,6 +14,9 @@ class EditorDeNodos(QWidget):
 		
 		self.filename = None
 		
+		self.initUI()
+		
+	def initUI(self):
 		# Administrador de espacio en pantalla
 		self.AdminDeEspEnPan = QVBoxLayout()
 		self.AdminDeEspEnPan.setContentsMargins(0, 0, 0, 0)
@@ -21,28 +24,46 @@ class EditorDeNodos(QWidget):
 		
 		# Gráficos (Escena)
 		self.escena = Escena()
+		
 		# Gráficos (Vista)
 		self.Vista = GraficosdelaVistaVP(self.escena.GraficosEsc, self)
 		self.AdminDeEspEnPan.addWidget(self.Vista)
-		
-		self.agregadodenodos()
 
 	def haycambios(self):
-		return self.escena.elementos_modificados
+		return self.escena.haycambios()
 
-	def confirmarsihaynombredearchivo(self):
+	def hayNombredeArchivo(self):
 		return self.filename is not None
 	
+	def objetosSeleccionados(self):
+		return self.escena.objetosSeleccionados()
+	
+	def hayAlgoSeleccionado(self):
+		return self.objetosSeleccionados() != []
+	
+	def habilitarDeshacer(self):
+		return self.escena.historial.habilitarDeshacer()
+	
+	def habilitarRehacer(self):
+		return self.escena.historial.habilitarRehacer()
+	
 	def obtenerNombreAmigablealUsuario(self):
-		nombre = os.path.basename(self.filename) if self.confirmarsihaynombredearchivo() else "Nuevo archivo"
+		nombre = os.path.basename(self.filename) if self.hayNombredeArchivo() else "Nuevo archivo"
 		return nombre + ("*" if self.haycambios() else "")
+	
+	def nuevoarchivo(self):
+		self.escena.limpiarEscena()
+		self.filename = None
+		self.escena.historial.historial_nuevo()
+		self.escena.historial.marcaInicialdelHistorial()
 	
 	def leerarchivo(self, filename):
 		QApplication.setOverrideCursor(Qt.WaitCursor)
 		try:
 			self.escena.abrirArchivo(filename)
 			self.filename = filename
-			# Limpiar historial.
+			self.escena.historial.historial_nuevo()
+			self.escena.historial.marcaInicialdelHistorial()
 			return True
 		except InvalidFile as e:
 			print(e)
@@ -72,4 +93,6 @@ class EditorDeNodos(QWidget):
 		
 		conexion1 = Conexion(self.escena, nodo1.salidas[0], nodo2.entradas[0])
 		conexion2 = Conexion(self.escena, nodo2.salidas[0], nodo3.entradas[0])
+		
+		self.escena.historial.marcaInicialdelHistorial()
 		

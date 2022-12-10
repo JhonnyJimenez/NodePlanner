@@ -112,17 +112,17 @@ class VenCalc(Ventana):
 	def crearMenus(self):
 		super().crearMenus()
 		
-		self.MenuVentana = self.menuBar().addMenu("&Ventana")
-		self.actualizarMenuVentana()
-		self.MenuVentana.aboutToShow.connect(self.actualizarMenuVentana)
+		self.menu_ventana = self.menuBar().addMenu("&Ventana")
+		self.menu_ventana.aboutToShow.connect(self.actualizarMenuVentana)
 		
 		self.menuBar().addSeparator()
 		
-		self.MenuAyuda = self.menuBar().addMenu("&Ayuda")
-		self.MenuAyuda.addAction(self.MSobre)
+		self.menu_ayuda = self.menuBar().addMenu("&Ayuda")
+		self.menu_ayuda.addAction(self.MSobre)
+		
+		self.menu_edicion.aboutToShow.connect(self.actualizarMenuEditar)
 	
 	def actualizarMenus(self):
-		print("Menús actualizados")
 		activo = self.obtenerActualEditordeNodos()
 		haysubventanas = (activo is not None)
 		
@@ -135,18 +135,38 @@ class VenCalc(Ventana):
 		self.ActVenSig.setEnabled(haysubventanas)
 		self.ActVenAnt.setEnabled(haysubventanas)
 		self.ActSeparator.setEnabled(haysubventanas)
+		
+		self.actualizarMenuEditar()
+		self.actualizarMenuVentana()
+		
+		# print("Menús actualizados.")
+	
+	def actualizarMenuEditar(self):
+		activo = self.obtenerActualEditordeNodos()
+		haysubventanas = (activo is not None)
+		
+		self.ActPegar.setEnabled(haysubventanas)
+		
+		self.ActCortar.setEnabled(haysubventanas and activo.hayAlgoSeleccionado())
+		self.ActCopiar.setEnabled(haysubventanas and activo.hayAlgoSeleccionado())
+		self.ActEliminar.setEnabled(haysubventanas and activo.hayAlgoSeleccionado())
+		
+		self.ActDeshacer.setEnabled(haysubventanas and activo.habilitarDeshacer())
+		self.ActRehacer.setEnabled(haysubventanas and activo.habilitarRehacer())
+		
+		print("Menú Editar actualizado.")
 	
 	def actualizarMenuVentana(self):
-		self.MenuVentana.clear()
-		self.MenuVentana.addAction(self.ActCerrar)
-		self.MenuVentana.addAction(self.ActCerrarTodas)
-		self.MenuVentana.addSeparator()
-		self.MenuVentana.addAction(self.ActTile)
-		self.MenuVentana.addAction(self.ActCascade)
-		self.MenuVentana.addSeparator()
-		self.MenuVentana.addAction(self.ActVenSig)
-		self.MenuVentana.addAction(self.ActVenAnt)
-		self.MenuVentana.addAction(self.ActSeparator)
+		self.menu_ventana.clear()
+		self.menu_ventana.addAction(self.ActCerrar)
+		self.menu_ventana.addAction(self.ActCerrarTodas)
+		self.menu_ventana.addSeparator()
+		self.menu_ventana.addAction(self.ActTile)
+		self.menu_ventana.addAction(self.ActCascade)
+		self.menu_ventana.addSeparator()
+		self.menu_ventana.addAction(self.ActVenSig)
+		self.menu_ventana.addAction(self.ActVenAnt)
+		self.menu_ventana.addAction(self.ActSeparator)
 		
 		windows = self.mdiArea.subWindowList()
 		self.ActSeparator.setVisible(len(windows) != 0)
@@ -158,11 +178,12 @@ class VenCalc(Ventana):
 			if i < 9:
 				text = '&' + text
 			
-			action = self.MenuVentana.addAction(text)
+			action = self.menu_ventana.addAction(text)
 			action.setCheckable(True)
 			action.setChecked(child is self.obtenerActualEditordeNodos())
 			action.triggered.connect(self.windowMapper.map)
 			self.windowMapper.setMapping(action, window)
+		# print("Menú Ventana actualizado.")
 	
 	def crearBarradeHerramientas(self):
 		pass

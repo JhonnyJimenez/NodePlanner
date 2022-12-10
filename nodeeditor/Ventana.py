@@ -122,8 +122,7 @@ class Ventana(QMainWindow):
 		
 	def NuevoArchivo(self):
 		if self.confirmacion():
-			self.obtenerActualEditordeNodos().escena.limpiarEscena()
-			self.obtenerActualEditordeNodos().filename = None
+			self.obtenerActualEditordeNodos().nuevoarchivo()
 			self.definirtitulo()
 			
 		
@@ -137,7 +136,7 @@ class Ventana(QMainWindow):
 	def GuardarArchivo(self):
 		actual_editor_de_nodos = self.obtenerActualEditordeNodos()
 		if actual_editor_de_nodos is not None:
-			if not actual_editor_de_nodos.confirmarsihaynombredearchivo(): return self.GuardarArchivoComo()
+			if not actual_editor_de_nodos.hayNombredeArchivo(): return self.GuardarArchivoComo()
 	
 			actual_editor_de_nodos.guardararchivo()
 			self.statusBar().showMessage("Guardado éxitosamente en %s" % actual_editor_de_nodos.filename, 5000)

@@ -30,6 +30,12 @@ class Escena(Serializable):
 		self.historial = HistorialEscena(self)
 		self.portapapeles = PortapapelesEscena(self)
 		
+	def haycambios(self):
+		return self.elementos_modificados
+	
+	def objetosSeleccionados(self):
+		return self.GraficosEsc.selectedItems()
+		
 	@property
 	def elementos_modificados(self):
 		return self._elementos_modificados
