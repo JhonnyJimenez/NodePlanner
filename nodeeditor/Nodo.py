@@ -3,6 +3,7 @@ from nodeeditor.Seriabilizador import Serializable
 from nodeeditor.GraficosdelNodo import GraficosdelNodo
 from nodeeditor.ContenidodelNodo import ContenidoDelNodo
 from nodeeditor.Zocalos import *
+from nodeeditor.Utilidades import dump_exception
 
 
 DEBUG = False
@@ -105,27 +106,29 @@ class Nodo(Serializable):
 		])
 	
 	def deserializacion(self, data, hashmap={}, restaure_id=True):
-		if restaure_id: self.id = data['id']
-		hashmap[data['id']] = self
-		
-		self.definirposicion(data['Pos_x'], data['Pos_y'])
-		self.titulo =  data['Titulo']
-		
-		data['Entradas'].sort(key=lambda Zocalo: Zocalo['Indice'] + Zocalo['Posicion'] * 10000 )
-		data['Salidas'].sort(key=lambda Zocalo: Zocalo['Indice'] + Zocalo['Posicion'] * 10000 )
-		
-		self.entradas = []
-		for Zocalo_data in data['Entradas']:
-			nuevo_zocalo = Zocalo(nodo=self, indice=Zocalo_data['Indice'], posicion=Zocalo_data['Posicion'],
-								  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'])
-			nuevo_zocalo.deserializacion(Zocalo_data, hashmap, restaure_id)
-			self.entradas.append(nuevo_zocalo)
-		
-		self.salidas = []
-		for Zocalo_data in data['Salidas']:
-			nuevo_zocalo = Zocalo(nodo=self, indice=Zocalo_data['Indice'], posicion=Zocalo_data['Posicion'],
-								  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'])
-			nuevo_zocalo.deserializacion(Zocalo_data, hashmap, restaure_id)
-			self.salidas.append(nuevo_zocalo)
+		try:
+			if restaure_id: self.id = data['id']
+			hashmap[data['id']] = self
 			
+			self.definirposicion(data['Pos_x'], data['Pos_y'])
+			self.titulo =  data['Titulo']
+			
+			data['Entradas'].sort(key=lambda Zocalo: Zocalo['Indice'] + Zocalo['Posicion'] * 10000 )
+			data['Salidas'].sort(key=lambda Zocalo: Zocalo['Indice'] + Zocalo['Posicion'] * 10000 )
+			
+			self.entradas = []
+			for Zocalo_data in data['Entradas']:
+				nuevo_zocalo = Zocalo(nodo=self, indice=Zocalo_data['Indice'], posicion=Zocalo_data['Posicion'],
+									  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'])
+				nuevo_zocalo.deserializacion(Zocalo_data, hashmap, restaure_id)
+				self.entradas.append(nuevo_zocalo)
+			
+			self.salidas = []
+			for Zocalo_data in data['Salidas']:
+				nuevo_zocalo = Zocalo(nodo=self, indice=Zocalo_data['Indice'], posicion=Zocalo_data['Posicion'],
+									  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'])
+				nuevo_zocalo.deserializacion(Zocalo_data, hashmap, restaure_id)
+				self.salidas.append(nuevo_zocalo)
+		except Exception as e: dump_exception(e)
+				
 		return True

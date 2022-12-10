@@ -123,7 +123,7 @@ class Ventana(QMainWindow):
 	def NuevoArchivo(self):
 		if self.confirmacion():
 			self.obtenerActualEditordeNodos().escena.limpiarEscena()
-			self.filename = None
+			self.obtenerActualEditordeNodos().filename = None
 			self.definirtitulo()
 			
 		
@@ -133,22 +133,20 @@ class Ventana(QMainWindow):
 			if fname == '':
 				return
 			if os.path.isfile(fname):
-				self.obtenerActualEditordeNodos().escena.abrirArchivo(fname)
-				self.filename = fname
-				self.definirtitulo()
+				self.obtenerActualEditordeNodos().leerarchivo(fname)
 	
 	def GuardarArchivo(self):
-		if self.filename is None: return self.GuardarArchivoComo()
-		self.obtenerActualEditordeNodos().escena.guardarArchivo(self.filename)
-		self.statusBar().showMessage("Guardado éxitosamente en %s" % self.filename)
+		if self.obtenerActualEditordeNodos().filename is None: return self.GuardarArchivoComo()
+		self.obtenerActualEditordeNodos().guardararchivo()
+		self.statusBar().showMessage("Guardado éxitosamente en %s" % self.obtenerActualEditordeNodos().filename)
 		return True
 	
 	def GuardarArchivoComo(self):
 		fname, filter = QFileDialog.getSaveFileName(self, 'Guardar como')
 		if fname == '':
 			return False
-		self.filename = fname
-		self.GuardarArchivo()
+		self.obtenerActualEditordeNodos().guardararchivo(fname)
+		self.statusBar().showMessage("Guardado éxitosamente en %s" % self.obtenerActualEditordeNodos().filename)
 		return True
 		
 	def DeshacerMEditar(self):

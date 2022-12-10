@@ -219,9 +219,9 @@ class GraficosdelaVistaVP(QGraphicsView):
 			else:
 				super().keyPressEvent(event)
 		# elif event.key() == Qt.Key_S and event.modifiers() & Qt.ControlModifier:
-		#	self.escena.escena.guardarArchivo("graph.json.txt")
+		#	self.escena.escena.guardarArchivo("graph.json")
 		# elif event.key() == Qt.Key_A and event.modifiers() & Qt.ControlModifier:
-		#	self.escena.escena.abrirArchivo("graph.json.txt")
+		#	self.escena.escena.abrirArchivo("graph.json")
 		# elif event.key() == Qt.Key_1:
 		#	self.escena.escena.historial.almacenarHistorial("Item A")
 		# elif event.key() == Qt.Key_Z and event.modifiers() & Qt.ControlModifier and not event.modifiers() & Qt.ShiftModifier:

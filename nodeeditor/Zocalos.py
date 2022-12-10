@@ -69,6 +69,13 @@ class Zocalo(Serializable):
 	# def tieneconexiones(self):
 	#	return self.conexiones is not None
 	
+	def determinarmulticonexion(self, data):
+		if 'Multiconexion' in data:
+			return data['Multiconexion']
+		else:
+			# Probablemente una versión antigua del archivo, por lo tanto, hacer los zócalos derechos como multiconexión por defecto.
+			return data['Posicion'] in (Derecha_abajo, Derecha_arriba)
+	
 	def serializacion(self):
 		return OrderedDict([
 			('id', self.id),
@@ -80,6 +87,6 @@ class Zocalo(Serializable):
 	
 	def deserializacion(self, data, hashmap={}, restaure_id=True):
 		if restaure_id: self.id = data['id']
-		self.esmulticonexion = data['Multiconexion']
+		self.esmulticonexion = self.determinarmulticonexion(data)
 		hashmap[data['id']] = self
 		return True

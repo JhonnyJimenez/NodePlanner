@@ -1,3 +1,4 @@
+import os
 import json
 from collections import OrderedDict
 from nodeeditor.Seriabilizador import Serializable
@@ -6,6 +7,9 @@ from nodeeditor.Nodo import Nodo
 from nodeeditor.Conexiones import Conexion
 from nodeeditor.Historial_escena import HistorialEscena
 from nodeeditor.Portapapeles import PortapapelesEscena
+from nodeeditor.Utilidades import dump_exception
+
+class InvalidFile(Exception): pass
 
 
 class Escena(Serializable):
@@ -76,13 +80,17 @@ class Escena(Serializable):
 	def abrirArchivo(self, archivo):
 		with open(archivo, "r") as file:
 			raw_data = file.read()
-			data = json.loads(raw_data)
-			# En el tutorial en la linea 45 añade un «enconding='utf-8'», pero al añadirla yo,
-			# el parametro encoding no aparece, y ejecutar este codigo al presionar las respectivas
-			# teclas da error. Decidí eliminarlo y dejar esta nota por si surge algún error luego por esto.
-			self.deserializacion(data)
-			
-			self.elementos_modificados = False
+			try:
+				data = json.loads(raw_data)
+				# En el tutorial en la linea 45 añade un «enconding='utf-8'», pero al añadirla yo,
+				# el parametro encoding no aparece, y ejecutar este codigo al presionar las respectivas
+				# teclas da error. Decidí eliminarlo y dejar esta nota por si surge algún error luego por esto.
+				self.deserializacion(data)
+				self.elementos_modificados = False
+			except json.JSONDecodeError:
+				raise InvalidFile("%s no es un archivo JSON válido." % os.path.basename(archivo))
+			except Exception as e:
+				dump_exception(e)
 	
 	
 	def serializacion(self):

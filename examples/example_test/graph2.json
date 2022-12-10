@@ -1,0 +1,105 @@
+{
+    "id": 1737562339536,
+    "Escena_Ancho": 64000,
+    "Escena_Alto": 64000,
+    "Nodos": [
+        {
+            "id": 1737562540816,
+            "Titulo": "Nodo cronista",
+            "Pos_x": -249.0,
+            "Pos_y": -208.0,
+            "Entradas": [
+                {
+                    "id": 1737593591184,
+                    "Indice": 0,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 0
+                },
+                {
+                    "id": 1737593591248,
+                    "Indice": 1,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 0
+                },
+                {
+                    "id": 1737593591952,
+                    "Indice": 2,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 0
+                }
+            ],
+            "Salidas": [
+                {
+                    "id": 1737593592656,
+                    "Indice": 0,
+                    "Multiconexion": true,
+                    "Posicion": 3,
+                    "Tipo_de_zocalo": 1
+                }
+            ],
+            "Contenido": {}
+        },
+        {
+            "id": 1737593593360,
+            "Titulo": "Nodo de personaje",
+            "Pos_x": 70.0,
+            "Pos_y": -75.0,
+            "Entradas": [
+                {
+                    "id": 1737593594832,
+                    "Indice": 0,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 3
+                },
+                {
+                    "id": 1737593594896,
+                    "Indice": 1,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 3
+                },
+                {
+                    "id": 1737593595600,
+                    "Indice": 2,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 3
+                }
+            ],
+            "Salidas": [
+                {
+                    "id": 1737593596304,
+                    "Indice": 0,
+                    "Multiconexion": true,
+                    "Posicion": 3,
+                    "Tipo_de_zocalo": 1
+                }
+            ],
+            "Contenido": {}
+        }
+    ],
+    "Conexiones": [
+        {
+            "id": 1737593600912,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 1737593592656,
+            "Zocalo_de_destino": 1737593594832
+        },
+        {
+            "id": 1737593723792,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 1737593592656,
+            "Zocalo_de_destino": 1737593594896
+        },
+        {
+            "id": 1737593727504,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 1737593596304,
+            "Zocalo_de_destino": 1737593595600
+        }
+    ]
+}

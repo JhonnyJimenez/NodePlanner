@@ -31,7 +31,7 @@ class VenCalc(Ventana):
 		self.mdiArea.setTabsMovable(True)
 		self.setCentralWidget(self.mdiArea)
 		
-		self.mdiArea.subWindowActivated.connect(self.actualizarMenuVentana)
+		self.mdiArea.subWindowActivated.connect(self.actualizarMenus)
 		self.windowMapper = QSignalMapper(self)
 		self.windowMapper.mapped[QWidget].connect(self.configSubVentanaActiva)
 		
@@ -39,7 +39,7 @@ class VenCalc(Ventana):
 		self.crearMenus()
 		self.crearBarradeHerramientas()
 		self.crearBarradeEstado()
-		self.actualizarMenuVentana()
+		self.actualizarMenus()
 		
 		self.crearDockdeNodos()
 		
@@ -55,20 +55,35 @@ class VenCalc(Ventana):
 			self.escribirConfigs()
 			event.accept()
 	
+	def actualizarMenus(self):
+		print("Menús actualizados")
+		activo = self.subVentanaActiva()
+		haysubventanas = (activo is not None)
+		
+		self.ActGuardar.setEnabled(haysubventanas)
+		self.ActGuardarComo.setEnabled(haysubventanas)
+		self.ActCerrar.setEnabled(haysubventanas)
+		self.ActCerrarTodas.setEnabled(haysubventanas)
+		self.ActTile.setEnabled(haysubventanas)
+		self.ActCascade.setEnabled(haysubventanas)
+		self.ActVenSig.setEnabled(haysubventanas)
+		self.ActVenAnt.setEnabled(haysubventanas)
+		self.ActSeparator.setEnabled(haysubventanas)
+	
 	def actualizarMenuVentana(self):
 		self.MenuVentana.clear()
-		self.MenuVentana.addAction(self.closeAct)
-		self.MenuVentana.addAction(self.closeAllAct)
+		self.MenuVentana.addAction(self.ActCerrar)
+		self.MenuVentana.addAction(self.ActCerrarTodas)
 		self.MenuVentana.addSeparator()
-		self.MenuVentana.addAction(self.tileAct)
-		self.MenuVentana.addAction(self.cascadeAct)
+		self.MenuVentana.addAction(self.ActTile)
+		self.MenuVentana.addAction(self.ActCascade)
 		self.MenuVentana.addSeparator()
-		self.MenuVentana.addAction(self.nextAct)
-		self.MenuVentana.addAction(self.previousAct)
-		self.MenuVentana.addAction(self.separatorAct)
+		self.MenuVentana.addAction(self.ActVenSig)
+		self.MenuVentana.addAction(self.ActVenAnt)
+		self.MenuVentana.addAction(self.ActSeparator)
 		
 		windows = self.mdiArea.subWindowList()
-		self.separatorAct.setVisible(len(windows) != 0)
+		self.ActSeparator.setVisible(len(windows) != 0)
 	
 		for i, window in enumerate(windows):
 			child = window.widget()
@@ -86,21 +101,66 @@ class VenCalc(Ventana):
 	def crearAcciones(self):
 		super().crearAcciones()
 		
-		self.closeAct = QAction("C&errar", self, statusTip="Cierra la ventana activa.", triggered=self.mdiArea.closeActiveSubWindow)
-		self.closeAllAct = QAction("Ce&rrar todas", self, statusTip="Cierra todas las ventanas.", triggered=self.mdiArea.closeAllSubWindows)
-		self.tileAct = QAction("&Apilada", self, statusTip="Apila las ventanas.", triggered=self.mdiArea.tileSubWindows)
-		self.cascadeAct = QAction("&Cascada", self, statusTip="Coloca las ventanas en cascada.", triggered=self.mdiArea.cascadeSubWindows)
-		self.nextAct = QAction("S&iguiente", self, shortcut=QKeySequence.NextChild, statusTip="Activa la siguiente ventana.", triggered=self.mdiArea.activateNextSubWindow)
-		self.previousAct = QAction("A&nterior", self, shortcut=QKeySequence.PreviousChild, statusTip="Activa la ventana anterior.", triggered=self.mdiArea.activatePreviousSubWindow)
-		self.separatorAct = QAction(self)
-		self.separatorAct.setSeparator(True)
+		self.ActCerrar = QAction("C&errar", self, statusTip="Cierra la ventana activa.", triggered=self.mdiArea.closeActiveSubWindow)
+		self.ActCerrarTodas = QAction("Ce&rrar todas", self, statusTip="Cierra todas las ventanas.", triggered=self.mdiArea.closeAllSubWindows)
+		self.ActTile = QAction("&Apilada", self, statusTip="Apila las ventanas.", triggered=self.mdiArea.tileSubWindows)
+		self.ActCascade = QAction("&Cascada", self, statusTip="Coloca las ventanas en cascada.", triggered=self.mdiArea.cascadeSubWindows)
+		self.ActVenSig = QAction("S&iguiente", self, shortcut=QKeySequence.NextChild, statusTip="Activa la siguiente ventana.", triggered=self.mdiArea.activateNextSubWindow)
+		self.ActVenAnt = QAction("A&nterior", self, shortcut=QKeySequence.PreviousChild, statusTip="Activa la ventana anterior.", triggered=self.mdiArea.activatePreviousSubWindow)
+		self.ActSeparator = QAction(self)
+		self.ActSeparator.setSeparator(True)
 		
 		self.MSobre = QAction("&About", self, statusTip="Muestra una ventana con información de la aplicación.", triggered=self.sobre)
 	
 	def NuevoArchivo(self):
-		subven = self.crearSubVentana()
-		subven.show()
+		try:
+			subven = self.crearSubVentana()
+			subven.show()
+		except Exception as e: dump_exception(e)
+		
+	def GuardarArchivo(self):
+		ActualEditordeNodos = self.subVentanaActiva()
+		if ActualEditordeNodos:
+			if not ActualEditordeNodos.confirmarsihaynombredearchivo():
+				return self.GuardarArchivoComo()
+			else:
+				ActualEditordeNodos.guardararchivo() # No pasamos el nombre, mantener el nombre.
+				self.statusBar().showMessage("Guardado satisfactoriamente en %s" % ActualEditordeNodos.filename, 5000)
+				ActualEditordeNodos.definirtitulo()
+				return True
 	
+	def GuardarArchivoComo(self):
+		ActualEditordeNodos = self.subVentanaActiva()
+		if ActualEditordeNodos:
+			fname, filter = QFileDialog.getSaveFileName(self, "Guarda el archivo actual.")
+			
+			if fname == '': return False
+			
+			ActualEditordeNodos.guardararchivo(fname)
+			ActualEditordeNodos.definirtitulo()
+			self.statusBar().showMessage("Guardado satisfactoriamente como %s" % fname, 5000)
+		
+	def AbrirArchivo(self):
+		fnames, filter = QFileDialog.getOpenFileNames(self, 'Abrir')
+		
+		try:
+			for fname in fnames:
+				if fname:
+					existing = self.encontrarSubVentana(fname)
+					if existing:
+						self.mdiArea.setActiveSubWindow(existing)
+					else:
+						# Necesitaremos crear una nueva subventana y abrir el archivo.
+						editor_de_nodos = SubVenCalc()
+						if editor_de_nodos.leerarchivo(fname):
+							self.statusBar().showMessage("Archivo abierto: %s" % fname, 5000)
+							editor_de_nodos.definirtitulo()
+							subven = self.mdiArea.addSubWindow(editor_de_nodos)
+							subven.show()
+						else:
+							editor_de_nodos.close()
+		except Exception as e: dump_exception(e)
+		
 	def sobre(self):
 		QMessageBox.about(self, "Sobre el ejemplo \"Calculadora de nodos\"",
 						  "El ejemplo <b>Calculadora con nodos</b> demuestra cómo escribir múltiples "
@@ -111,16 +171,13 @@ class VenCalc(Ventana):
 		super().crearMenus()
 		
 		self.MenuVentana = self.menuBar().addMenu("&Ventana")
-		self.actualizarMenuenVentanas()
-		self.MenuVentana.aboutToShow.connect(self.actualizarMenuenVentanas)
+		self.actualizarMenuVentana()
+		self.MenuVentana.aboutToShow.connect(self.actualizarMenuVentana)
 		
 		self.menuBar().addSeparator()
 		
 		self.MenuAyuda = self.menuBar().addMenu("&Ayuda")
 		self.MenuAyuda.addAction(self.MSobre)
-		
-	def actualizarMenuenVentanas(self):
-		pass
 	
 	def crearBarradeHerramientas(self):
 		pass
@@ -145,6 +202,12 @@ class VenCalc(Ventana):
 		editor_de_nodos = SubVenCalc()
 		subven = self.mdiArea.addSubWindow(editor_de_nodos)
 		return subven
+	
+	def encontrarSubVentana(self, filename):
+		for window in self.mdiArea.subWindowList():
+			if window.widget().filename == filename:
+				return window
+		return None
 	
 	def subVentanaActiva(self):
 		# Estamos devolviendo el widget de nodos aquí...

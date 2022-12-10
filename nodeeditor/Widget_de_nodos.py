@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 from nodeeditor.GraficosdelaVista_vp import GraficosdelaVistaVP
-from nodeeditor.Escena import Escena
+from nodeeditor.Escena import Escena, InvalidFile
 from nodeeditor.Nodo import Nodo
 from nodeeditor.Conexiones import Conexion, recta, bezier
 
@@ -36,6 +36,31 @@ class EditorDeNodos(QWidget):
 	def obtenerNombreAmigablealUsuario(self):
 		nombre = os.path.basename(self.filename) if self.confirmarsihaynombredearchivo() else "Nuevo archivo"
 		return nombre + ("*" if self.haycambios() else "")
+	
+	def leerarchivo(self, filename):
+		QApplication.setOverrideCursor(Qt.WaitCursor)
+		try:
+			self.escena.abrirArchivo(filename)
+			self.filename = filename
+			# Limpiar historial.
+			return True
+		except InvalidFile as e:
+			print(e)
+			QApplication.restoreOverrideCursor()
+			QMessageBox.warning(self, "Error al abrir %s" % os.path.basename(filename), str(e))
+			return False
+		finally:
+			QApplication.restoreOverrideCursor()
+			
+		return False
+	
+	def guardararchivo(self, filename=None):
+		# Cuando se llame sin parámetros no podremos almacenar el nombre de archivo.
+		if filename is not None: self.filename = filename
+		QApplication.setOverrideCursor(Qt.WaitCursor)
+		self.escena.guardarArchivo(self.filename)
+		QApplication.restoreOverrideCursor()
+		return True
 	
 	def agregadodenodos(self):
 		nodo1 = Nodo(self.escena, "Nodo cronista", entradas=[0, 0, 0], salidas=[1])
