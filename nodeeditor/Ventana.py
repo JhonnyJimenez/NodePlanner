@@ -89,7 +89,7 @@ class Ventana(QMainWindow):
 
 	
 	def closeEvent(self, event):
-		if self.confirmacion():
+		if self.confirmarCierre():
 			event.accept()
 		else:
 			event.ignore()
@@ -98,9 +98,9 @@ class Ventana(QMainWindow):
 		return self.centralWidget()
 	
 	def ArchivoModificado(self):
-		return self.obtenerActualEditordeNodos().escena.elementos_modificados
+		return self.obtenerActualEditordeNodos().escena.haycambios()
 			
-	def confirmacion(self):
+	def confirmarCierre(self):
 		if not self.ArchivoModificado():
 			return True
 		
@@ -121,13 +121,13 @@ class Ventana(QMainWindow):
 		self.status_mouse_pos.setText("Posición: [%d, %d]" % (x, y))
 		
 	def NuevoArchivo(self):
-		if self.confirmacion():
+		if self.confirmarCierre():
 			self.obtenerActualEditordeNodos().nuevoarchivo()
 			self.definirtitulo()
 			
 		
 	def AbrirArchivo(self):
-		if self.confirmacion():
+		if self.confirmarCierre():
 			fname, filter = QFileDialog.getOpenFileName(self, 'Abrir')
 			if fname != '' and os.path.isfile(fname):
 				self.obtenerActualEditordeNodos().leerarchivo(fname)
@@ -161,39 +161,45 @@ class Ventana(QMainWindow):
 			return True
 		
 	def DeshacerMEditar(self):
-		self.obtenerActualEditordeNodos().escena.historial.deshacer()
+		if self.obtenerActualEditordeNodos():
+			self.obtenerActualEditordeNodos().escena.historial.deshacer()
 		
 	def RehacerMEditar(self):
-		self.obtenerActualEditordeNodos().escena.historial.rehacer()
+		if self.obtenerActualEditordeNodos():
+			self.obtenerActualEditordeNodos().escena.historial.rehacer()
 	
 	def EliminarMEditar(self):
-		self.obtenerActualEditordeNodos().escena.GraficosEsc.views()[0].eliminarSeleccionado()
+		if self.obtenerActualEditordeNodos():
+			self.obtenerActualEditordeNodos().escena.GraficosEsc.views()[0].eliminarSeleccionado()
 	
 	def CortarMEditar(self):
-		data = self.obtenerActualEditordeNodos().escena.portapapeles.serializacionSeleccionado(delete=True)
-		str_data = json.dumps(data, indent=4)
-		QApplication.instance().clipboard().setText(str_data)
+		if self.obtenerActualEditordeNodos():
+			data = self.obtenerActualEditordeNodos().escena.portapapeles.serializacionSeleccionado(delete=True)
+			str_data = json.dumps(data, indent=4)
+			QApplication.instance().clipboard().setText(str_data)
 
 	def CopiarMEditar(self):
-		data = self.obtenerActualEditordeNodos().escena.portapapeles.serializacionSeleccionado(delete=False)
-		str_data = json.dumps(data, indent=4)
-		QApplication.instance().clipboard().setText(str_data)
+		if self.obtenerActualEditordeNodos():
+			data = self.obtenerActualEditordeNodos().escena.portapapeles.serializacionSeleccionado(delete=False)
+			str_data = json.dumps(data, indent=4)
+			QApplication.instance().clipboard().setText(str_data)
 		
 	def PegarMEditar(self):
-		raw_data = QApplication.instance().clipboard().text()
-		
-		try:
-			data = json.loads(raw_data)
-		except ValueError as e:
-			print("¡Pegaste datos og inválidos!", e)
-			return
-
-		# Verificar si los datos json son correctos.
-		if "Nodos" not in data:
-			print("¡Los datos no contienen ningún nodo!")
-			return
-		
-		self.obtenerActualEditordeNodos().escena.portapapeles.deserializacionDesdePortapapeles(data)
+		if self.obtenerActualEditordeNodos():
+			raw_data = QApplication.instance().clipboard().text()
+			
+			try:
+				data = json.loads(raw_data)
+			except ValueError as e:
+				print("¡Pegaste datos og inválidos!", e)
+				return
+	
+			# Verificar si los datos json son correctos.
+			if "Nodos" not in data:
+				print("¡Los datos no contienen ningún nodo!")
+				return
+			
+			self.obtenerActualEditordeNodos().escena.portapapeles.deserializacionDesdePortapapeles(data)
 	
 	def leerConfigs(self):
 		config = QSettings(self.compania, self.nombre_del_producto)

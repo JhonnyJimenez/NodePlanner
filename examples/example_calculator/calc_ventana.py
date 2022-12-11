@@ -22,6 +22,8 @@ class VenCalc(Ventana):
 			self.styleSheet_filename,
 		)
 		
+		self.icono_vacio = QIcon(".")
+		
 		self.mdiArea = QMdiArea()
 		self.mdiArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 		self.mdiArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -97,7 +99,7 @@ class VenCalc(Ventana):
 						if editor_de_nodos.leerarchivo(fname):
 							self.statusBar().showMessage("Archivo abierto: %s" % fname, 5000)
 							editor_de_nodos.definirtitulo()
-							subven = self.mdiArea.addSubWindow(editor_de_nodos)
+							subven = self.crearSubVentana(editor_de_nodos)
 							subven.show()
 						else:
 							editor_de_nodos.close()
@@ -142,19 +144,21 @@ class VenCalc(Ventana):
 		# print("Menús actualizados.")
 	
 	def actualizarMenuEditar(self):
-		activo = self.obtenerActualEditordeNodos()
-		haysubventanas = (activo is not None)
-		
-		self.ActPegar.setEnabled(haysubventanas)
-		
-		self.ActCortar.setEnabled(haysubventanas and activo.hayAlgoSeleccionado())
-		self.ActCopiar.setEnabled(haysubventanas and activo.hayAlgoSeleccionado())
-		self.ActEliminar.setEnabled(haysubventanas and activo.hayAlgoSeleccionado())
-		
-		self.ActDeshacer.setEnabled(haysubventanas and activo.habilitarDeshacer())
-		self.ActRehacer.setEnabled(haysubventanas and activo.habilitarRehacer())
-		
-		print("Menú Editar actualizado.")
+		try:
+			activo = self.obtenerActualEditordeNodos()
+			haysubventanas = (activo is not None)
+			
+			self.ActPegar.setEnabled(haysubventanas)
+			
+			self.ActCortar.setEnabled(haysubventanas and activo.hayAlgoSeleccionado())
+			self.ActCopiar.setEnabled(haysubventanas and activo.hayAlgoSeleccionado())
+			self.ActEliminar.setEnabled(haysubventanas and activo.hayAlgoSeleccionado())
+			
+			self.ActDeshacer.setEnabled(haysubventanas and activo.habilitarDeshacer())
+			self.ActRehacer.setEnabled(haysubventanas and activo.habilitarRehacer())
+			
+			print("Menú Editar actualizado.")
+		except Exception as e: dump_exception(e)
 	
 	def actualizarMenuVentana(self):
 		self.menu_ventana.clear()
@@ -204,10 +208,24 @@ class VenCalc(Ventana):
 	def crearBarradeEstado(self):
 		self.statusBar().showMessage("Listo")
 	
-	def crearSubVentana(self):
-		editor_de_nodos = SubVenCalc()
+	def crearSubVentana(self, subwidget=None):
+		editor_de_nodos = subwidget if subwidget is not None else SubVenCalc()
 		subven = self.mdiArea.addSubWindow(editor_de_nodos)
+		subven.setWindowIcon(self.icono_vacio)
+		# editor_de_nodos.escena.agregarObjetoSeleccionadoListener(self.actualizarMenuEditar)
+		# editor_de_nodos.escena.agregarObjetosNoSeleccionadosListener(self.actualizarMenuEditar)
+		editor_de_nodos.escena.historial.agregarmodificadoresdelhistorialisteners(self.actualizarMenuEditar)
+		editor_de_nodos.agregarCloseEventListeners(self.cerrarSubVentana)
 		return subven
+	
+	def cerrarSubVentana(self, widget, event):
+		existe = self.encontrarSubVentana(widget.filename)
+		self.mdiArea.setActiveSubWindow(existe)
+		
+		if self.confirmarCierre():
+			event.accept()
+		else:
+			event.ignore()
 	
 	def encontrarSubVentana(self, filename):
 		for window in self.mdiArea.subWindowList():

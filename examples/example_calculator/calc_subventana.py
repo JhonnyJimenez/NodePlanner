@@ -11,5 +11,14 @@ class SubVenCalc(EditorDeNodos):
 		
 		self.escena.agregarElementosModificadosListener(self.definirtitulo)
 		
+		self._close_event_listeners = []
+		
 	def definirtitulo(self):
 		self.setWindowTitle(self.obtenerNombreAmigablealUsuario())
+		
+	def agregarCloseEventListeners(self, callback):
+		self._close_event_listeners.append(callback)
+		
+	def closeEvent(self, event):
+		for callback in self._close_event_listeners: callback(self, event)
+		

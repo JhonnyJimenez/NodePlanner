@@ -13,6 +13,8 @@ class HistorialEscena:
 		self.historial_nuevo()
 		self.limite_historial = 32
 		
+		self._modificadores_del_historial_listeners = []
+		
 	def historial_nuevo(self):
 		self.listado_historial = []
 		self.pos_act_historial = -1
@@ -32,18 +34,25 @@ class HistorialEscena:
 		if self.habilitarDeshacer():
 			self.pos_act_historial -= 1
 			self.restaurarHistorial()
+			self.escena._elementos_modificados = True
 		
 	def rehacer(self):
 		if DEBUG: print("Redo")
+		
 		if self.habilitarRehacer():
 			self.pos_act_historial += 1
 			self.restaurarHistorial()
+			self.escena._elementos_modificados = True
+			
+	def agregarmodificadoresdelhistorialisteners(self, callback):
+		self._modificadores_del_historial_listeners.append(callback)
 		
 	def restaurarHistorial(self):
 		if DEBUG: print("Restaurando historial",
 						".... posición actual: @%d" % self.pos_act_historial,
 						"(%d)" % len(self.listado_historial))
 		self.RestaurarMarcaHistorial(self.listado_historial[self.pos_act_historial])
+		for callback in self._modificadores_del_historial_listeners: callback()
 
 
 	def almacenarHistorial(self, desc, setModified=False):
@@ -68,6 +77,8 @@ class HistorialEscena:
 		self.listado_historial.append(hs)
 		self.pos_act_historial += 1
 		if DEBUG: print(" == configurando posición a:", self.pos_act_historial)
+		
+		for callback in self._modificadores_del_historial_listeners: callback()
 		
 	def crear_Marca_Historial(self, desc):
 		sel_obj = {
