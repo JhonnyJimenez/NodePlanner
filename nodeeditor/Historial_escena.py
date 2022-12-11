@@ -1,4 +1,5 @@
 from nodeeditor.GraficosdeConexion import GraficosdeConexion
+from nodeeditor.GraficosdelNodo import GraficosdelNodo
 
 from nodeeditor.Utilidades import dump_exception
 
@@ -75,8 +76,8 @@ class HistorialEscena:
 		}
 		
 		for objeto in self.escena.GraficosEsc.selectedItems():
-			if hasattr(objeto, 'Nodo'):
-				sel_obj['nodos'].append(objeto.Nodo.id)
+			if isinstance(objeto, GraficosdelNodo):
+				sel_obj['nodos'].append(objeto.nodo.id)
 			elif isinstance(objeto, GraficosdeConexion):
 				sel_obj['conexiones'].append(objeto.linea.id)
 		

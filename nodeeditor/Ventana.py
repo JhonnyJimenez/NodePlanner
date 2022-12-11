@@ -26,7 +26,7 @@ class Ventana(QMainWindow):
 		self.crearMenus()
 		
 		self.Editor_de_nodos = EditorDeNodos(self)
-		self.Editor_de_nodos.escena.addelementosmodificadoslistener(self.definirtitulo)
+		self.Editor_de_nodos.escena.agregarElementosModificadosListener(self.definirtitulo)
 		self.setCentralWidget(self.Editor_de_nodos)
 		
 		self.crearBarradeEstado()

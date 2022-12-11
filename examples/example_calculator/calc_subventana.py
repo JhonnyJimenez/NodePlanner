@@ -9,7 +9,7 @@ class SubVenCalc(EditorDeNodos):
 		
 		self.definirtitulo()
 		
-		self.escena.addelementosmodificadoslistener(self.definirtitulo)
+		self.escena.agregarElementosModificadosListener(self.definirtitulo)
 		
 	def definirtitulo(self):
 		self.setWindowTitle(self.obtenerNombreAmigablealUsuario())

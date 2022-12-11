@@ -22,13 +22,39 @@ class Escena(Serializable):
 		self.Escena_Alto = 64000
 		
 		self._elementos_modificados = False
-		self._elementos_modificados_listeners = []
+		self._ultimos_objetos_seleccionados = []
 		
+		# Inicializado de los listeners.
+		self._elementos_modificados_listeners = []
+		self._objeto_seleccionado_listeners = []
+		self._objetos_no_seleccionados_listeners = []
+		
+		self.initUI()
+		self.historial = HistorialEscena(self)
+		self.portapapeles = PortapapelesEscena(self)
+		
+		self.GraficosEsc.objetoSeleccionado.connect(self.objetoSeleccionado)
+		self.GraficosEsc.objetosNoSeleccionados.connect(self.objetosNoSeleccionados)
+		
+	def initUI(self):
 		self.GraficosEsc = GraficosdelaEscenaVP(self)
 		self.GraficosEsc.config_esc(self.Escena_Ancho, self.Escena_Alto)
 		
-		self.historial = HistorialEscena(self)
-		self.portapapeles = PortapapelesEscena(self)
+	def objetoSeleccionado(self):
+		objetos_seleccionados_actualmente = self.objetosSeleccionados()
+		if objetos_seleccionados_actualmente != self._ultimos_objetos_seleccionados:
+			self._ultimos_objetos_seleccionados = objetos_seleccionados_actualmente
+			self.historial.almacenarHistorial("La selección ha cambiado.")
+			for callback in self._objeto_seleccionado_listeners: callback()
+			
+		
+	def objetosNoSeleccionados(self):
+		self.restaurarUltimoEstadodeSeleccion()
+		if self._ultimos_objetos_seleccionados != []:
+			self._ultimos_objetos_seleccionados = []
+			self.historial.almacenarHistorial("Todos los objetos se han deseleccionado.")
+			for callback in self._objetos_no_seleccionados_listeners: callback()
+			
 		
 	def haycambios(self):
 		return self.elementos_modificados
@@ -43,16 +69,30 @@ class Escena(Serializable):
 	@elementos_modificados.setter
 	def elementos_modificados(self, value):
 		if not self._elementos_modificados and value:
+			# Configurándolo ahora, porque se leerá el dato pronto.
 			self._elementos_modificados = value
 			
-			# llamar a todos los listeners
-			for callback in self._elementos_modificados_listeners:
-				callback()
+			# Llama todos los listeners registrados.
+			for callback in self._elementos_modificados_listeners: callback()
 		
 		self._elementos_modificados = value
 		
-	def addelementosmodificadoslistener(self, callback):
+	# Funciones de ayuda para los listeners.
+	def agregarElementosModificadosListener(self, callback):
 		self._elementos_modificados_listeners.append(callback)
+		
+	def agregarObjetoSeleccionadoListener(self, callback):
+		self._objeto_seleccionado_listeners.append(callback)
+	
+	def agregarObjetosNoSeleccionadosListener(self, callback):
+		self._objetos_no_seleccionados_listeners.append(callback)
+	
+	# Señales para detectar si algún nodo o conexión a sido seleccionado.
+	def restaurarUltimoEstadodeSeleccion(self):
+		for nodo in self.Nodos:
+			nodo.Nodograficas._ultimo_estado_de_seleccion = False
+		for conexion in self.Conexiones:
+			conexion.GraficosDeConexion._ultimo_estado_de_seleccion = False
 	
 	def agregarnodo(self, nodo):
 		self.Nodos.append(nodo)

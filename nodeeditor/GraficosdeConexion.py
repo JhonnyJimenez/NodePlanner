@@ -15,6 +15,21 @@ class GraficosdeConexion(QGraphicsPathItem):
 		
 		self.linea = linea
 		
+		# init de eventos.
+		self._ultimo_estado_de_seleccion = False
+		
+		# init de variables.
+		self.posicion_origen = [0, 0]
+		self.posicion_destino = [200, 100]
+		
+		self.initAssets()
+		self.initUI()
+
+	def initUI(self):
+		self.setFlag(QGraphicsItem.ItemIsSelectable)
+		self.setZValue(-1)
+		
+	def initAssets(self):
 		self._color = QColor("#001000")
 		self._color_seleccionado = QColor("#00ff00")
 		self._pen = QPen(self._color)
@@ -25,12 +40,15 @@ class GraficosdeConexion(QGraphicsPathItem):
 		self._pen_seleccionado.setWidth(2)
 		self._pen_dibujo.setWidth(2)
 		
-		self.setFlag(QGraphicsItem.ItemIsSelectable)
+	def seleccionado(self):
+		self.linea.escena.GraficosEsc.objetoSeleccionado.emit()
 		
-		self.setZValue(-1)
-		
-		self.posicion_origen = [0, 0]
-		self.posicion_destino = [200, 100]
+	def mouseReleaseEvent(self, event):
+		super().mouseReleaseEvent(event)
+		if self._ultimo_estado_de_seleccion != self.isSelected():
+			self.linea.escena.restaurarUltimoEstadodeSeleccion()
+			self._ultimo_estado_de_seleccion = self.isSelected()
+			self.seleccionado()
 		
 	def punto_origen(self, x, y):
 		self.posicion_origen = [x, y]

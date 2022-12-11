@@ -165,11 +165,23 @@ class GraficosdelaVistaVP(QGraphicsView):
 			self.modo = MODO_NORMAL
 			return
 		
-		# if self.dragMode() == QGraphicsView.RubberBandDrag:
 		if self.rubberBandDraggingRectangle:
-			self.escena.escena.historial.almacenarHistorial("Selection changed")
 			self.rubberBandDraggingRectangle = False
+			objetos_seleccionados_actualmente = self.escena.selectedItems()
+			
+			if objetos_seleccionados_actualmente != self.escena.escena._ultimos_objetos_seleccionados:
+				if objetos_seleccionados_actualmente == []:
+					self.escena.objetosNoSeleccionados.emit()
+				else:
+					self.escena.objetoSeleccionado.emit()
+				self.escena.escena._ultimos_objetos_seleccionados = objetos_seleccionados_actualmente
+			
+			return
 		
+		# De otro modo deseleccionar todos los objetos.
+		if objeto is None:
+			self.escena.objetosNoSeleccionados.emit()
+			
 		super().mouseReleaseEvent(event)
 
 	def rightMouseButtonPress(self, event):
