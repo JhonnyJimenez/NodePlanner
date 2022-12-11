@@ -6,6 +6,7 @@ from PyQt5.QtCore import *
 from nodeeditor.Utilidades import dump_exception, loadstylesheets, pp
 from nodeeditor.Ventana import Ventana
 from examples.example_calculator.calc_subventana import SubVenCalc
+from examples.example_calculator.calc_drag_listbox import Listbox
 
 # Imágenes para la skin negra.
 import examples.example_calculator.qss.nodeeditor_dark_resources
@@ -37,13 +38,13 @@ class VenCalc(Ventana):
 		self.windowMapper = QSignalMapper(self)
 		self.windowMapper.mapped[QWidget].connect(self.configSubVentanaActiva)
 		
+		self.crearDockdeNodos()
+		
 		self.crearAcciones()
 		self.crearMenus()
 		self.crearBarradeHerramientas()
 		self.crearBarradeEstado()
 		self.actualizarMenus()
-		
-		self.crearDockdeNodos()
 		
 		self.leerConfigs()
 		
@@ -141,7 +142,7 @@ class VenCalc(Ventana):
 		self.actualizarMenuEditar()
 		self.actualizarMenuVentana()
 		
-		# print("Menús actualizados.")
+		print("Menús actualizados.")
 	
 	def actualizarMenuEditar(self):
 		try:
@@ -162,6 +163,14 @@ class VenCalc(Ventana):
 	
 	def actualizarMenuVentana(self):
 		self.menu_ventana.clear()
+		
+		barra_lateral_de_nodos = self.menu_ventana.addAction("Barra de nodos")
+		barra_lateral_de_nodos.setCheckable(True)
+		barra_lateral_de_nodos.triggered.connect(self.barraLateraldeNodos)
+		barra_lateral_de_nodos.setChecked(self.dockNodos.isVisible())
+		
+		self.menu_ventana.addSeparator()
+		
 		self.menu_ventana.addAction(self.ActCerrar)
 		self.menu_ventana.addAction(self.ActCerrarTodas)
 		self.menu_ventana.addSeparator()
@@ -187,23 +196,25 @@ class VenCalc(Ventana):
 			action.setChecked(child is self.obtenerActualEditordeNodos())
 			action.triggered.connect(self.windowMapper.map)
 			self.windowMapper.setMapping(action, window)
-		# print("Menú Ventana actualizado.")
+		print("Menú Ventana actualizado.")
+		
+	def barraLateraldeNodos(self):
+		if self.dockNodos.isVisible():
+			self.dockNodos.hide()
+		else:
+			self.dockNodos.show()
 	
 	def crearBarradeHerramientas(self):
 		pass
 	
 	def crearDockdeNodos(self):
-		self.listadeWidget = QListWidget()
-		self.listadeWidget.addItem("Sumar")
-		self.listadeWidget.addItem("Restar")
-		self.listadeWidget.addItem("Multiplicar")
-		self.listadeWidget.addItem("Dividir")
+		self.widgetListadeNodos = Listbox()
 		
-		self.objetos = QDockWidget("Nodos")
-		self.objetos.setWidget(self.listadeWidget)
-		self.objetos.setFloating(False)
+		self.dockNodos = QDockWidget("Nodos")
+		self.dockNodos.setWidget(self.widgetListadeNodos)
+		self.dockNodos.setFloating(False)
 		
-		self.addDockWidget(Qt.RightDockWidgetArea, self.objetos)
+		self.addDockWidget(Qt.RightDockWidgetArea, self.dockNodos)
 	
 	def crearBarradeEstado(self):
 		self.statusBar().showMessage("Listo")
