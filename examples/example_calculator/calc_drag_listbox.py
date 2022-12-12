@@ -6,8 +6,6 @@ from examples.example_calculator.calc_config import *
 from nodeeditor.Utilidades import dump_exception
 
 
-imagen = "iconos/owoAwoo.png"
-
 class Listbox(QListWidget):
 	def __init__(self, parent=None):
 		super().__init__()
@@ -23,12 +21,11 @@ class Listbox(QListWidget):
 		self.agregarMisObjetos()
 		
 	def agregarMisObjetos(self):
-		self.agregarMiObjeto("Entrada", imagen, NODO_ENTRADA)
-		self.agregarMiObjeto("Salida", imagen, NODO_SALIDA)
-		self.agregarMiObjeto("Sumar", imagen, NODO_SUMA)
-		self.agregarMiObjeto("Restar", imagen, NODO_RESTA)
-		self.agregarMiObjeto("Multiplicar", imagen, NODO_MULTIPLICACION)
-		self.agregarMiObjeto("Dividir", imagen, NODO_DIVISION)
+		keys = list(CALC_NODOS.keys())
+		keys.sort()
+		for key in keys:
+			nodo = obtener_clase_del_codigo_op(key)
+			self.agregarMiObjeto(nodo.titulo_op, nodo.icono, nodo.codigo_op)
 		
 	def agregarMiObjeto(self, nombre, icono=None, codigo_operacion=0):
 		objeto = QListWidgetItem(nombre, self) # Puede ser (icono, texto, parent, <int>type)

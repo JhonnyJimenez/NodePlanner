@@ -4,14 +4,16 @@ from nodeeditor.GraficosDeZocalos import GraficosDeZocalos
 
 
 Izquierda_arriba = 1
-Izquierda_abajo = 2
-Derecha_arriba = 3
-Derecha_abajo = 4
+Izquierda_centro = 2
+Izquierda_abajo = 3
+Derecha_arriba = 4
+Derecha_centro = 5
+Derecha_abajo = 6
 
 DEBUG = False
 
 class Zocalo(Serializable):
-	def __init__(self, nodo, indice, posicion, tipo_zocalo=1, multiconexion=True):
+	def __init__(self, nodo, indice, posicion, tipo_zocalo=1, multiconexion=True, cantidad_en_el_lado_actual=1, esEntrada=False):
 		super().__init__()
 		
 		self.nodo = nodo
@@ -19,23 +21,29 @@ class Zocalo(Serializable):
 		self.posicion = posicion
 		self.tipo_zocalo = tipo_zocalo
 		self.esmulticonexion = multiconexion
+		self.cantidad_en_el_lado_actual = cantidad_en_el_lado_actual
+		self.esEntrada = esEntrada
+		self.esSalida = not self.esEntrada
 		
 		if DEBUG:
 			self.debugnames(posicion)
 			print("Zócalo", self.indice, "ubicado", self.nposition, "del", self.nodo.titulo, self.nodo, )
-		
+			
 		self.GraficosZocalos = GraficosDeZocalos(self, self.tipo_zocalo)
 		
-		self.GraficosZocalos.setPos(*self.nodo.obtener_posicion_zocalo(indice, posicion))
+		self.definir_posicion_del_zocalo()
 		
 		self.Zocaloconexiones = []
 	
 	def __str__(self):
 		return "<Zócalo %s %s..%s>" % ("multiconexion" if self.esmulticonexion else "de conexion única", hex(id(self))[2:5], hex(id(self))[-3:])
 	
+	def definir_posicion_del_zocalo(self):
+		self.GraficosZocalos.setPos(*self.nodo.obtener_posicion_zocalo(self.indice, self.posicion, self.cantidad_en_el_lado_actual))
+	
 	def posicion_zocalo(self):
 		if DEBUG: print("   GSP:", self.indice, self.posicion, "Nodo:", self.nodo)
-		res =  self.nodo.obtener_posicion_zocalo(self.indice, self.posicion)
+		res =  self.nodo.obtener_posicion_zocalo(self.indice, self.posicion, self.cantidad_en_el_lado_actual)
 		if DEBUG: print("   res:", res)
 		return res
 		

@@ -3,6 +3,10 @@ from PyQt5.QtCore import *
 from examples.example_calculator.calc_config import *
 from nodeeditor.Widget_de_nodos import EditorDeNodos
 from examples.example_calculator.calc_nodo_base import CalcNodo
+from nodeeditor.Utilidades import dump_exception
+
+
+DEBUG = False
 
 
 class SubVenCalc(EditorDeNodos):
@@ -29,8 +33,6 @@ class SubVenCalc(EditorDeNodos):
 		for callback in self._close_event_listeners: callback(self, event)
 		
 	def arrastrar(self, event):
-		# print("Subventana de calculadora: Arrastrando objeto")
-		# print("Texto: '%s'" % event.mimeData().text())
 		if event.mimeData().hasFormat(LISTBOX_MIMETYPE):
 			event.acceptProposedAction()
 		else:
@@ -38,24 +40,24 @@ class SubVenCalc(EditorDeNodos):
 			event.setAccepted(False)
 	
 	def soltar(self, event):
-		# print("Subventana de calculadora: Soltando objeto")
-		# print("Texto: '%s'" % event.mimeData().text())
 		if event.mimeData().hasFormat(LISTBOX_MIMETYPE):
 			eventData = event.mimeData().data(LISTBOX_MIMETYPE)
 			dataStream = QDataStream(eventData, QIODevice.ReadOnly)
 			pixmap = QPixmap()
 			dataStream >> pixmap
-			codigo_operacion = dataStream.readInt()
+			codigo_op = dataStream.readInt()
 			text = dataStream.readQString()
 			
 			mouse_pos = event.pos()
 			escena_pos = self.escena.GraficosEsc.views()[0].mapToScene(mouse_pos)
 			
-			print("Objeto soltado: [%d] '%s'" % (codigo_operacion, text), "Mouse:", mouse_pos, "Escena:", escena_pos)
+			if DEBUG: print("Objeto soltado: [%d] '%s'" % (codigo_op, text), "Mouse:", mouse_pos, "Escena:", escena_pos)
 			
-			# ¡Arréglame!
-			nodo = CalcNodo(self.escena, codigo_operacion, text, entradas=[1, 1], salidas=[2])
-			nodo.definirposicion(escena_pos.x(), escena_pos.y())
+			try:
+				nodo = obtener_clase_del_codigo_op(codigo_op)(self.escena)
+				nodo.definirposicion(escena_pos.x(), escena_pos.y())
+				self.escena.historial.almacenarHistorial("Creación de un nodo: %s" % nodo.__class__.__name__)
+			except Exception as e: dump_exception(e)
 			
 			event.setDropAction(Qt.MoveAction)
 			event.accept()

@@ -14,7 +14,7 @@ def loadstylesheets(*args):
 	res = ''
 	
 	for arg in args:
-		print('Style loading:', arg)
+		# print('Style loading:', arg)
 		file = QFile(arg)
 		file.open(QFile.ReadOnly | QFile.Text)
 		stylesheet = file.readAll()

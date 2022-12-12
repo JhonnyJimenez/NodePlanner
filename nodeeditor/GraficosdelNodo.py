@@ -25,15 +25,16 @@ class GraficosdelNodo(QGraphicsItem):
 		self.titulo_del_nodo()
 		self.nombre = self.nodo.titulo
 		
-		self.initzocalos()
 		self.initContenido()
 		
 	def initSizes(self):
 		self.anchoNodo = 180
 		self.altoNodo = 240
-		self.redondezNodo = 10.0
+		self.redondezdelaOrilladelNodo = 10.0
+		self.sangria_de_la_orilla = 10.0
 		self.alturaTituloNodo = 24.0
-		self._sangria = 4.0
+		self.sangria_del_titulo = 4.0
+		self.sangria_vertical_del_titulo = 4.0
 		
 	def initAssets(self):
 		self._ColorDelTitulo = Qt.white
@@ -101,28 +102,26 @@ class GraficosdelNodo(QGraphicsItem):
 		self.titulo_del_objeto.nodo = self.nodo
 		self.titulo_del_objeto.setDefaultTextColor(self._ColorDelTitulo)
 		self.titulo_del_objeto.setFont(self._FuenteDelTitulo)
-		self.titulo_del_objeto.setPos(self._sangria, 0)
+		self.titulo_del_objeto.setPos(self.sangria_del_titulo, 0)
 		self.titulo_del_objeto.setTextWidth(
 			self.anchoNodo
-			- 2 * self._sangria
+			- 2 * self.sangria_del_titulo
 		)
 	
 	def initContenido(self):
 		self.GraficosContenidoNodo = QGraphicsProxyWidget(self)
-		self.contenido.setGeometry(int(self.redondezNodo), int(self.alturaTituloNodo + self.redondezNodo), self.anchoNodo - int((2 * self.redondezNodo)), self.altoNodo - int((2 * self.redondezNodo) + self.alturaTituloNodo))
+		self.contenido.setGeometry(int(self.sangria_de_la_orilla), int(self.alturaTituloNodo + self.sangria_de_la_orilla),
+								   self.anchoNodo - int((2 * self.sangria_de_la_orilla)), self.altoNodo - int((2 * self.sangria_de_la_orilla) + self.alturaTituloNodo))
 		self.GraficosContenidoNodo.setWidget(self.contenido)
-		
-	def initzocalos(self):
-		pass
-		
+
 	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
 		
 		# Título
 		dibujado_del_titulo = QPainterPath()
 		dibujado_del_titulo.setFillRule(Qt.WindingFill)
-		dibujado_del_titulo.addRoundedRect(0, 0, self.anchoNodo, self.alturaTituloNodo, self.redondezNodo, self.redondezNodo)
-		dibujado_del_titulo.addRect(0, self.alturaTituloNodo - self.redondezNodo, self.redondezNodo, self.redondezNodo)
-		dibujado_del_titulo.addRect(self.anchoNodo - self.redondezNodo, self.alturaTituloNodo - self.redondezNodo, self.redondezNodo, self.redondezNodo)
+		dibujado_del_titulo.addRoundedRect(0, 0, self.anchoNodo, self.alturaTituloNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
+		dibujado_del_titulo.addRect(0, self.alturaTituloNodo - self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
+		dibujado_del_titulo.addRect(self.anchoNodo - self.redondezdelaOrilladelNodo, self.alturaTituloNodo - self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
 		painter.setPen(Qt.NoPen)
 		painter.setBrush(self._relleno_titulo_nodo)
 		painter.drawPath(dibujado_del_titulo.simplified())
@@ -130,16 +129,16 @@ class GraficosdelNodo(QGraphicsItem):
 		# Contenido
 		dibujado_del_contenido = QPainterPath()
 		dibujado_del_contenido.setFillRule(Qt.WindingFill)
-		dibujado_del_contenido.addRoundedRect(0, self.alturaTituloNodo, self.anchoNodo, self.altoNodo - self.alturaTituloNodo, self.redondezNodo, self.redondezNodo)
-		dibujado_del_contenido.addRect(0, self.alturaTituloNodo, self.redondezNodo, self.redondezNodo)
-		dibujado_del_contenido.addRect(self.anchoNodo - self.redondezNodo, self.alturaTituloNodo, self.redondezNodo, self.redondezNodo)
+		dibujado_del_contenido.addRoundedRect(0, self.alturaTituloNodo, self.anchoNodo, self.altoNodo - self.alturaTituloNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
+		dibujado_del_contenido.addRect(0, self.alturaTituloNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
+		dibujado_del_contenido.addRect(self.anchoNodo - self.redondezdelaOrilladelNodo, self.alturaTituloNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
 		painter.setPen(Qt.NoPen)
 		painter.setBrush(self._relleno_fondo_nodo)
 		painter.drawPath(dibujado_del_contenido.simplified())
 		
 		# Contorno
 		dibujado_del_contorno = QPainterPath()
-		dibujado_del_contorno.addRoundedRect(0, 0, self.anchoNodo, self.altoNodo, self.redondezNodo, self.redondezNodo)
+		dibujado_del_contorno.addRoundedRect(0, 0, self.anchoNodo, self.altoNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
 		painter.setPen(self._nodo_no_seleccionado if not self.isSelected() else self._nodo_seleccionado)
 		painter.setBrush(Qt.NoBrush)
 		painter.drawPath(dibujado_del_contorno.simplified())

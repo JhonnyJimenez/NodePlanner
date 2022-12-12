@@ -7,9 +7,13 @@ from nodeeditor.Utilidades import dump_exception, loadstylesheets, pp
 from nodeeditor.Ventana import Ventana
 from examples.example_calculator.calc_subventana import SubVenCalc
 from examples.example_calculator.calc_drag_listbox import Listbox
+from examples.example_calculator.calc_config import *
+from examples.example_calculator.calc_config_nodos import *
 
 # Imágenes para la skin negra.
 import examples.example_calculator.qss.nodeeditor_dark_resources
+
+DEBUG = False
 
 
 class VenCalc(Ventana):
@@ -24,6 +28,10 @@ class VenCalc(Ventana):
 		)
 		
 		self.icono_vacio = QIcon(".")
+		
+		if DEBUG:
+			print("Nodos registrados:")
+			pp(CALC_NODOS)
 		
 		self.mdiArea = QMdiArea()
 		self.mdiArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)

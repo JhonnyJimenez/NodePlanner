@@ -55,15 +55,19 @@ class Nodo(Serializable):
 		# Creación de los nuevos zócalos.
 		contador = 0
 		for item in entradas:
-			zocalos = Zocalo(nodo=self, indice=contador, posicion=self.pos_det_entradas, tipo_zocalo=item,
-							 multiconexion=self.entradas_multiconexion)
+			zocalos = Zocalo(nodo=self, indice=contador, posicion=self.pos_det_entradas,
+							 tipo_zocalo=item, multiconexion=self.entradas_multiconexion,
+							cantidad_en_el_lado_actual=len(entradas), esEntrada=True
+			)
 			contador += 1
 			self.entradas.append(zocalos)
 		
 		contador = 0
 		for item in salidas:
-			zocalos = Zocalo(nodo=self, indice=contador, posicion=self.pos_det_salidas, tipo_zocalo=item,
-							 multiconexion=self.salidas_multiconexion)
+			zocalos = Zocalo(nodo=self, indice=contador, posicion=self.pos_det_salidas,
+							 tipo_zocalo=item, multiconexion=self.salidas_multiconexion,
+							cantidad_en_el_lado_actual=len(salidas), esEntrada=False
+			)
 			contador += 1
 			self.salidas.append(zocalos)
 			
@@ -86,15 +90,31 @@ class Nodo(Serializable):
 		self._titulo = valor
 		self.Nodograficas.nombre = self._titulo
 			
-	def obtener_posicion_zocalo(self, indice, posicion):
-		x = 0 if (posicion in (Izquierda_arriba, Izquierda_abajo)) else self.Nodograficas.anchoNodo
+	def obtener_posicion_zocalo(self, indice, posicion, num_out_of=1):
+		x = 0 if (posicion in (Izquierda_arriba, Izquierda_centro, Izquierda_abajo)) else self.Nodograficas.anchoNodo
 		
 		if posicion in (Izquierda_abajo, Derecha_abajo):
 			# Comenzando desde abajo.
-			y = self.Nodograficas.altoNodo - self.Nodograficas._sangria - self.Nodograficas.redondezNodo - (indice * self.espaciadoconectores)
-		else:
+			y = self.Nodograficas.altoNodo - self.Nodograficas.redondezdelaOrilladelNodo - self.Nodograficas.sangria_vertical_del_titulo - (indice * self.espaciadoconectores)
+		elif posicion in (Izquierda_centro, Derecha_centro):
+			no_de_zocalos = num_out_of
+			altura_del_nodo = self.Nodograficas.altoNodo
+			altura_no_usable = self.Nodograficas.alturaTituloNodo + 2 * self.Nodograficas.sangria_vertical_del_titulo + self.Nodograficas.sangria_de_la_orilla
+			altura_disponible = altura_del_nodo - altura_no_usable
+			
+			altura_total_de_todos_los_zocalos = num_out_of * self.espaciadoconectores
+			nueva_altura = altura_disponible - altura_total_de_todos_los_zocalos
+			
+			y = altura_no_usable + altura_disponible / 2.0 + (indice - 0.5) * self.espaciadoconectores
+			if no_de_zocalos > 1:
+				y -= self.espaciadoconectores * (no_de_zocalos - 1) / 2
+			
+		elif posicion in (Izquierda_arriba, Derecha_arriba):
 			# Comenzando desde arriba.
-			y = self.Nodograficas.alturaTituloNodo + self.Nodograficas._sangria + self.Nodograficas.redondezNodo + (indice * self.espaciadoconectores)
+			y = self.Nodograficas.alturaTituloNodo + self.Nodograficas.sangria_vertical_del_titulo + self.Nodograficas.redondezdelaOrilladelNodo + (indice * self.espaciadoconectores)
+		else:
+			# Esto nunca debe pasar.
+			y = 0
 		
 		return [x, y]
 	
@@ -143,18 +163,22 @@ class Nodo(Serializable):
 			
 			data['Entradas'].sort(key=lambda Zocalo: Zocalo['Indice'] + Zocalo['Posicion'] * 10000 )
 			data['Salidas'].sort(key=lambda Zocalo: Zocalo['Indice'] + Zocalo['Posicion'] * 10000 )
+			num_entradas = len(data['Entradas'])
+			num_salidas = len(data['Salidas'])
 			
 			self.entradas = []
 			for Zocalo_data in data['Entradas']:
 				nuevo_zocalo = Zocalo(nodo=self, indice=Zocalo_data['Indice'], posicion=Zocalo_data['Posicion'],
-									  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'])
+									  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'], cantidad_en_el_lado_actual=num_entradas,
+									  esEntrada=True)
 				nuevo_zocalo.deserializacion(Zocalo_data, hashmap, restaure_id)
 				self.entradas.append(nuevo_zocalo)
 			
 			self.salidas = []
 			for Zocalo_data in data['Salidas']:
 				nuevo_zocalo = Zocalo(nodo=self, indice=Zocalo_data['Indice'], posicion=Zocalo_data['Posicion'],
-									  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'])
+									  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'], cantidad_en_el_lado_actual=num_salidas,
+									  esEntrada=False)
 				nuevo_zocalo.deserializacion(Zocalo_data, hashmap, restaure_id)
 				self.salidas.append(nuevo_zocalo)
 		except Exception as e: dump_exception(e)

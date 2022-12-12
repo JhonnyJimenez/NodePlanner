@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import *
 from nodeeditor.Nodo import Nodo
 from nodeeditor.ContenidodelNodo import ContenidoDelNodo
 from nodeeditor.GraficosdelNodo import GraficosdelNodo
+from nodeeditor.Zocalos import Izquierda_centro, Derecha_centro
 
 
 class GraphCalcNodo(GraficosdelNodo):
@@ -9,8 +10,11 @@ class GraphCalcNodo(GraficosdelNodo):
 		super().initSizes()
 		self.anchoNodo = 160
 		self.altoNodo = 74
-		self.redondezNodo = 5
-		self._sangria = 8
+		self.redondezdelaOrilladelNodo = 6
+		self.sangria_de_la_orilla = 0
+		self.sangria_del_titulo = 8
+		self.sangria_vertical_del_titulo = 10
+		
 
 
 class CalcContenido(ContenidoDelNodo):
@@ -19,14 +23,20 @@ class CalcContenido(ContenidoDelNodo):
 		lbl.setObjectName(self.nodo.content_label_objname)
 
 class CalcNodo(Nodo):
-	def __init__(self, escena, codigo_operacion, titulo_operacion, content_label="", content_label_objname="calc_nodo_bg", entradas=[2, 2], salidas=[1]):
-		self.codigo_operacion = codigo_operacion
-		self.titulo_operacion = titulo_operacion
-		self.content_label = content_label
-		self.content_label_objname = content_label_objname
-		
-		super().__init__(escena, self.titulo_operacion, entradas, salidas)
+	icono = ""
+	codigo_op = 0
+	titulo_op = "Indefinido"
+	content_label = None
+	content_label_objname = "calc_nodo_bg"
+	
+	def __init__(self, escena, entradas=[2, 2], salidas=[1]):
+		super().__init__(escena, self.__class__.titulo_op, entradas, salidas)
 	
 	def initClasesInternas(self):
 		self.contenido = CalcContenido(self)
 		self.Nodograficas = GraphCalcNodo(self)
+		
+	def initConfiguraciones(self):
+		super().initConfiguraciones()
+		self.pos_det_entradas = Izquierda_centro
+		self.pos_det_salidas = Derecha_centro
