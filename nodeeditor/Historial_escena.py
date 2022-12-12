@@ -3,7 +3,7 @@ from nodeeditor.GraficosdelNodo import GraficosdelNodo
 
 from nodeeditor.Utilidades import dump_exception
 
-DEBUG = True
+DEBUG = False
 
 
 class HistorialEscena:

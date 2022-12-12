@@ -141,8 +141,6 @@ class VenCalc(Ventana):
 		
 		self.actualizarMenuEditar()
 		self.actualizarMenuVentana()
-		
-		print("Menús actualizados.")
 	
 	def actualizarMenuEditar(self):
 		try:
@@ -158,7 +156,6 @@ class VenCalc(Ventana):
 			self.ActDeshacer.setEnabled(haysubventanas and activo.habilitarDeshacer())
 			self.ActRehacer.setEnabled(haysubventanas and activo.habilitarRehacer())
 			
-			print("Menú Editar actualizado.")
 		except Exception as e: dump_exception(e)
 	
 	def actualizarMenuVentana(self):
@@ -196,7 +193,6 @@ class VenCalc(Ventana):
 			action.setChecked(child is self.obtenerActualEditordeNodos())
 			action.triggered.connect(self.windowMapper.map)
 			self.windowMapper.setMapping(action, window)
-		print("Menú Ventana actualizado.")
 		
 	def barraLateraldeNodos(self):
 		if self.dockNodos.isVisible():

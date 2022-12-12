@@ -29,6 +29,10 @@ class GraficosdelaEscenaVP(QGraphicsScene):
 		
 		self.setBackgroundBrush(self._ColordeFondo)
 		
+	# El evento de arrastre (arrastrar y soltar) no funcionará hasta que dragMoveEvent sea sobreescrito.
+	def dragMoveEvent(self, event):
+		pass
+		
 	def config_esc(self, width, height):
 		self.setSceneRect(-width // 2, -height // 2, width, height)
 

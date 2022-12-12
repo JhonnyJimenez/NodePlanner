@@ -39,9 +39,13 @@ class GraficosdelaVistaVP(QGraphicsView):
 		self.NiveldeZoom = 1
 		self.RangodeZoom = [0, 10]
 		
-		# outline
+		# Cutline
 		self.linea_de_recorte = Recortado()
 		self.escena.addItem(self.linea_de_recorte)
+		
+		# Listeners
+		self._drag_enter_listeners = []
+		self._drop_listeners = []
 		
 	def initui(self):
 		self.setRenderHints(
@@ -58,6 +62,21 @@ class GraficosdelaVistaVP(QGraphicsView):
 		
 		self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
 		self.setDragMode(QGraphicsView.RubberBandDrag)
+		
+		# Activado de arrastre y soltura de objetos.
+		self.setAcceptDrops(True)
+		
+	def dragEnterEvent(self, event):
+		for callback in self._drag_enter_listeners: callback(event)
+	
+	def dropEvent(self, event):
+		for callback in self._drop_listeners: callback(event)
+		
+	def agregarDragEnterListener(self, callback):
+		self._drag_enter_listeners.append(callback)
+	
+	def agregarDropListener(self, callback):
+		self._drop_listeners.append(callback)
 
 	def mousePressEvent(self, event):
 		if event.button() == Qt.MiddleButton:

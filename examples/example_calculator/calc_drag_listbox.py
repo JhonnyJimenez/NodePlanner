@@ -2,6 +2,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+from examples.example_calculator.calc_config import *
+from nodeeditor.Utilidades import dump_exception
+
 
 imagen = "iconos/owoAwoo.png"
 
@@ -20,12 +23,12 @@ class Listbox(QListWidget):
 		self.agregarMisObjetos()
 		
 	def agregarMisObjetos(self):
-		self.agregarMiObjeto("Entrada", imagen)
-		self.agregarMiObjeto("Salida", imagen)
-		self.agregarMiObjeto("Sumar", imagen)
-		self.agregarMiObjeto("Restar", imagen)
-		self.agregarMiObjeto("Multiplicar", imagen)
-		self.agregarMiObjeto("Dividir", imagen)
+		self.agregarMiObjeto("Entrada", imagen, NODO_ENTRADA)
+		self.agregarMiObjeto("Salida", imagen, NODO_SALIDA)
+		self.agregarMiObjeto("Sumar", imagen, NODO_SUMA)
+		self.agregarMiObjeto("Restar", imagen, NODO_RESTA)
+		self.agregarMiObjeto("Multiplicar", imagen, NODO_MULTIPLICACION)
+		self.agregarMiObjeto("Dividir", imagen, NODO_DIVISION)
 		
 	def agregarMiObjeto(self, nombre, icono=None, codigo_operacion=0):
 		objeto = QListWidgetItem(nombre, self) # Puede ser (icono, texto, parent, <int>type)
@@ -38,3 +41,31 @@ class Listbox(QListWidget):
 		# Configuración de los datos
 		objeto.setData(Qt.UserRole, pixmap)
 		objeto.setData(Qt.UserRole + 1, codigo_operacion)
+		
+	def startDrag(self, *args, **kwargs):
+		# print("ListBox::startDrag")
+		
+		try:
+			objeto = self.currentItem()
+			codigo_operacion = objeto.data(Qt.UserRole + 1)
+			# print("Arrastrando objeto <%d>" % codigo_operacion, objeto)
+			
+			pixmap = QPixmap(objeto.data(Qt.UserRole)).scaled(32, 32, 1, 1)
+			
+			itemData = QByteArray()
+			dataStream = QDataStream(itemData, QIODevice.WriteOnly)
+			dataStream << pixmap
+			dataStream.writeInt(codigo_operacion)
+			dataStream.writeQString(objeto.text())
+			
+			mimeData = QMimeData()
+			mimeData.setData(LISTBOX_MIMETYPE, itemData)
+			
+			drag = QDrag(self)
+			drag.setMimeData(mimeData)
+			drag.setHotSpot(QPoint(int(pixmap.width() / 2), int(pixmap.height() / 2)))
+			drag.setPixmap(pixmap)
+			
+			drag.exec_(Qt.MoveAction)
+			
+		except Exception as e: dump_exception(e)

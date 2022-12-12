@@ -46,7 +46,6 @@ class Escena(Serializable):
 			self._ultimos_objetos_seleccionados = objetos_seleccionados_actualmente
 			self.historial.almacenarHistorial("La selección ha cambiado.")
 			for callback in self._objeto_seleccionado_listeners: callback()
-			
 		
 	def objetosNoSeleccionados(self):
 		self.restaurarUltimoEstadodeSeleccion()
@@ -86,6 +85,12 @@ class Escena(Serializable):
 	
 	def agregarObjetosNoSeleccionadosListener(self, callback):
 		self._objetos_no_seleccionados_listeners.append(callback)
+		
+	def agregarDragEnterListener(self, callback):
+		self.GraficosEsc.views()[0].agregarDragEnterListener(callback)
+		
+	def agregarDropListener(self, callback):
+		self.GraficosEsc.views()[0].agregarDropListener(callback)
 	
 	# Señales para detectar si algún nodo o conexión a sido seleccionado.
 	def restaurarUltimoEstadodeSeleccion(self):
