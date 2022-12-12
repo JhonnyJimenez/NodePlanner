@@ -15,30 +15,58 @@ class Nodo(Serializable):
 		self._titulo = titulo
 		self.escena = escena
 		
-		self.contenido = ContenidoDelNodo(self)
-		self.Nodograficas = GraficosdelNodo(self)
+		self.initClasesInternas()
+		self.initConfiguraciones()
+		
 		self.titulo = titulo
 		
 		self.escena.agregarnodo(self)
 		self.escena.GraficosEsc.addItem(self.Nodograficas)
 		
-		self.espaciadoconectores = 22
-		
 		# Creación de conectores para entradas y salidas de nodos.
 		self.entradas = []
 		self.salidas = []
+		self.initZocalos(entradas, salidas)
+	
+	def initClasesInternas(self):
+		self.contenido = ContenidoDelNodo(self)
+		self.Nodograficas = GraficosdelNodo(self)
+	
+	def initConfiguraciones(self):
+		self.espaciadoconectores = 22
+		
+		self.pos_det_entradas = Izquierda_abajo
+		self.pos_det_salidas = Derecha_arriba
+		self.entradas_multiconexion = False
+		self.salidas_multiconexion = True
+	
+	def initZocalos(self, entradas, salidas, reset=True):
+		# Creación de zócalos para las entradas y salidas.
+		
+		if reset:
+			# Limpiar los zócalos viejos.
+			if hasattr(self, 'entradas') and hasattr(self, 'salidas'):
+				# Quitar zócalos de la escena.
+				for zocalo in (self.entradas + self.salidas):
+					self.escena.GraficosEsc.removeItem(zocalo.GraficosZocalos)
+				self.entradas = []
+				self.salidas = []
+				
+		# Creación de los nuevos zócalos.
 		contador = 0
 		for item in entradas:
-			zocalos = Zocalo(nodo=self, indice=contador, posicion=Izquierda_abajo, tipo_zocalo=item, multiconexion=False)
+			zocalos = Zocalo(nodo=self, indice=contador, posicion=self.pos_det_entradas, tipo_zocalo=item,
+							 multiconexion=self.entradas_multiconexion)
 			contador += 1
 			self.entradas.append(zocalos)
-			
+		
 		contador = 0
 		for item in salidas:
-			zocalos = Zocalo(nodo=self, indice=contador, posicion=Derecha_arriba, tipo_zocalo=item, multiconexion=True)
+			zocalos = Zocalo(nodo=self, indice=contador, posicion=self.pos_det_salidas, tipo_zocalo=item,
+							 multiconexion=self.salidas_multiconexion)
 			contador += 1
 			self.salidas.append(zocalos)
-	
+			
 	def __str__(self):
 		return "<Nodo %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
 	

@@ -2,7 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from examples.example_calculator.calc_config import *
 from nodeeditor.Widget_de_nodos import EditorDeNodos
-from nodeeditor.Nodo import Nodo
+from examples.example_calculator.calc_nodo_base import CalcNodo
 
 
 class SubVenCalc(EditorDeNodos):
@@ -54,9 +54,8 @@ class SubVenCalc(EditorDeNodos):
 			print("Objeto soltado: [%d] '%s'" % (codigo_operacion, text), "Mouse:", mouse_pos, "Escena:", escena_pos)
 			
 			# ¡Arréglame!
-			nodo = Nodo(self.escena, text, entradas=[1, 1], salidas=[2])
+			nodo = CalcNodo(self.escena, codigo_operacion, text, entradas=[1, 1], salidas=[2])
 			nodo.definirposicion(escena_pos.x(), escena_pos.y())
-			self.escena.agregarnodo(nodo)
 			
 			event.setDropAction(Qt.MoveAction)
 			event.accept()
