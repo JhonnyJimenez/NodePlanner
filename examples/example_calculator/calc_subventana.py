@@ -34,9 +34,10 @@ class SubVenCalc(EditorDeNodos):
 		if super().leerarchivo(filename):
 			# Evaluar todos los nodos de salida.
 			for nodo in self.escena.Nodos:
-				if nodo.__class__.__name__ == "CalcNodo_Salida":
+				if nodo.__class__.__name__ == "CalcNodoSalida":
 					nodo.evaluar()
 			return True
+		
 		return False
 	
 	

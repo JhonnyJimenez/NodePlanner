@@ -9,7 +9,7 @@ imagen = "iconos/owoAwoo.png"
 
 class CalcNodoSalida_Contenido(ContenidoDelNodo):
 	def initui(self):
-		self.lbl = QLabel("42", self)
+		self.lbl = QLabel("", self)
 		self.lbl.setAlignment(Qt.AlignLeft)
 		self.lbl.setObjectName(self.nodo.content_label_objname)
 

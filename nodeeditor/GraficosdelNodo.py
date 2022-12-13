@@ -10,6 +10,7 @@ class GraficosdelNodo(QGraphicsItem):
 		self.contenido = self.nodo.contenido
 		
 		# init de señales
+		self.hovered = False
 		self._elemento_movido = False
 		self._ultimo_estado_de_seleccion = False
 		
@@ -19,6 +20,7 @@ class GraficosdelNodo(QGraphicsItem):
 	
 	def initUI(self):
 		self.setFlag(QGraphicsItem.ItemIsSelectable)
+		self.setAcceptHoverEvents(True)
 		self.setFlag(QGraphicsItem.ItemIsMovable)
 		
 		# init titulos
@@ -40,8 +42,16 @@ class GraficosdelNodo(QGraphicsItem):
 		self._ColorDelTitulo = Qt.white
 		self._FuenteDelTitulo = QFont("Rounded Mgen+ 1c regular", 9)
 		
-		self._nodo_no_seleccionado = QPen(QColor("#7F000000"))
-		self._nodo_seleccionado = QPen(QColor("#FFFFFFFF"))
+		self._color = QColor("#7F000000")
+		self._color_seleccionado = QColor("#FFFFFFFF")
+		self._color_hovered = QColor("#FF37A6FF")
+		
+		self._pen_default = QPen(self._color)
+		self._pen_default.setWidthF(2.0)
+		self._pen_seleccionado = QPen(self._color_seleccionado)
+		self._pen_seleccionado.setWidthF(2.0)
+		self._pen_hovered = QPen(self._color_hovered)
+		self._pen_hovered.setWidthF(3.0)
 		
 		self._relleno_titulo_nodo = QBrush(QColor("#FF246283"))
 		self._relleno_fondo_nodo = QBrush(QColor("#E3303030"))
@@ -80,6 +90,14 @@ class GraficosdelNodo(QGraphicsItem):
 			self.nodo.escena.restaurarUltimoEstadodeSeleccion()
 			self._ultimo_estado_de_seleccion = self.isSelected()
 			self.seleccionado()
+	
+	def hoverEnterEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
+		self.hovered = True
+		self.update()
+	
+	def hoverLeaveEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
+		self.hovered = False
+		self.update()
 	
 	@property
 	def nombre(self): return self._titulo
@@ -139,6 +157,12 @@ class GraficosdelNodo(QGraphicsItem):
 		# Contorno
 		dibujado_del_contorno = QPainterPath()
 		dibujado_del_contorno.addRoundedRect(0, 0, self.anchoNodo, self.altoNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
-		painter.setPen(self._nodo_no_seleccionado if not self.isSelected() else self._nodo_seleccionado)
 		painter.setBrush(Qt.NoBrush)
-		painter.drawPath(dibujado_del_contorno.simplified())
+		if self.hovered:
+			painter.setPen(self._pen_hovered)
+			painter.drawPath(dibujado_del_contorno.simplified())
+			painter.setPen(self._pen_default)
+			painter.drawPath(dibujado_del_contorno.simplified())
+		else:
+			painter.setPen(self._pen_default if not self.isSelected() else self._pen_seleccionado)
+			painter.drawPath(dibujado_del_contorno.simplified())

@@ -15,8 +15,9 @@ class GraficosdeConexion(QGraphicsPathItem):
 		
 		self.linea = linea
 		
-		# init de eventos.
+		# init de señales.
 		self._ultimo_estado_de_seleccion = False
+		self.hovered = False
 		
 		# init de variables.
 		self.posicion_origen = [0, 0]
@@ -27,18 +28,22 @@ class GraficosdeConexion(QGraphicsPathItem):
 
 	def initUI(self):
 		self.setFlag(QGraphicsItem.ItemIsSelectable)
+		self.setAcceptHoverEvents(True)
 		self.setZValue(-1)
 		
 	def initAssets(self):
 		self._color = QColor("#001000")
 		self._color_seleccionado = QColor("#00ff00")
+		self._color_hovered = QColor("#FF37A6FF")
 		self._pen = QPen(self._color)
 		self._pen_seleccionado = QPen(self._color_seleccionado)
 		self._pen_dibujo = QPen(self._color)
+		self._pen_hover = QPen(self._color_hovered)
 		self._pen_dibujo.setStyle(Qt.DashLine)
-		self._pen.setWidth(2)
-		self._pen_seleccionado.setWidth(2)
-		self._pen_dibujo.setWidth(2)
+		self._pen.setWidthF(3.0)
+		self._pen_seleccionado.setWidthF(3.0)
+		self._pen_dibujo.setWidthF(3.0)
+		self._pen_hover.setWidthF(5.0)
 		
 	def seleccionado(self):
 		self.linea.escena.GraficosEsc.objetoSeleccionado.emit()
@@ -49,6 +54,14 @@ class GraficosdeConexion(QGraphicsPathItem):
 			self.linea.escena.restaurarUltimoEstadodeSeleccion()
 			self._ultimo_estado_de_seleccion = self.isSelected()
 			self.seleccionado()
+			
+	def hoverEnterEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
+		self.hovered = True
+		self.update()
+		
+	def hoverLeaveEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
+		self.hovered = False
+		self.update()
 		
 	def punto_origen(self, x, y):
 		self.posicion_origen = [x, y]
@@ -59,11 +72,16 @@ class GraficosdeConexion(QGraphicsPathItem):
 	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
 		self.setPath(self.calculo_de_ruta())
 		
+		painter.setBrush(Qt.NoBrush)
+		
+		if self.hovered and self.linea.zocalo_final is not None:
+			painter.setPen(self._pen_hover)
+			painter.drawPath(self.path())
+		
 		if self.linea.zocalo_final is None:
 			painter.setPen(self._pen_dibujo)
 		else:
 			painter.setPen(self._pen if not self.isSelected() else self._pen_seleccionado)
-		painter.setBrush(Qt.NoBrush)
 		painter.drawPath(self.path())
 		
 	def cruzadocon(self, p1, p2):
