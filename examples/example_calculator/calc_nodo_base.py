@@ -64,8 +64,30 @@ class CalcNodo(Nodo):
 		self.pos_det_entradas = Izquierda_centro
 		self.pos_det_salidas = Derecha_centro
 		
-	def ImplementacionEvaluacion(self):
+	def realizarOperacion(self, entrada1, entrada2):
 		return 123
+	
+	def ImplementacionEvaluacion(self):
+		e1 = self.obtenerEntrada(0)
+		e2 = self.obtenerEntrada(1)
+		
+		if e1 is None or e2 is None:
+			self.marcarInvalido()
+			self.marcarDescendenciaIndefinido()
+			self.Nodograficas.setToolTip("Conecte todas las entradas, por favor")
+			return None
+		
+		else:
+			val = self.realizarOperacion(e1.evaluar(), e2.evaluar())
+			self.valor = val
+			self.marcarIndefinido(False)
+			self.marcarInvalido(False)
+			self.Nodograficas.setToolTip("")
+			
+			self.marcarDescendenciaIndefinido()
+			self.evaluarHijos()
+			
+			return val
 	
 	def evaluar(self):
 		if not self.esIndefinido() and not self.esInvalido():

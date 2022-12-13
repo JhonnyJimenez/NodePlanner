@@ -1,3 +1,4 @@
+import math
 from PyQt5.QtCore import *
 from examples.example_calculator.calc_config import *
 from examples.example_calculator.calc_nodo_base import *
@@ -36,12 +37,13 @@ class CalcNodoSalida(CalcNodo):
 		
 		val = nodo_de_entrada.evaluar()
 		
-		if not val:
+		if val is None:
 			self.Nodograficas.setToolTip("Los datos en la entrada no son un número.")
 			self.marcarInvalido()
 			return
 		
-		self.contenido.lbl.setText("%d" % val)
+		decimal, entero = math.modf(val)
+		self.contenido.lbl.setText("%s" % (int(val) if decimal == 0.0 else str(round(val, 3))))
 		self.marcarInvalido(False)
 		self.marcarIndefinido(False)
 		self.Nodograficas.setToolTip("")

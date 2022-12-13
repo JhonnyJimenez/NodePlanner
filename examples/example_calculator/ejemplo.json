@@ -79,8 +79,8 @@
         {
             "id": 3204704435472,
             "Titulo": "Divisi\u00f3n",
-            "Pos_x": -3.0,
-            "Pos_y": 148.0,
+            "Pos_x": 30.20312499999997,
+            "Pos_y": 130.421875,
             "Entradas": [
                 {
                     "id": 3204704435728,
@@ -112,8 +112,8 @@
         {
             "id": 3204704493712,
             "Titulo": "Suma",
-            "Pos_x": 50.0,
-            "Pos_y": -64.0,
+            "Pos_x": 38.28125,
+            "Pos_y": -73.765625,
             "Entradas": [
                 {
                     "id": 3204704493456,
@@ -178,8 +178,8 @@
         {
             "id": 3204704520720,
             "Titulo": "Salida",
-            "Pos_x": 379.0,
-            "Pos_y": -124.0,
+            "Pos_x": 297.35937500000006,
+            "Pos_y": -72.43750000000009,
             "Entradas": [
                 {
                     "id": 3204693269840,
@@ -196,11 +196,47 @@
         {
             "id": 3204704524240,
             "Titulo": "Salida",
-            "Pos_x": 366.0,
-            "Pos_y": -18.0,
+            "Pos_x": 297.64062500000006,
+            "Pos_y": 34.73437499999996,
             "Entradas": [
                 {
                     "id": 3204704524624,
+                    "Indice": 0,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 1
+                }
+            ],
+            "Salidas": [],
+            "Contenido": {},
+            "Codigo_op": 2
+        },
+        {
+            "id": 2738114815888,
+            "Titulo": "Salida",
+            "Pos_x": 288.7187500000002,
+            "Pos_y": 144.64062499999977,
+            "Entradas": [
+                {
+                    "id": 2738114817552,
+                    "Indice": 0,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 1
+                }
+            ],
+            "Salidas": [],
+            "Contenido": {},
+            "Codigo_op": 2
+        },
+        {
+            "id": 2738114912336,
+            "Titulo": "Salida",
+            "Pos_x": 294.5781250000003,
+            "Pos_y": -174.109375,
+            "Entradas": [
+                {
+                    "id": 2738114912848,
                     "Indice": 0,
                     "Multiconexion": false,
                     "Posicion": 2,
@@ -238,16 +274,52 @@
             "Zocalo_de_destino": 3204693270032
         },
         {
-            "id": 3204704601104,
+            "id": 2738114598800,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704386192,
+            "Zocalo_de_destino": 3204693809360
+        },
+        {
+            "id": 2738114572432,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704421264,
+            "Zocalo_de_destino": 3204704431184
+        },
+        {
+            "id": 2738114602960,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704421264,
+            "Zocalo_de_destino": 3204704435728
+        },
+        {
+            "id": 2738114574736,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704421264,
+            "Zocalo_de_destino": 3204693272016
+        },
+        {
+            "id": 2738114493200,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704498832,
+            "Zocalo_de_destino": 3204704524624
+        },
+        {
+            "id": 2738114820880,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704435792,
+            "Zocalo_de_destino": 2738114817552
+        },
+        {
+            "id": 2738114492560,
             "Tipo_de_conexion": 2,
             "Zocalo_de_origen": 3204704493776,
             "Zocalo_de_destino": 3204693269840
         },
         {
-            "id": 3204704714512,
+            "id": 2738213037520,
             "Tipo_de_conexion": 2,
-            "Zocalo_de_origen": 3204704498832,
-            "Zocalo_de_destino": 3204704524624
+            "Zocalo_de_origen": 3204704431312,
+            "Zocalo_de_destino": 2738114912848
         }
     ]
 }

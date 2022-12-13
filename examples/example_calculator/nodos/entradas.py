@@ -46,7 +46,7 @@ class CalcNodoEntrada(CalcNodo):
 		
 	def ImplementacionEvaluacion(self):
 		valor_ingresado = self.contenido.edit.text()
-		valor_seguro = int(valor_ingresado)
+		valor_seguro = float(valor_ingresado)
 		self.valor = valor_seguro
 		self.marcarIndefinido(False)
 		self.marcarInvalido(False)

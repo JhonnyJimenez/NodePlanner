@@ -30,6 +30,16 @@ class SubVenCalc(EditorDeNodos):
 		if 'Codigo_op' not in data: return None
 		return obtener_clase_del_codigo_op(data['Codigo_op'])
 	
+	def leerarchivo(self, filename):
+		if super().leerarchivo(filename):
+			# Evaluar todos los nodos de salida.
+			for nodo in self.escena.Nodos:
+				if nodo.__class__.__name__ == "CalcNodo_Salida":
+					nodo.evaluar()
+			return True
+		return False
+	
+	
 	def initNuevaOpciondeNodo(self):
 		self.opciones_de_nodos = {}
 		keys = list(CALC_NODOS.keys())
