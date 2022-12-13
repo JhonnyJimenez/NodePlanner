@@ -56,7 +56,7 @@ class PortapapelesEscena:
 		
 		# Si corta (mejor conocido como Delete), quitar el objeto.
 		if delete:
-			self.escena.GraficosEsc.views()[0].eliminarSeleccionado()
+			self.escena.obtenerVista().eliminarSeleccionado()
 			# Guardado en el historial.
 			self.escena.historial.almacenarHistorial("Elementos cortados de la escena", setModified=True)
 		
@@ -67,7 +67,7 @@ class PortapapelesEscena:
 		hashmap = {}
 		
 		# Calcular la posición en la escena del puntero del mouse.
-		vista = self.escena.GraficosEsc.views()[0]
+		vista = self.escena.obtenerVista()
 		mouse_scene_pos = vista.ultima_posicion_mouse_escena
 		
 		# Calcular el contorno delimitador de los objetos seleccionados y su centro.

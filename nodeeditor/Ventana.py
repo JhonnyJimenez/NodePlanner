@@ -170,7 +170,7 @@ class Ventana(QMainWindow):
 	
 	def EliminarMEditar(self):
 		if self.obtenerActualEditordeNodos():
-			self.obtenerActualEditordeNodos().escena.GraficosEsc.views()[0].eliminarSeleccionado()
+			self.obtenerActualEditordeNodos().escena.obtenerVista().eliminarSeleccionado()
 	
 	def CortarMEditar(self):
 		if self.obtenerActualEditordeNodos():

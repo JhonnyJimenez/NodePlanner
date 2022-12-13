@@ -90,10 +90,10 @@ class Escena(Serializable):
 		self._objetos_no_seleccionados_listeners.append(callback)
 		
 	def agregarDragEnterListener(self, callback):
-		self.GraficosEsc.views()[0].agregarDragEnterListener(callback)
+		self.obtenerVista().agregarDragEnterListener(callback)
 		
 	def agregarDropListener(self, callback):
-		self.GraficosEsc.views()[0].agregarDropListener(callback)
+		self.obtenerVista().agregarDropListener(callback)
 	
 	# Señales para detectar si algún nodo o conexión a sido seleccionado.
 	def restaurarUltimoEstadodeSeleccion(self):
@@ -101,6 +101,12 @@ class Escena(Serializable):
 			nodo.Nodograficas._ultimo_estado_de_seleccion = False
 		for conexion in self.Conexiones:
 			conexion.GraficosDeConexion._ultimo_estado_de_seleccion = False
+	
+	def obtenerVista(self):
+		return self.GraficosEsc.views()[0]
+	
+	def obtenerObjetoAl(self, pos):
+		return self.obtenerVista().itemAt(pos)
 	
 	def agregarnodo(self, nodo):
 		self.Nodos.append(nodo)

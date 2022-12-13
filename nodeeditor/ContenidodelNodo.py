@@ -20,7 +20,7 @@ class ContenidoDelNodo(QWidget, Serializable):
 		self.lienzo.addWidget(EditordeTexto("Mira, un texto"))
 		
 	def ConfigEdicion(self, value):
-		self.nodo.escena.GraficosEsc.views()[0].eventoedicion = value
+		self.nodo.escena.obtenerVista().eventoedicion = value
 		
 	def serializacion(self):
 		return OrderedDict([

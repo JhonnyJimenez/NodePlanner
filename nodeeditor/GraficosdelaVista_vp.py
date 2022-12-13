@@ -99,6 +99,24 @@ class GraficosdelaVistaVP(QGraphicsView):
 			super().mouseReleaseEvent(event)
 
 	def middleMouseButtonPress(self, event):
+		objeto = self.ConseguirObjetoAlCliquear(event)
+
+		# DEBUG print.
+		if DEBUG:
+			if isinstance(objeto, GraficosdeConexion): print('RMB DEBUG:', 'La', objeto.linea, 'conecta',
+															 'el', objeto.linea.zocalo_origen, 'con el',
+															 objeto.linea.zocalo_final)
+			if type(objeto) is GraficosDeZocalos: print('RMB DEBUG:', 'El', objeto.zocalo, 'tiene las',
+														objeto.zocalo.Zocaloconexiones)
+			
+			if objeto is None:
+				print('Escena:')
+				print('   Nodo:')
+				for nodo in self.escena.escena.Nodos: print('     ', nodo)
+				print('   Conexión:')
+				for conexion in self.escena.escena.Conexiones: print('     ', conexion)
+		
+		# Eventos falsos para activar el desplazamiento por la ventana.
 		soltado_del_mouse = QMouseEvent(QEvent.MouseButtonRelease, event.localPos(), event.screenPos(), Qt.LeftButton, Qt.NoButton, event.modifiers())
 		super().mouseReleaseEvent(soltado_del_mouse)
 		self.setDragMode(QGraphicsView.ScrollHandDrag)
@@ -205,20 +223,6 @@ class GraficosdelaVistaVP(QGraphicsView):
 
 	def rightMouseButtonPress(self, event):
 		super().mousePressEvent(event)
-		
-		objeto = self.ConseguirObjetoAlCliquear(event)
-		
-		if DEBUG:
-			if isinstance(objeto, GraficosdeConexion): print('RMB DEBUG:', 'La', objeto.linea, 'conecta',
-															 'el', objeto.linea.zocalo_origen, 'con el', objeto.linea.zocalo_final)
-			if type(objeto) is GraficosDeZocalos: print('RMB DEBUG:', 'El', objeto.zocalo, 'tiene las', objeto.zocalo.Zocaloconexiones)
-			
-			if objeto is None:
-				print('Escena:')
-				print('   Nodo:')
-				for nodo in self.escena.escena.Nodos: print('     ', nodo)
-				print('   Conexión:')
-				for conexion in self.escena.escena.Conexiones: print('     ', conexion)
 
 	def rightMouseButtonRelease(self, event):
 		super().mouseReleaseEvent(event)
