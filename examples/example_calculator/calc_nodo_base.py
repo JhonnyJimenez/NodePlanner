@@ -14,8 +14,6 @@ class GraphCalcNodo(GraficosdelNodo):
 		self.sangria_de_la_orilla = 0
 		self.sangria_del_titulo = 8
 		self.sangria_vertical_del_titulo = 10
-		
-
 
 class CalcContenido(ContenidoDelNodo):
 	def initui(self):
@@ -40,3 +38,14 @@ class CalcNodo(Nodo):
 		super().initConfiguraciones()
 		self.pos_det_entradas = Izquierda_centro
 		self.pos_det_salidas = Derecha_centro
+		
+	def serializacion(self):
+		res = super().serializacion()
+		res['Codigo_op'] = self.__class__.codigo_op
+		return res
+	
+	def deserializacion(self, data, hashmap={}, restaure_id=True):
+		res = super().deserializacion(data, hashmap, restaure_id)
+		print("Deserializando CalcNodo '%s'" % self.__class__.__name__, "res:", res)
+		return res
+		

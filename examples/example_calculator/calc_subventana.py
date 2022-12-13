@@ -19,10 +19,14 @@ class SubVenCalc(EditorDeNodos):
 		self.escena.agregarElementosModificadosListener(self.definirtitulo)
 		self.escena.agregarDragEnterListener(self.arrastrar)
 		self.escena.agregarDropListener(self.soltar)
-		
+		self.escena.definirSelectordeClasesdeNodos(self.obtener_clase_del_nodo_de_datos)
 		
 		self._close_event_listeners = []
 		
+	def obtener_clase_del_nodo_de_datos(self, data):
+		if 'Codigo_op' not in data: return None
+		return obtener_clase_del_codigo_op(data['Codigo_op'])
+	
 	def definirtitulo(self):
 		self.setWindowTitle(self.obtenerNombreAmigablealUsuario())
 		

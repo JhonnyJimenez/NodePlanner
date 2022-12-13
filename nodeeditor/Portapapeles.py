@@ -4,7 +4,7 @@ from nodeeditor.Nodo import Nodo
 from nodeeditor.Conexiones import Conexion
 
 
-DEBUG = False
+DEBUG = True
 
 
 class PortapapelesEscena:
@@ -89,7 +89,7 @@ class PortapapelesEscena:
 		
 		# Creación de cada nodo.
 		for data_nodos in data['Nodos']:
-			nuevo_nodo = Nodo(self.escena)
+			nuevo_nodo = self.escena.obtener_clase_del_nodo_de_datos(data_nodos)(self.escena)
 			nuevo_nodo.deserializacion(data_nodos, hashmap, restaure_id=False)
 			
 			# Reajuste de posición para el nuevo nodo.

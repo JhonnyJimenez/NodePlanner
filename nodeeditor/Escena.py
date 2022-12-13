@@ -29,6 +29,9 @@ class Escena(Serializable):
 		self._objeto_seleccionado_listeners = []
 		self._objetos_no_seleccionados_listeners = []
 		
+		# Aquí podremos almacenar llamadas para obtener la clase de los nodos.
+		self.selector_de_clases_de_nodos = None
+		
 		self.initUI()
 		self.historial = HistorialEscena(self)
 		self.portapapeles = PortapapelesEscena(self)
@@ -142,7 +145,14 @@ class Escena(Serializable):
 				raise InvalidFile("%s no es un archivo JSON válido." % os.path.basename(archivo))
 			except Exception as e:
 				dump_exception(e)
+
+	def definirSelectordeClasesdeNodos(self, funcion_selectora_de_clases):
+		# Cuando está configurada la función self.selector_de_clases_de_nodos, podremos usar diferentes clases de nodos.
+		self.selector_de_clases_de_nodos = funcion_selectora_de_clases
 	
+	
+	def obtener_clase_del_nodo_de_datos(self, data):
+		return Nodo if self.selector_de_clases_de_nodos is None else self.selector_de_clases_de_nodos(data)
 	
 	def serializacion(self):
 		nodos, conexiones = [], []
@@ -164,7 +174,7 @@ class Escena(Serializable):
 		
 		# Creación de nodos.
 		for nodo_data in data['Nodos']:
-			Nodo(self).deserializacion(nodo_data, hashmap, restaure_id)
+			self.obtener_clase_del_nodo_de_datos(nodo_data)(self).deserializacion(nodo_data, hashmap, restaure_id)
 		
 		# Creación de conexiones.
 		for datos_conexion in data['Conexiones']:

@@ -182,5 +182,8 @@ class Nodo(Serializable):
 				nuevo_zocalo.deserializacion(Zocalo_data, hashmap, restaure_id)
 				self.salidas.append(nuevo_zocalo)
 		except Exception as e: dump_exception(e)
+		
+		# También deserializa el contenido del nodo.
+		res = self.contenido.deserializacion(data['Contenido'], hashmap)
 				
-		return True
+		return True & res

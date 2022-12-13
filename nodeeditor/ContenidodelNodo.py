@@ -28,7 +28,7 @@ class ContenidoDelNodo(QWidget, Serializable):
 		])
 	
 	def deserializacion(self, data, hashmap={}):
-		return False
+		return True
 		
 class EditordeTexto(QTextEdit):
 	def focusInEvent(self, event):
