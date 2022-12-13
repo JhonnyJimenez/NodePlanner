@@ -13,6 +13,11 @@ class CalcNodoSuma(CalcNodo):
 	titulo_op = "Suma"
 	content_label = "+"
 	content_label_objname = "calc_nodo_bg"
+	
+	def ImplementacionEvaluacion(self):
+		self.marcarInvalido(False)
+		self.marcarIndefinido(False)
+		return 123
 
 
 @registrar_nodo(NODO_RESTA)

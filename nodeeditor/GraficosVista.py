@@ -341,7 +341,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 					if DEBUG: print('Vista: FDibujadoConexion - Nueva conexión creada:', nueva_conexion, 'conecta', nueva_conexion.zocalo_origen, 'y', nueva_conexion.zocalo_final)
 					
 					for zocalo in [self.zocalo_inicial_de_dibujado, objeto.zocalo]:
-						zocalo.nodo.LineaConexionCambiada(nueva_conexion)
+						zocalo.nodo.DatosdeConexionCambiados(nueva_conexion)
 						if zocalo.esEntrada: zocalo.nodo.DatosdeEntradaCambiados(nueva_conexion)
 					
 					self.escena.escena.historial.almacenarHistorial("Conexion creada mediante dibujado", setModified=True)

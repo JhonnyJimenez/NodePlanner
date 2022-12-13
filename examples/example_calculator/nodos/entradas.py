@@ -43,3 +43,19 @@ class CalcNodoEntrada(CalcNodo):
 		self.contenido = CalcNodoEntrada_Contenido(self)
 		self.Nodograficas = GraphCalcNodo(self)
 		self.contenido.edit.textChanged.connect(self.DatosdeEntradaCambiados)
+		
+	def ImplementacionEvaluacion(self):
+		valor_ingresado = self.contenido.edit.text()
+		valor_seguro = int(valor_ingresado)
+		self.valor = valor_seguro
+		self.marcarIndefinido(False)
+		self.marcarInvalido(False)
+		
+		self.marcarDescendenciaInvalido(False)
+		self.marcarDescendenciaIndefinido()
+		
+		self.Nodograficas.setToolTip("")
+		
+		self.evaluarHijos()
+		
+		return self.valor

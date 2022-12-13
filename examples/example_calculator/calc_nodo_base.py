@@ -73,18 +73,21 @@ class CalcNodo(Nodo):
 			return self.valor
 		
 		try:
+			
 			val = self.ImplementacionEvaluacion()
-			self.marcarIndefinido(False)
-			self.marcarInvalido(False)
 			return val
-		
+		except ValueError as e:
+			self.marcarInvalido()
+			self.Nodograficas.setToolTip(str(e))
+			self.marcarDescendenciaIndefinido()
 		except Exception as e:
 			self.marcarInvalido()
+			self.Nodograficas.setToolTip(str(e))
 			dump_exception(e)
 		
 		
 	def DatosdeEntradaCambiados(self, nueva_conexion):
-		print("%s::__EntradaConexionCambiada:" % self.__class__.__name__)
+		print("%s::__DatosdeEntradaCambiados (Nodo base)" % self.__class__.__name__)
 		self.marcarIndefinido()
 		self.evaluar()
 		

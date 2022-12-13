@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from nodeeditor.Seriabilizador import Serializable
 from nodeeditor.GraficosdeConexion import *
+from nodeeditor.Utilidades import dump_exception
 
 recta = 1
 bezier = 2
@@ -108,6 +109,8 @@ class Conexion(Serializable):
 		self.zocalo_origen = None
 		
 	def quitar(self):
+		zocalos_antiguos = [self.zocalo_origen, self.zocalo_final]
+		
 		if DEBUG: print('@ Quitando la conexión', self)
 		if DEBUG: print('	Quitando conexiones de todos los zócalos.')
 		self.quitar_de_zocalos()
@@ -120,7 +123,15 @@ class Conexion(Serializable):
 		except ValueError:
 			pass
 		if DEBUG: print('	Todo salió bien.')
-	
+		
+		try:
+			# Notificar a los nodos desde los viejos zócalos.
+			for zocalo in zocalos_antiguos:
+				if zocalo and zocalo.nodo:
+					zocalo.nodo.DatosdeConexionCambiados(self)
+					if zocalo.esEntrada: zocalo.nodo.DatosdeEntradaCambiados(self)
+		except Exception as e: dump_exception(e)
+		
 	def serializacion(self):
 		return OrderedDict([
 			('id', self.id),

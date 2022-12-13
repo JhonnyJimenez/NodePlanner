@@ -75,11 +75,11 @@ class Nodo(Serializable):
 			contador += 1
 			self.salidas.append(zocalos)
 
-	def LineaConexionCambiada(self, nueva_conexion):
-		print("%s::LineaConexionCambiada" % self.__class__.__name__, nueva_conexion)
+	def DatosdeConexionCambiados(self, conexion):
+		print("%s::DatosdeConexionCambiados" % self.__class__.__name__, conexion)
 		
-	def DatosdeEntradaCambiados(self, nueva_conexion):
-		print("%s::EntradaConexionCambiada" % self.__class__.__name__, nueva_conexion)
+	def DatosdeEntradaCambiados(self, conexion):
+		print("%s::DatosdeEntradaCambiados" % self.__class__.__name__, onexion)
 		self.marcarIndefinido()
 		self.marcarDescendenciaIndefinido()
 	
@@ -206,7 +206,32 @@ class Nodo(Serializable):
 				nodo_hijo = conexion.obtenerOtrosZocalos(self.salidas[0]).nodo
 				lista_de_nodos_hijos.append(nodo_hijo)
 		return lista_de_nodos_hijos
-			
+	
+	def obtenerEntrada(self, indice=0):
+		try:
+			conexion = self.entradas[indice].Zocaloconexiones[0]
+			zocalo = conexion.obtenerOtrosZocalos(self.entradas[indice])
+			return zocalo.nodo
+		except IndexError:
+			print("EXC::Se obtener un índice, pero no hay nada ligado a él:", self)
+			return None
+		except Exception as e:
+			dump_exception(e)
+			return None
+		
+	def obtenerMultiplesEntradas(self, indice=0):
+		entradas = []
+		for conexion in self.entradas[indice].Zocaloconexiones:
+			otro_zocalo = conexion.obtenerOtrosZocalos(self.entradas[indice])
+			entradas.append(otro_zocalo.nodo)
+		return entradas
+	
+	def obtenerMultiplesSalidas(self, indice=0):
+		salidas = []
+		for conexion in self.salidas[indice].Zocaloconexiones:
+			otro_zocalo = conexion.obtenerOtrosZocalos(self.salidas[indice])
+			salidas.append(otro_zocalo.nodo)
+		return salidas
 	
 	# Funciones de serialización.
 	def serializacion(self):
