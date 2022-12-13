@@ -110,10 +110,11 @@ class SubVenCalc(EditorDeNodos):
 	def controlMenuContextualNodos(self, event):
 		if DEBUG_CONTEXT: print("Menú contextual: NODO")
 		menu_contextual = QMenu(self)
-		opcionProblematico = menu_contextual.addAction("Marcar como problemático")
-		opcionInvalido = menu_contextual.addAction("Marcar como invalido")
-		opcionDesmarcarInvalido = menu_contextual.addAction("Desmarcar como invalido")
-		opcionEvaluado = menu_contextual.addAction("Evaluado")
+		opcionIndefinido = menu_contextual.addAction("Marcar indefinido")
+		opcionDescendenciaIndefinido = menu_contextual.addAction("Marcar descendencia indefinido")
+		opcionInvalido = menu_contextual.addAction("Marcar inválido")
+		opcionDesmarcarInvalido = menu_contextual.addAction("Desmarcar invalido")
+		opcionEvaluado = menu_contextual.addAction("Marcar evaluado")
 		accion = menu_contextual.exec_(self.mapToGlobal(event.pos()))
 		
 		seleccionado = None
@@ -127,7 +128,13 @@ class SubVenCalc(EditorDeNodos):
 			seleccionado = objeto.zocalo.nodo
 		
 		if DEBUG_CONTEXT: print("Objeto obtenido:", seleccionado)
-		# ToDo: Funciones para las opciones del menú.
+		if seleccionado and accion == opcionIndefinido: seleccionado.marcarIndefinido()
+		if seleccionado and accion == opcionDescendenciaIndefinido: seleccionado.marcarDescendenciaIndefinido()
+		if seleccionado and accion == opcionInvalido: seleccionado.marcarInvalido()
+		if seleccionado and accion == opcionDesmarcarInvalido: seleccionado.marcarInvalido(False)
+		if seleccionado and accion == opcionEvaluado:
+			val = seleccionado.evaluar()
+			if DEBUG_CONTEXT: print("EVALUADO:", val)
 	
 	def controlMenuContextualLinea(self, event):
 		if DEBUG_CONTEXT: print("Menú contextual: LINEA")

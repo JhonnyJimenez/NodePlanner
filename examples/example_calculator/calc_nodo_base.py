@@ -1,3 +1,5 @@
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from nodeeditor.Nodo import Nodo
 from nodeeditor.ContenidodelNodo import ContenidoDelNodo
@@ -14,6 +16,23 @@ class GraphCalcNodo(GraficosdelNodo):
 		self.sangria_de_la_orilla = 0
 		self.sangria_del_titulo = 8
 		self.sangria_vertical_del_titulo = 10
+		
+	def initAssets(self):
+		super().initAssets()
+		self.iconos = QImage("iconos/status_icons.png")
+		
+	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
+		super().paint(painter, QStyleOptionGraphicsItem, widget)
+		
+		offset = 24.0
+		if self.nodo.esIndefinido(): offset = 0.0
+		if self.nodo.esInvalido(): offset = 48.0
+		
+		painter.drawImage(
+			QRectF(-10, -10, 24.0, 24.0),
+			self.iconos,
+			QRectF(offset, 0, 24.0, 24.0)
+		)
 
 class CalcContenido(ContenidoDelNodo):
 	def initui(self):

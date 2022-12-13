@@ -27,6 +27,10 @@ class Nodo(Serializable):
 		self.entradas = []
 		self.salidas = []
 		self.initZocalos(entradas, salidas)
+		
+		# Cosas de evaluación.
+		self._es_indefinido = False
+		self._es_invalido = False
 	
 	def initClasesInternas(self):
 		self.contenido = ContenidoDelNodo(self)
@@ -139,6 +143,64 @@ class Nodo(Serializable):
 		self.escena.eliminarnodo(self)
 		if DEBUG: print('	Todo salió bien.')
 	
+	# Evaluación de nodos.
+	def esIndefinido(self):
+		return self._es_indefinido
+	
+	def marcarIndefinido(self, nuevo_valor=True):
+		self._es_indefinido = nuevo_valor
+		if self._es_indefinido: self.sobremarcarIndefinido()
+		
+	def sobremarcarIndefinido(self): pass
+	
+	def marcarHijoIndefinido(self, nuevo_valor=True):
+		for nodo_hijo in self.obtenerNodosHijos():
+			nodo_hijo.marcarIndefinido(nuevo_valor)
+			
+	def marcarDescendenciaIndefinido(self, nuevo_valor=True):
+		for nodo_hijo in self.obtenerNodosHijos():
+			nodo_hijo.marcarIndefinido(nuevo_valor)
+			nodo_hijo.marcarHijoIndefinido(nuevo_valor)
+		
+	def esInvalido(self):
+		return self._es_invalido
+	
+	def marcarInvalido(self, nuevo_valor=True):
+		self._es_invalido = nuevo_valor
+		if self._es_invalido: self.sobremarcarInvalido()
+		
+	def sobremarcarInvalido(self): pass
+	
+	def marcarHijoInvalido(self, nuevo_valor=True):
+		for nodo_hijo in self.obtenerNodosHijos():
+			nodo_hijo.marcarInvalido(nuevo_valor)
+	
+	def marcarDescendenciaInvalido(self, nuevo_valor=True):
+		for nodo_hijo in self.obtenerNodosHijos():
+			nodo_hijo.marcarInvalido(nuevo_valor)
+			nodo_hijo.marcarHijoInvalido(nuevo_valor)
+	
+	def evaluar(self):
+		self.marcarIndefinido(False)
+		self.marcarInvalido(False)
+		return 0
+	
+	def evaluarHijos(self):
+		for nodo in self.obtenerNodosHijos():
+			nodo.evaluar()
+	
+	# Funciones que pasan a través de los nodos.
+	def obtenerNodosHijos(self):
+		if self.salidas == []: return []
+		lista_de_nodos_hijos = []
+		for ix in range(len(self.salidas)):
+			for conexion in self.salidas[ix].Zocaloconexiones:
+				nodo_hijo = conexion.obtenerOtrosZocalos(self.salidas[0]).nodo
+				lista_de_nodos_hijos.append(nodo_hijo)
+		return lista_de_nodos_hijos
+			
+	
+	# Funciones de serialización.
 	def serializacion(self):
 		entradas, salidas = [], []
 		for Zocalo in self.entradas: entradas.append(Zocalo.serializacion())
