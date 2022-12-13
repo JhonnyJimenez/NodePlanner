@@ -1,3 +1,48 @@
-ContenidoDelNodo { background: transparent; }
-ContenidoDelNodo QLabel { color: #e0e0e0; }
-QGraphicsView { selection-background-color: rgb(255, 255, 255); }
+ContenidoDelNodo {
+  background: transparent;
+}
+ContenidoDelNodo QFrame {
+  background: transparent;
+}
+ContenidoDelNodo QTextEdit,
+ContenidoDelNodo QLineEdit {
+  background: #666;
+  color: #fff;
+}
+ContenidoDelNodo QLabel {
+  color: #e0e0e0;
+}
+ContenidoDelNodo QLabel#calc_nodo_bg,
+ContenidoDelNodo QLabel#calc_nodo_mul,
+ContenidoDelNodo QLabel#calc_nodo_div {
+  background: transparent;
+  height: 8px;
+  color: #373737;
+  font-size: 72px;
+  max-height: 49px;
+  min-height: 49px;
+  padding-left: 94px;
+}
+ContenidoDelNodo QLabel#calc_nodo_mul,
+ContenidoDelNodo QLabel#calc_nodo_div {
+  padding-top: 12px;
+}
+ContenidoDelNodo QLabel#calc_nodo_salida {
+  min-width: 150px;
+  max-width: 150px;
+  min-height: 45px;
+  max-height: 45px;
+  margin-left: 10px;
+  margin-top: 5px;
+  font-size: 28px;
+}
+ContenidoDelNodo QLineEdit#calc_nodo_entrada {
+  width: 140px;
+  height: 36px;
+  margin-top: 5px;
+  margin-left: 5px;
+  font-size: 28px;
+}
+QGraphicsView {
+  selection-background-color: #fff;
+}
