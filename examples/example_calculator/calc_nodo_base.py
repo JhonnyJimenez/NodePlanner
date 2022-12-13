@@ -5,6 +5,7 @@ from nodeeditor.Nodo import Nodo
 from nodeeditor.ContenidodelNodo import ContenidoDelNodo
 from nodeeditor.GraficosdelNodo import GraficosdelNodo
 from nodeeditor.Zocalos import Izquierda_centro, Derecha_centro
+from nodeeditor.Utilidades import dump_exception
 
 
 class GraphCalcNodo(GraficosdelNodo):
@@ -48,6 +49,11 @@ class CalcNodo(Nodo):
 	
 	def __init__(self, escena, entradas=[2, 2], salidas=[1]):
 		super().__init__(escena, self.__class__.titulo_op, entradas, salidas)
+		
+		self.valor = None
+		
+		# Es realmente importante marcar los nodos indefinidos por defecto.
+		self.marcarIndefinido()
 	
 	def initClasesInternas(self):
 		self.contenido = CalcContenido(self)
@@ -57,6 +63,30 @@ class CalcNodo(Nodo):
 		super().initConfiguraciones()
 		self.pos_det_entradas = Izquierda_centro
 		self.pos_det_salidas = Derecha_centro
+		
+	def ImplementacionEvaluacion(self):
+		return 123
+	
+	def evaluar(self):
+		if not self.esIndefinido() and not self.esInvalido():
+			print(" _> devolver valor %s en cache:" % self.__class__.__name__, self.valor)
+			return self.valor
+		
+		try:
+			val = self.ImplementacionEvaluacion()
+			self.marcarIndefinido(False)
+			self.marcarInvalido(False)
+			return val
+		
+		except Exception as e:
+			self.marcarInvalido()
+			dump_exception(e)
+		
+		
+	def DatosdeEntradaCambiados(self, nueva_conexion):
+		print("%s::__EntradaConexionCambiada:" % self.__class__.__name__)
+		self.marcarIndefinido()
+		self.evaluar()
 		
 	def serializacion(self):
 		res = super().serializacion()

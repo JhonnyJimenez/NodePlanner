@@ -32,3 +32,5 @@ def obtener_clase_del_codigo_op(codigo_op):
 	if codigo_op not in CALC_NODOS: raise CodigoopNoRegistrado("El código op '%d' no está registrado" % codigo_op)
 	return CALC_NODOS[codigo_op]
 	
+# Importado de todos los nodos y su registro.
+from examples.example_calculator.nodos import *

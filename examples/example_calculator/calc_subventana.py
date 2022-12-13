@@ -7,7 +7,7 @@ from nodeeditor.Conexiones import bezier, recta
 from nodeeditor.Utilidades import dump_exception
 
 DEBUG = False
-DEBUG_CONTEXT = True
+DEBUG_CONTEXT = False
 
 
 class SubVenCalc(EditorDeNodos):
@@ -160,5 +160,5 @@ class SubVenCalc(EditorDeNodos):
 			nuevo_calcnodo = obtener_clase_del_codigo_op(accion.data())(self.escena)
 			pos_escena = self.escena.obtenerVista().mapToScene(event.pos())
 			nuevo_calcnodo.definirposicion(pos_escena.x(), pos_escena.y())
-			print("Nodo seleccionado:", nuevo_calcnodo)
+			if DEBUG_CONTEXT: print("Nodo seleccionado:", nuevo_calcnodo)
 		

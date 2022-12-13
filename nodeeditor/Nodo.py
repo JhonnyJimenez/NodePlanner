@@ -74,7 +74,15 @@ class Nodo(Serializable):
 			)
 			contador += 1
 			self.salidas.append(zocalos)
-			
+
+	def LineaConexionCambiada(self, nueva_conexion):
+		print("%s::LineaConexionCambiada" % self.__class__.__name__, nueva_conexion)
+		
+	def DatosdeEntradaCambiados(self, nueva_conexion):
+		print("%s::EntradaConexionCambiada" % self.__class__.__name__, nueva_conexion)
+		self.marcarIndefinido()
+		self.marcarDescendenciaIndefinido()
+	
 	def __str__(self):
 		return "<Nodo %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
 	

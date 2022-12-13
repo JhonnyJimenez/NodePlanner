@@ -2,7 +2,7 @@ import os
 import json
 from collections import OrderedDict
 from nodeeditor.Seriabilizador import Serializable
-from nodeeditor.GraficosdelaEscena_vp import GraficosdelaEscenaVP
+from nodeeditor.GraficosEscena import GraficosdelaEscenaVP
 from nodeeditor.Nodo import Nodo
 from nodeeditor.Conexiones import Conexion
 from nodeeditor.Historial_escena import HistorialEscena

@@ -2,7 +2,7 @@ import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-from nodeeditor.GraficosdelaVista_vp import GraficosdelaVistaVP
+from nodeeditor.GraficosVista import GraficosdelaVistaVP
 from nodeeditor.Escena import Escena, InvalidFile
 from nodeeditor.Nodo import Nodo
 from nodeeditor.Conexiones import Conexion, recta, bezier

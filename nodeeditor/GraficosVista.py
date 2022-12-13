@@ -6,8 +6,9 @@ from PyQt5.QtGui import *
 
 from nodeeditor.GraficosDeZocalos import GraficosDeZocalos
 from nodeeditor.GraficosdeConexion import GraficosdeConexion
-from nodeeditor.Conexiones import Conexion, bezier
+from nodeeditor.Conexiones import Conexion, bezier, recta
 from nodeeditor.GraficosdeCortado import Recortado
+from nodeeditor.Utilidades import dump_exception
 
 MODO_NORMAL = 1
 MODO_DIBUJO = 2
@@ -15,7 +16,7 @@ MODO_CORTE = 3
 
 EDGE_DRAG_START_THRESHOLD = 10
 
-DEBUG = True
+DEBUG = False
 
 
 class GraficosdelaVistaVP(QGraphicsView):
@@ -306,12 +307,14 @@ class GraficosdelaVistaVP(QGraphicsView):
 		return objeto
 	
 	def ComenzarDibujadoConexion(self, objeto):
-		if DEBUG: print('Vista: CDibujadoConexion - Comienza a dibujar la conexión.')
-		if DEBUG: print('Vista: CDibujadoConexion -  Zócalo inicial asignado a:', objeto.zocalo)
-		# self.conexion_anterior = objeto.zocalo.Zocaloconexiones
-		self.zocalo_inicial_de_dibujado = objeto.zocalo
-		self.dibujar_conexion = Conexion(self.escena.escena, objeto.zocalo, None, bezier)
-		if DEBUG: print('Vista: CDibujadoConexion - Dibujado:', self.dibujar_conexion)
+		try:
+			if DEBUG: print('Vista: CDibujadoConexion - Comienza a dibujar la conexión.')
+			if DEBUG: print('Vista: CDibujadoConexion -  Zócalo inicial asignado a:', objeto.zocalo)
+			# self.conexion_anterior = objeto.zocalo.Zocaloconexiones
+			self.zocalo_inicial_de_dibujado = objeto.zocalo
+			self.dibujar_conexion = Conexion(self.escena.escena, objeto.zocalo, None, bezier)
+			if DEBUG: print('Vista: CDibujadoConexion - Dibujado:', self.dibujar_conexion)
+		except Exception as e: dump_exception(e)
 	
 	def FinalizarDibujadoConexion(self, objeto):
 		# Devuelve verdadero si se salta el resto del código
@@ -321,48 +324,31 @@ class GraficosdelaVistaVP(QGraphicsView):
 		self.dibujar_conexion.quitar()
 		self.dibujar_conexion = None
 		
-		if type(objeto) is GraficosDeZocalos:
-			if objeto.zocalo != self.zocalo_inicial_de_dibujado:
-				# Si soltamos el dibujado sobre un zocalo distinto al de inicio
-				# if DEBUG: print('Vista: FDibujadoConexion -  conexion anterior', self.conexion_anterior)
-				
-				# if objeto.zocalo.tieneconexiones():
-				#	objeto.zocalo.Zocaloconexiones.quitar()
-				# for conexion in objeto.zocalo.Zocaloconexiones:
-				#	if DEBUG: print('Vista: FDibujadoConexion - Limpiando conexiones en el destino:', conexion)
-				#	conexion.quitar_de_zocalos()
-				#	if DEBUG: print('Vista: FDibujadoConexion - Limpiando conexiones en el destino:', conexion, 'quitada')
-				
-				if not objeto.zocalo.esmulticonexion:
-					objeto.zocalo.quitar_todas_las_conexiones()
+		try:
+			if type(objeto) is GraficosDeZocalos:
+				if objeto.zocalo != self.zocalo_inicial_de_dibujado:
+					# Si soltamos el dibujado sobre un zocalo distinto al de inicio
 					
-				if not self.zocalo_inicial_de_dibujado.esmulticonexion:
-					self.zocalo_inicial_de_dibujado.quitar_todas_las_conexiones()
-				
-				# if DEBUG: print('Vista: FDibujadoConexion -  Zócalo final asignado', objeto.zocalo)
-				# if self.conexion_anterior is not None: self.conexion_anterior.quitar()
-				# if DEBUG: print('Vista: FDibujadoConexion - Conexion anterior eliminada')
-				# self.dibujar_conexion.zocalo_origen = self.zocalo_inicial_de_dibujado
-				# self.dibujar_conexion.zocalo_final = objeto.zocalo
-				# self.dibujar_conexion.zocalo_origen.agregar_conexion(self.dibujar_conexion)
-				# self.dibujar_conexion.zocalo_final.agregar_conexion(self.dibujar_conexion)
-				# if DEBUG: print('Vista: FDibujadoConexion -  Zócalo inicial y final reasignados')
-				# self.dibujar_conexion.posiciones_actualizadas()
-				
-				nueva_conexion = Conexion(self.escena.escena, self.zocalo_inicial_de_dibujado, objeto.zocalo, tipo_de_conexion=bezier)
-				if DEBUG: print('Vista: FDibujadoConexion - Nueva conexión creada:', nueva_conexion, 'conecta', nueva_conexion.zocalo_origen, 'y', nueva_conexion.zocalo_final)
-				
-				
-				self.escena.escena.historial.almacenarHistorial("Conexion creada mediante dibujado", setModified=True)
-				return True
-		
-		
-		# if DEBUG: print('Vista: FDibujadoConexion - Sobre configurar el zocalo al anterior:', self.conexion_anterior)
-		# if self.conexion_anterior is not None:
-		# 	self.conexion_anterior.zocalo_origen.Zocaloconexiones = self.conexion_anterior
+					# Para mantener todos las conexiones que vienen del zócalo de destino.
+					if not objeto.zocalo.esmulticonexion:
+						objeto.zocalo.quitar_todas_las_conexiones()
+						
+					# Para mantener todos las coneziones que vienen del zócalo de origen.
+					if not self.zocalo_inicial_de_dibujado.esmulticonexion:
+						self.zocalo_inicial_de_dibujado.quitar_todas_las_conexiones()
+					
+					nueva_conexion = Conexion(self.escena.escena, self.zocalo_inicial_de_dibujado, objeto.zocalo, tipo_de_conexion=bezier)
+					if DEBUG: print('Vista: FDibujadoConexion - Nueva conexión creada:', nueva_conexion, 'conecta', nueva_conexion.zocalo_origen, 'y', nueva_conexion.zocalo_final)
+					
+					for zocalo in [self.zocalo_inicial_de_dibujado, objeto.zocalo]:
+						zocalo.nodo.LineaConexionCambiada(nueva_conexion)
+						if zocalo.esEntrada: zocalo.nodo.DatosdeEntradaCambiados(nueva_conexion)
+					
+					self.escena.escena.historial.almacenarHistorial("Conexion creada mediante dibujado", setModified=True)
+					return True
+		except Exception as e: dump_exception(e)
 		
 		if DEBUG: print('Vista: FDibujadoConexion - Todo bien')
-		
 		return False
 	
 	def DistanciaEntreClicksEsCero(self, event):
