@@ -72,8 +72,6 @@ class EditorDeNodos(QWidget):
 			return False
 		finally:
 			QApplication.restoreOverrideCursor()
-			
-		return False
 	
 	def guardararchivo(self, filename=None):
 		# Cuando se llame sin parámetros no podremos almacenar el nombre de archivo.

@@ -9,7 +9,7 @@ imagen = "iconos/owoAwoo.png"
 
 class CalcNodoSalida_Contenido(ContenidoDelNodo):
 	def initui(self):
-		self.lbl = QLabel("", self)
+		self.lbl = QLabel("42", self)
 		self.lbl.setAlignment(Qt.AlignLeft)
 		self.lbl.setObjectName(self.nodo.content_label_objname)
 
@@ -43,8 +43,8 @@ class CalcNodoSalida(CalcNodo):
 			return
 		
 		decimal, entero = math.modf(val)
-		self.contenido.lbl.setText("%s" % (int(val) if decimal == 0.0 else str(round(val, 3))))
-		self.marcarInvalido(False)
+		self.contenido.lbl.setText("%s" % (int(val) if decimal == 0.0 else round(val, 3)))
+		print(round(val, 3))
 		self.marcarIndefinido(False)
 		self.Nodograficas.setToolTip("")
 		return val

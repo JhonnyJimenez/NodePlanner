@@ -79,9 +79,12 @@ class Nodo(Serializable):
 		print("%s::DatosdeConexionCambiados" % self.__class__.__name__, conexion)
 		
 	def DatosdeEntradaCambiados(self, conexion):
-		print("%s::DatosdeEntradaCambiados" % self.__class__.__name__, onexion)
+		print("%s::DatosdeEntradaCambiados" % self.__class__.__name__, conexion)
 		self.marcarIndefinido()
 		self.marcarDescendenciaIndefinido()
+		
+	def hacerSeleccion(self, nuevo_estado=True):
+		self.Nodograficas.hacerSeleccion(nuevo_estado)
 	
 	def __str__(self):
 		return "<Nodo %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
@@ -213,7 +216,7 @@ class Nodo(Serializable):
 			zocalo = conexion.obtenerOtrosZocalos(self.entradas[indice])
 			return zocalo.nodo
 		except IndexError:
-			print("EXC::Se obtener un índice, pero no hay nada ligado a él:", self)
+			if DEBUG: print("EXC::Se obtiene un índice, pero no hay nada ligado a él:", self)
 			return None
 		except Exception as e:
 			dump_exception(e)

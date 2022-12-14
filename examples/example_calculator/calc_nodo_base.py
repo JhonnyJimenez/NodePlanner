@@ -107,7 +107,6 @@ class CalcNodo(Nodo):
 			self.Nodograficas.setToolTip(str(e))
 			dump_exception(e)
 		
-		
 	def DatosdeEntradaCambiados(self, nueva_conexion):
 		print("%s::__DatosdeEntradaCambiados (Nodo base)" % self.__class__.__name__)
 		self.marcarIndefinido()
@@ -120,6 +119,6 @@ class CalcNodo(Nodo):
 	
 	def deserializacion(self, data, hashmap={}, restaure_id=True):
 		res = super().deserializacion(data, hashmap, restaure_id)
-		print("Deserializando CalcNodo '%s'" % self.__class__.__name__, "res:", res)
+		# print("Deserializando CalcNodo '%s'" % self.__class__.__name__, "res:", res)
 		return res
 		

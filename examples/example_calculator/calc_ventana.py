@@ -226,6 +226,8 @@ class VenCalc(Ventana):
 		editor_de_nodos = subwidget if subwidget is not None else SubVenCalc()
 		subven = self.mdiArea.addSubWindow(editor_de_nodos)
 		subven.setWindowIcon(self.icono_vacio)
+		editor_de_nodos.escena.historial.historial_nuevo()
+		editor_de_nodos.escena.historial.marcaInicialdelHistorial()
 		# editor_de_nodos.escena.agregarObjetoSeleccionadoListener(self.actualizarMenuEditar)
 		# editor_de_nodos.escena.agregarObjetosNoSeleccionadosListener(self.actualizarMenuEditar)
 		editor_de_nodos.escena.historial.agregarmodificadoresdelhistorialisteners(self.actualizarMenuEditar)

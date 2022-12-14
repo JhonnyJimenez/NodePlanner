@@ -24,11 +24,14 @@ class Conexion(Serializable):
 		
 		self.escena.agregarconexion(self)
 	
-	def __str__(self):
-		return "<Conexion %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
-	
 	def obtenerOtrosZocalos(self, zocalo_conocido):
 		return self.zocalo_origen if zocalo_conocido == self.zocalo_final else self.zocalo_final
+	
+	def hacerSeleccion(self, nuevo_estado=True):
+		self.GraficosDeConexion.hacerSeleccion(nuevo_estado)
+	
+	def __str__(self):
+		return "<Conexion %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
 	
 	@property
 	def zocalo_origen(self): return self._zocalo_origen

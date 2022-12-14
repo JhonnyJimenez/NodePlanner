@@ -13,7 +13,10 @@ class HistorialEscena:
 		self.historial_nuevo()
 		self.limite_historial = 32
 		
+		# listeners
 		self._modificadores_del_historial_listeners = []
+		self._almacenado_del_historial_listeners = []
+		self._restaurado_del_historial_listeners = []
 		
 	def historial_nuevo(self):
 		self.listado_historial = []
@@ -21,6 +24,15 @@ class HistorialEscena:
 		
 	def marcaInicialdelHistorial(self):
 		self.almacenarHistorial("Marca inicial del historial")
+		
+	def agregarmodificadoresdelhistorialisteners(self, callback):
+		self._modificadores_del_historial_listeners.append(callback)
+		
+	def agregaralmacenadodelhistorialisteners(self, callback):
+		self._almacenado_del_historial_listeners.append(callback)
+		
+	def agregarrestauradodelhistorialisteners(self, callback):
+		self._restaurado_del_historial_listeners.append(callback)
 		
 	def habilitarDeshacer(self):
 		return self.pos_act_historial > 0
@@ -34,7 +46,7 @@ class HistorialEscena:
 		if self.habilitarDeshacer():
 			self.pos_act_historial -= 1
 			self.restaurarHistorial()
-			self.escena._elementos_modificados = True
+			self.escena.elementos_modificados = True
 		
 	def rehacer(self):
 		if DEBUG: print("Redo")
@@ -42,10 +54,7 @@ class HistorialEscena:
 		if self.habilitarRehacer():
 			self.pos_act_historial += 1
 			self.restaurarHistorial()
-			self.escena._elementos_modificados = True
-			
-	def agregarmodificadoresdelhistorialisteners(self, callback):
-		self._modificadores_del_historial_listeners.append(callback)
+			self.escena.elementos_modificados = True
 		
 	def restaurarHistorial(self):
 		if DEBUG: print("Restaurando historial",
@@ -53,6 +62,7 @@ class HistorialEscena:
 						"(%d)" % len(self.listado_historial))
 		self.RestaurarMarcaHistorial(self.listado_historial[self.pos_act_historial])
 		for callback in self._modificadores_del_historial_listeners: callback()
+		for callback in self._restaurado_del_historial_listeners: callback()
 
 
 	def almacenarHistorial(self, desc, setModified=False):
@@ -79,6 +89,7 @@ class HistorialEscena:
 		if DEBUG: print(" == configurando posición a:", self.pos_act_historial)
 		
 		for callback in self._modificadores_del_historial_listeners: callback()
+		for callback in self._almacenado_del_historial_listeners: callback()
 		
 	def crear_Marca_Historial(self, desc):
 		sel_obj = {
@@ -119,3 +130,4 @@ class HistorialEscena:
 						break
 						
 		except Exception as e: dump_exception(e)
+		

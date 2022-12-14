@@ -59,6 +59,11 @@ class GraficosdelNodo(QGraphicsItem):
 	def seleccionado(self):
 		self.nodo.escena.GraficosEsc.objetoSeleccionado.emit()
 		
+	def hacerSeleccion(self, nuevo_estado=True):
+		self.setSelected(nuevo_estado)
+		self._ultimo_estado_de_seleccion = nuevo_estado
+		if nuevo_estado: self.seleccionado()
+		
 	def mouseMoveEvent(self, evento):
 		super().mouseMoveEvent(evento)
 

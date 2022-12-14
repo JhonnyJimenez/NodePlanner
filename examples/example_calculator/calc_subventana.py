@@ -4,6 +4,7 @@ from examples.example_calculator.calc_config import *
 from nodeeditor.Widget_de_nodos import EditorDeNodos
 from examples.example_calculator.calc_nodo_base import *
 from nodeeditor.Conexiones import bezier, recta
+from nodeeditor.GraficosVista import MODO_DIBUJO
 from nodeeditor.Utilidades import dump_exception
 
 DEBUG = False
@@ -20,6 +21,7 @@ class SubVenCalc(EditorDeNodos):
 		self.initNuevaOpciondeNodo()
 		
 		self.escena.agregarElementosModificadosListener(self.definirtitulo)
+		self.escena.historial.agregarrestauradodelhistorialisteners(self.alRestaurarHistorial)
 		self.escena.agregarDragEnterListener(self.arrastrar)
 		self.escena.agregarDropListener(self.soltar)
 		self.escena.definirSelectordeClasesdeNodos(self.obtener_clase_del_nodo_de_datos)
@@ -29,17 +31,22 @@ class SubVenCalc(EditorDeNodos):
 	def obtener_clase_del_nodo_de_datos(self, data):
 		if 'Codigo_op' not in data: return None
 		return obtener_clase_del_codigo_op(data['Codigo_op'])
+
+	def hacerEvaluaciondeSalidas(self):
+		# Evaluar todos los nodos de salida.
+		for nodo in self.escena.Nodos:
+			if nodo.__class__.__name__ == "CalcNodoSalida":
+				nodo.evaluar()
+				
+	def alRestaurarHistorial(self):
+		self.hacerEvaluaciondeSalidas()
 	
 	def leerarchivo(self, filename):
 		if super().leerarchivo(filename):
-			# Evaluar todos los nodos de salida.
-			for nodo in self.escena.Nodos:
-				if nodo.__class__.__name__ == "CalcNodoSalida":
-					nodo.evaluar()
+			self.hacerEvaluaciondeSalidas()
 			return True
 		
 		return False
-	
 	
 	def initNuevaOpciondeNodo(self):
 		self.opciones_de_nodos = {}
@@ -90,7 +97,7 @@ class SubVenCalc(EditorDeNodos):
 			try:
 				nodo = obtener_clase_del_codigo_op(codigo_op)(self.escena)
 				nodo.definirposicion(escena_pos.x(), escena_pos.y())
-				self.escena.historial.almacenarHistorial("Creación de un nodo: %s" % nodo.__class__.__name__)
+				self.escena.historial.almacenarHistorial("Creación de un nodo: %s" % nodo.__class__.__name__, setModified=True)
 			except Exception as e: dump_exception(e)
 			
 			event.setDropAction(Qt.MoveAction)
@@ -172,4 +179,12 @@ class SubVenCalc(EditorDeNodos):
 			pos_escena = self.escena.obtenerVista().mapToScene(event.pos())
 			nuevo_calcnodo.definirposicion(pos_escena.x(), pos_escena.y())
 			if DEBUG_CONTEXT: print("Nodo seleccionado:", nuevo_calcnodo)
-		
+			
+			if self.escena.obtenerVista().modo == MODO_DIBUJO:
+				# Cuando se dibuja una conexion:
+				self.escena.obtenerVista().FinalizarDibujadoConexion(nuevo_calcnodo.entradas[0].GraficosZocalos)
+				nuevo_calcnodo.hacerSeleccion()
+				# nuevo_calcnodo.entradas[0].Zocaloconexiones[-1].hacerSeleccion()
+				
+			else:
+				self.escena.historial.almacenarHistorial("Nodo %s creado" % nuevo_calcnodo.__class__.__name__)
