@@ -1,4 +1,3 @@
-# Vista gráfica (Ventana principal).
 from PyQt5.QtWidgets import QGraphicsView, QApplication
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -6,7 +5,7 @@ from PyQt5.QtGui import *
 
 from nodeeditor.GraficosDeZocalos import GraficosDeZocalos
 from nodeeditor.GraficosdeConexion import GraficosdeConexion
-from nodeeditor.Conexiones import Conexion, bezier, recta
+from nodeeditor.Dibujado_de_conexion import DibujadodeConexion
 from nodeeditor.GraficosdeCortado import Recortado
 from nodeeditor.Utilidades import dump_exception
 
@@ -15,9 +14,12 @@ MODO_DIBUJO = 2
 MODO_CORTE = 3
 MODO_REDIRECCION = 4
 
-EDGE_DRAG_START_THRESHOLD = 10
+# Distancia para activar el modo dibujo al cliquear en un zócalo.
+EDGE_DRAG_START_THRESHOLD = 50
 
 DEBUG = False
+DEBUG_CLIC_CENTRAL = True
+DEBUG_CLIC_CENTRAL_ULTIMAS_SELECCIONES = False
 
 
 class GraficosdelaVistaVP(QGraphicsView):
@@ -35,16 +37,19 @@ class GraficosdelaVistaVP(QGraphicsView):
 		self.eventoedicion = False
 		self.rubberBandDraggingRectangle = False
 		
+		# Dibujado de conexiones.
+		self.dibujado = DibujadodeConexion(self)
+		
+		# Cutline
+		self.linea_de_recorte = Recortado()
+		self.escena.addItem(self.linea_de_recorte)
+		
 		self.ultima_posicion_del_mouse = QPoint(0, 0)
 		self.FactorAcercamiento = 1.25
 		self.ZoomClamp = True
 		self.Zoom = 10
 		self.NiveldeZoom = 1
 		self.RangodeZoom = [0, 10]
-		
-		# Cutline
-		self.linea_de_recorte = Recortado()
-		self.escena.addItem(self.linea_de_recorte)
 		
 		# Listeners
 		self._drag_enter_listeners = []
@@ -68,6 +73,9 @@ class GraficosdelaVistaVP(QGraphicsView):
 		
 		# Activado de arrastre y soltura de objetos.
 		self.setAcceptDrops(True)
+		
+	def reiniciarModo(self):
+		self.modo = MODO_NORMAL
 		
 	def dragEnterEvent(self, event):
 		for callback in self._drag_enter_listeners: callback(event)
@@ -105,19 +113,34 @@ class GraficosdelaVistaVP(QGraphicsView):
 		objeto = self.ConseguirObjetoAlCliquear(event)
 
 		# DEBUG print.
-		if DEBUG:
-			if isinstance(objeto, GraficosdeConexion): print('RMB DEBUG:', 'La', objeto.linea, 'conecta',
-															 'el', objeto.linea.zocalo_origen, 'con el',
-															 objeto.linea.zocalo_final)
-			if type(objeto) is GraficosDeZocalos: print('RMB DEBUG:', 'El', objeto.zocalo, 'tiene las',
-														objeto.zocalo.Zocaloconexiones)
+		if DEBUG_CLIC_CENTRAL:
+			if isinstance(objeto, GraficosdeConexion):
+				print('MMB DEBUG: La', objeto.linea, "\n\t", objeto.linea.GraficosdeConexion if objeto.linea.GraficosdeConexion is not None else None)
+				return
 			
-			if objeto is None:
-				print('Escena:')
-				print('   Nodo:')
-				for nodo in self.escena.escena.Nodos: print('     ', nodo)
-				print('   Conexión:')
-				for conexion in self.escena.escena.Conexiones: print('     ', conexion)
+			if isinstance(objeto, GraficosDeZocalos):
+				print("MMB DEBUG:", objeto.zocalo, "Tipo_de_zocalo:", objeto.zocalo.tipo_zocalo,
+					  "¿tiene conexiones?:", "No" if objeto.zocalo.Zocaloconexiones == [] else "")
+				if objeto.zocalo.Zocaloconexiones:
+					for conexion in objeto.zocalo.Zocaloconexiones: print("\t", conexion)
+				return
+				
+			
+		if DEBUG_CLIC_CENTRAL and objeto is None:
+			print('Escena:')
+			print('   Nodo:')
+			for nodo in self.escena.escena.Nodos: print("\t", nodo)
+			print('   Conexión:')
+			for conexion in self.escena.escena.Conexiones: print("\t", conexion, "\n\t\tConexion:", conexion.GraficosDeConexion if conexion.GraficosDeConexion is not None else None)
+			
+			if event.modifiers() & Qt.CTRL:
+				print("  Objetos graficos en la escena gráfica:")
+				for objeto in self.escena.items():
+					print('    ', objeto)
+		
+		if DEBUG_CLIC_CENTRAL_ULTIMAS_SELECCIONES and event.modifiers() & Qt.SHIFT:
+			print("Escena _ultimos_objetos_seleccionados:", self.escena.escena._ultimos_objetos_seleccionados)
+			return
 		
 		# Eventos falsos para activar el desplazamiento por la ventana.
 		soltado_del_mouse = QMouseEvent(QEvent.MouseButtonRelease, event.localPos(), event.screenPos(), Qt.LeftButton, Qt.NoButton, event.modifiers())
@@ -154,11 +177,11 @@ class GraficosdelaVistaVP(QGraphicsView):
 		if isinstance(objeto, GraficosDeZocalos):
 			if self.modo == MODO_NORMAL:
 				self.modo = MODO_DIBUJO
-				self.ComenzarDibujadoConexion(objeto)
+				self.dibujado.ComenzarDibujadoConexion(objeto)
 				return
 
 		if self.modo == MODO_DIBUJO:
-			res = self.FinalizarDibujadoConexion(objeto)
+			res = self.dibujado.FinalizarDibujadoConexion(objeto)
 			if res: return
 			
 		if objeto is None:
@@ -178,45 +201,47 @@ class GraficosdelaVistaVP(QGraphicsView):
 		# Obtener el objeto sobre el que se suelta el clic.
 		objeto = self.ConseguirObjetoAlCliquear(event)
 		
-		# Lógica.
-		if hasattr(objeto, "nodo") or isinstance(objeto, GraficosdeConexion) or objeto is None:
-			if event.modifiers() & Qt.ShiftModifier:
-				event.ignore()
-				evento_falso = QMouseEvent(event.type(), event.localPos(), event.screenPos(),
-										   Qt.LeftButton, Qt.NoButton,
-										   event.modifiers() | Qt.ControlModifier)
-				super().mouseReleaseEvent(evento_falso)
+		try:
+			# Lógica.
+			if hasattr(objeto, "nodo") or isinstance(objeto, GraficosdeConexion) or objeto is None:
+				if event.modifiers() & Qt.ShiftModifier:
+					event.ignore()
+					evento_falso = QMouseEvent(event.type(), event.localPos(), event.screenPos(),
+											   Qt.LeftButton, Qt.NoButton,
+											   event.modifiers() | Qt.ControlModifier)
+					super().mouseReleaseEvent(evento_falso)
+					return
+				
+			if self.modo == MODO_DIBUJO:
+				if self.DistanciaEntreClicksEsCero(event):
+					res = self.dibujado.FinalizarDibujadoConexion(objeto)
+					if res: return
+					
+			if self.modo == MODO_CORTE:
+				self.ConexionesCortadas()
+				self.linea_de_recorte.linea_puntos = []
+				self.linea_de_recorte.update()
+				QApplication.setOverrideCursor(Qt.ArrowCursor)
+				self.modo = MODO_NORMAL
 				return
 			
-		if self.modo == MODO_DIBUJO:
-			if self.DistanciaEntreClicksEsCero(event):
-				res = self.FinalizarDibujadoConexion(objeto)
-				if res: return
+			if self.rubberBandDraggingRectangle:
+				self.rubberBandDraggingRectangle = False
+				objetos_seleccionados_actualmente = self.escena.selectedItems()
 				
-		if self.modo == MODO_CORTE:
-			self.ConexionesCortadas()
-			self.linea_de_recorte.linea_puntos = []
-			self.linea_de_recorte.update()
-			QApplication.setOverrideCursor(Qt.ArrowCursor)
-			self.modo = MODO_NORMAL
-			return
-		
-		if self.rubberBandDraggingRectangle:
-			self.rubberBandDraggingRectangle = False
-			objetos_seleccionados_actualmente = self.escena.selectedItems()
+				if objetos_seleccionados_actualmente != self.escena.escena._ultimos_objetos_seleccionados:
+					if objetos_seleccionados_actualmente == []:
+						self.escena.objetosNoSeleccionados.emit()
+					else:
+						self.escena.objetoSeleccionado.emit()
+					self.escena.escena._ultimos_objetos_seleccionados = objetos_seleccionados_actualmente
+				
+				return
 			
-			if objetos_seleccionados_actualmente != self.escena.escena._ultimos_objetos_seleccionados:
-				if objetos_seleccionados_actualmente == []:
-					self.escena.objetosNoSeleccionados.emit()
-				else:
-					self.escena.objetoSeleccionado.emit()
-				self.escena.escena._ultimos_objetos_seleccionados = objetos_seleccionados_actualmente
-			
-			return
-		
-		# De otro modo deseleccionar todos los objetos.
-		if objeto is None:
-			self.escena.objetosNoSeleccionados.emit()
+			# De otro modo deseleccionar todos los objetos.
+			if objeto is None:
+				self.escena.objetosNoSeleccionados.emit()
+		except: dump_exception()
 			
 		super().mouseReleaseEvent(event)
 
@@ -230,13 +255,9 @@ class GraficosdelaVistaVP(QGraphicsView):
 		pos_esc = self.mapToScene(event.pos())
 		
 		if self.modo == MODO_DIBUJO:
-			if self.dibujar_conexion is not None:
-				self.dibujar_conexion.GraficosDeConexion.punto_destino(pos_esc.x(), pos_esc.y())
-				self.dibujar_conexion.GraficosDeConexion.update()
-			else:
-				print("    Quiero actualizar self.dibujar_conexion.GraficosDeConexion, ¡¡¡pero no hay nada!!!")
+			self.dibujado.actualizarDestino(pos_esc.x(), pos_esc.y())
 			
-		if self.modo == MODO_CORTE:
+		if self.modo == MODO_CORTE and self.linea_de_recorte is not None:
 			self.linea_de_recorte.linea_puntos.append(pos_esc)
 			self.linea_de_recorte.update()
 		
@@ -304,52 +325,6 @@ class GraficosdelaVistaVP(QGraphicsView):
 		posicion = event.pos()
 		objeto = self.itemAt(posicion)
 		return objeto
-	
-	def ComenzarDibujadoConexion(self, objeto):
-		try:
-			if DEBUG: print('Vista: CDibujadoConexion - Comienza a dibujar la conexión.')
-			if DEBUG: print('Vista: CDibujadoConexion -  Zócalo inicial asignado a:', objeto.zocalo)
-			# self.conexion_anterior = objeto.zocalo.Zocaloconexiones
-			self.zocalo_inicial_de_dibujado = objeto.zocalo
-			self.dibujar_conexion = Conexion(self.escena.escena, objeto.zocalo, None, bezier)
-			if DEBUG: print('Vista: CDibujadoConexion - Dibujado:', self.dibujar_conexion)
-		except Exception as e: dump_exception(e)
-	
-	def FinalizarDibujadoConexion(self, objeto):
-		# Devuelve verdadero si se salta el resto del código
-		self.modo = MODO_NORMAL
-		
-		if DEBUG: print('Vista: FDibujadoConexion - Termina de dibujar la conexión.')
-		self.dibujar_conexion.quitar()
-		self.dibujar_conexion = None
-		
-		try:
-			if isinstance(objeto, GraficosDeZocalos):
-				if objeto.zocalo != self.zocalo_inicial_de_dibujado:
-					# Si soltamos el dibujado sobre un zocalo distinto al de inicio
-					
-					# Para mantener todos las conexiones que vienen del zócalo de destino.
-					if not objeto.zocalo.esmulticonexion:
-						objeto.zocalo.quitar_todas_las_conexiones()
-						
-					# Para mantener todos las coneziones que vienen del zócalo de origen.
-					if not self.zocalo_inicial_de_dibujado.esmulticonexion:
-						self.zocalo_inicial_de_dibujado.quitar_todas_las_conexiones()
-					
-					nueva_conexion = Conexion(self.escena.escena, self.zocalo_inicial_de_dibujado, objeto.zocalo, tipo_de_conexion=bezier)
-					if DEBUG: print('Vista: FDibujadoConexion - Nueva conexión creada:', nueva_conexion, 'conecta', nueva_conexion.zocalo_origen, 'y', nueva_conexion.zocalo_final)
-					
-					# Manda notificaciones para la nueva conexion.
-					for zocalo in [self.zocalo_inicial_de_dibujado, objeto.zocalo]:
-						zocalo.nodo.DatosdeConexionCambiados(nueva_conexion)
-						if zocalo.esEntrada: zocalo.nodo.DatosdeEntradaCambiados(zocalo)
-					
-					self.escena.escena.historial.almacenarHistorial("Conexion creada mediante dibujado", setModified=True)
-					return True
-		except Exception as e: dump_exception(e)
-		
-		if DEBUG: print('Vista: FDibujadoConexion - Todo bien')
-		return False
 	
 	def DistanciaEntreClicksEsCero(self, event):
 		# Medidas si nosotros estamos muy lejos de la posición del último clic dado.

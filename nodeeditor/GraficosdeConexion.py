@@ -29,7 +29,7 @@ class GraficosdeConexion(QGraphicsPathItem):
 		self.setZValue(-1)
 		
 	def initAssets(self):
-		self._color = QColor("#001000")
+		self._color = self._default_color = QColor("#001000")
 		self._color_seleccionado = QColor("#00ff00")
 		self._color_hovered = QColor("#FF37A6FF")
 		self._pen = QPen(self._color)
@@ -41,6 +41,21 @@ class GraficosdeConexion(QGraphicsPathItem):
 		self._pen_seleccionado.setWidthF(3.0)
 		self._pen_dibujo.setWidthF(3.0)
 		self._pen_hover.setWidthF(5.0)
+		
+	def hacerNoSeleccionable(self):
+		self.setFlag(QGraphicsItem.ItemIsSelectable, False)
+		self.setAcceptHoverEvents(False)
+	
+	def cambiarColor(self, color):
+		self._color = QColor(color) if type(color) == str else color
+		self._pen = QPen(self._color)
+		self._pen.setWidthF(3.0)
+	
+	def definirColordesdeelZocalo(self):
+		tipo_zocalo_origen = self.linea.zocalo_inicial_de_dibujado.tipo_zocalo
+		tipo_zocalo_final = self.linea.zocalo_final.tipo_zocalo
+		if tipo_zocalo_origen != tipo_zocalo_final: return False
+		self.cambiarColor(self.linea.zocalo_origen.GraficosZocalos.obtenerColorparaelZocalo(tipo_zocalo_origen))
 		
 	def seleccionado(self):
 		self.linea.escena.GraficosEsc.objetoSeleccionado.emit()

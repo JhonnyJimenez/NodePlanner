@@ -124,6 +124,9 @@ class Nodo(Serializable):
 		self.marcarIndefinido()
 		self.marcarDescendenciaIndefinido()
 		
+	def AlDeserializar(self, data):
+		pass
+	
 	def DobleCliqueo(self, event):
 		pass
 		
@@ -160,6 +163,11 @@ class Nodo(Serializable):
 			y = 0
 		
 		return [x, y]
+	
+	def obtenerPosiciondeZocaloenEscena(self, zocalo):
+		pos_nodo = self.Nodograficas.pos()
+		pos_zocalo = self.obtener_posicion_zocalo(zocalo.indice, zocalo.posicion, zocalo.cantidad_en_el_lado_actual)
+		return (pos_nodo.x() + pos_zocalo[0], pos_nodo.y() + pos_zocalo[1])
 	
 	def actualizarconexiones(self):
 		for zocalo in self.entradas + self.salidas:
@@ -286,10 +294,10 @@ class Nodo(Serializable):
 			hashmap[data['id']] = self
 			
 			self.definirposicion(data['Pos_x'], data['Pos_y'])
-			self.titulo =  data['Titulo']
+			self.titulo = data['Titulo']
 			
-			data['Entradas'].sort(key=lambda Zocalo: Zocalo['Indice'] + Zocalo['Posicion'] * 10000 )
-			data['Salidas'].sort(key=lambda Zocalo: Zocalo['Indice'] + Zocalo['Posicion'] * 10000 )
+			data['Entradas'].sort(key=lambda Zocalo: Zocalo['Indice'] + Zocalo['Posicion'] * 10000)
+			data['Salidas'].sort(key=lambda Zocalo: Zocalo['Indice'] + Zocalo['Posicion'] * 10000)
 			num_entradas = len(data['Entradas'])
 			num_salidas = len(data['Salidas'])
 			
@@ -325,7 +333,7 @@ class Nodo(Serializable):
 				# nuevo_zocalo = self.__class__.ClasedeZocalo(nodo=self, indice=Zocalo_data['Indice'],
 				#											posicion=Zocalo_data['Posicion'],
 				#											tipo_zocalo=Zocalo_data['Tipo_de_zocalo'],
-				#											cantidad_en_el_lado_actual=num_entradas, esEntrada=False)
+				#											cantidad_en_el_lado_actual=num_salidas, esEntrada=False)
 				# nuevo_zocalo.deserializacion(Zocalo_data, hashmap, restaure_id)
 				# self.salidas.append(nuevo_zocalo)
 				
@@ -339,7 +347,7 @@ class Nodo(Serializable):
 					encontrado = self.__class__.ClasedeZocalo(nodo=self, indice=Zocalo_data['Indice'],
 															  posicion=Zocalo_data['Posicion'],
 															  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'],
-															  cantidad_en_el_lado_actual=num_entradas, esEntrada=True)
+															  cantidad_en_el_lado_actual=num_salidas, esEntrada=True)
 					self.salidas.append(encontrado)
 					encontrado.deserializacion(Zocalo_data, hashmap, restaure_id)
 		except Exception as e: dump_exception(e)

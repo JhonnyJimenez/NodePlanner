@@ -32,7 +32,7 @@ class Conexion(Serializable):
 		self.GraficosDeConexion.hacerSeleccion(nuevo_estado)
 	
 	def __str__(self):
-		return "<Conexion %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
+		return "<Conexion %s..%s -- S:%s E:%s>" % (hex(id(self))[2:5], hex(id(self))[-3:], self.zocalo_origen, self.zocalo_final)
 	
 	@property
 	def zocalo_origen(self): return self._zocalo_origen
@@ -73,17 +73,21 @@ class Conexion(Serializable):
 			self.escena.GraficosEsc.removeItem(self.GraficosDeConexion)
 		
 		self._tipo_de_conexion = value
-		if self.tipo_de_conexion == recta:
-			self.GraficosDeConexion = ConexionLRecta(self)
-		elif self.tipo_de_conexion == bezier:
-			self.GraficosDeConexion = ConexionLBezier(self)
-		else:
-			self.GraficosDeConexion = ConexionLBezier(self)
-			
+		self.GraficosDeConexion = self.crearInstanciadeClasedeConexion(self.tipo_de_conexion)
+		
 		self.escena.GraficosEsc.addItem(self.GraficosDeConexion)
 		
 		if self.zocalo_origen is not None:
 			self.posiciones_actualizadas()
+		
+	def determinarClaseConexion(self, tipo_de_conexion):
+		if self.tipo_de_conexion == recta: return ConexionLRecta
+		else: return ConexionLBezier
+		
+	def crearInstanciadeClasedeConexion(self, tipo_de_conexion):
+		ClasedeConexion = self.determinarClaseConexion(tipo_de_conexion)
+		conexion = ClasedeConexion(self)
+		return conexion
 	
 	def posiciones_actualizadas(self):
 		posicion_base = self.zocalo_origen.posicion_zocalo()
@@ -120,6 +124,7 @@ class Conexion(Serializable):
 		
 		if DEBUG: print("	Quitando los gráficos de las conexiones.", self.GraficosDeConexion)
 		self.escena.GraficosEsc.removeItem(self.GraficosDeConexion)
+		if DEBUG: print("   Graficos de conexión:", self.GraficosDeConexion)
 		
 		self.escena.GraficosEsc.update()
 		

@@ -7,7 +7,7 @@ from nodeeditor.Nodo import Nodo
 from nodeeditor.Conexiones import Conexion
 from nodeeditor.Historial_escena import HistorialEscena
 from nodeeditor.Portapapeles import PortapapelesEscena
-from nodeeditor.Utilidades import dump_exception
+from nodeeditor.Utilidades import dump_exception, pp
 
 DEBUG_REMOVE_WARNINGS = False
 
@@ -24,8 +24,9 @@ class Escena(Serializable):
 		self.Escena_Alto = 64000
 		
 		self._eventos_de_seleccion_silenciosa = False
+		
 		self._elementos_modificados = False
-		self._ultimos_objetos_seleccionados = []
+		self._ultimos_objetos_seleccionados = None
 		
 		# Inicializado de los listeners.
 		self._elementos_modificados_listeners = []
@@ -61,6 +62,12 @@ class Escena(Serializable):
 		self.GraficosEsc = GraficosEscena(self)
 		self.GraficosEsc.config_esc(self.Escena_Ancho, self.Escena_Alto)
 		
+	def obtenerNodoporID(self, id_nodo):
+		for nodo in self.Nodos:
+			if nodo.id == id_nodo:
+				return nodo
+		return None
+		
 	def configEventosdeSeleccionSilenciosa(self, valor=True):
 		self._eventos_de_seleccion_silenciosa = valor
 		
@@ -71,12 +78,15 @@ class Escena(Serializable):
 		if objetos_seleccionados_actualmente != self._ultimos_objetos_seleccionados:
 			self._ultimos_objetos_seleccionados = objetos_seleccionados_actualmente
 			if not silencioso:
-				self.historial.almacenarHistorial("La selección ha cambiado.")
 				for callback in self._objeto_seleccionado_listeners: callback()
+				self.historial.almacenarHistorial("La selección ha cambiado.")
 		
 	def objetosNoSeleccionados(self, silencioso=False):
+		seleccion_actual = self.objetosSeleccionados()
+		if seleccion_actual == self._ultimos_objetos_seleccionados:
+			return
 		self.restaurarUltimoEstadodeSeleccion()
-		if self._ultimos_objetos_seleccionados != []:
+		if seleccion_actual == []:
 			self._ultimos_objetos_seleccionados = []
 			if not silencioso:
 				self.historial.almacenarHistorial("Todos los objetos se han deseleccionado.")
@@ -168,6 +178,9 @@ class Escena(Serializable):
 				raise InvalidFile("%s no es un archivo JSON válido." % os.path.basename(archivo))
 			except Exception as e:
 				dump_exception(e)
+				
+	def obtenerClasedeConexion(self):
+		return Conexion
 
 	def definirSelectordeClasesdeNodos(self, funcion_selectora_de_clases):
 		# Cuando está configurada la función self.selector_de_clases_de_nodos, podremos usar diferentes clases de nodos.
@@ -189,17 +202,51 @@ class Escena(Serializable):
 		])
 	
 	def deserializacion(self, data, hashmap={}, restaure_id=True):
-		self.limpiarEscena()
 		hashmap = {}
 		
 		if restaure_id: self.id = data['id']
 		
-		# Creación de nodos.
-		for nodo_data in data['Nodos']:
-			self.obtener_clase_del_nodo_de_datos(nodo_data)(self).deserializacion(nodo_data, hashmap, restaure_id)
+		# Nodos
+		todos_los_nodos = self.Nodos.copy()
 		
-		# Creación de conexiones.
+		for datos_nodo in data['Nodos']:
+			encontrado = False
+			for nodo in todos_los_nodos:
+				if nodo.id == datos_nodo['id']:
+					encontrado = nodo
+					break
+			
+			if not encontrado:
+				nuevo_nodo = self.obtener_clase_del_nodo_de_datos(datos_nodo)(self)
+				nuevo_nodo.deserializacion(datos_nodo, hashmap, restaure_id)
+				nuevo_nodo.AlDeserializar(datos_nodo)
+			else:
+				encontrado.deserializacion(datos_nodo, hashmap, restaure_id)
+				encontrado.AlDeserializar(datos_nodo)
+				todos_los_nodos.remove(encontrado)
+				
+		while todos_los_nodos != []:
+			nodo = todos_los_nodos.pop()
+			nodo.remove()
+			
+		# Conexiones.
+		todas_las_conexiones = self.Conexiones.copy()
+		
 		for datos_conexion in data['Conexiones']:
-			Conexion(self).deserializacion(datos_conexion, hashmap, restaure_id)
+			encontrado = False
+			for conexion in todas_las_conexiones:
+				if conexion.id == datos_conexion['id']:
+					encontrado = conexion
+					break
+			
+			if not encontrado:
+				nueva_conexion = Conexion(self).deserializacion(datos_conexion, hashmap, restaure_id)
+			else:
+				encontrado.deserializacion(datos_conexion, hashmap, restaure_id)
+				todas_las_conexiones.remove(encontrado)
+				
+		while todas_las_conexiones != []:
+			conexion = todas_las_conexiones.pop()
+			conexion.remove()
 		
 		return True

@@ -4,6 +4,7 @@ from nodeeditor.GraficosdelNodo import GraficosdelNodo
 from nodeeditor.Utilidades import dump_exception
 
 DEBUG = False
+DEBUG_SELECCION = False
 
 
 class HistorialEscena:
@@ -12,6 +13,8 @@ class HistorialEscena:
 		
 		self.historial_nuevo()
 		self.limite_historial = 32
+		
+		self.deshacer_seleccion_ha_cambiado = False
 		
 		# listeners
 		self._modificadores_del_historial_listeners = []
@@ -91,7 +94,7 @@ class HistorialEscena:
 		for callback in self._modificadores_del_historial_listeners: callback()
 		for callback in self._almacenado_del_historial_listeners: callback()
 		
-	def crear_Marca_Historial(self, desc):
+	def capturarSeleccionActual(self):
 		sel_obj = {
 			'nodos': [],
 			'conexiones': [],
@@ -102,11 +105,13 @@ class HistorialEscena:
 				sel_obj['nodos'].append(objeto.nodo.id)
 			elif isinstance(objeto, GraficosdeConexion):
 				sel_obj['conexiones'].append(objeto.linea.id)
-		
+		return sel_obj
+	
+	def crear_Marca_Historial(self, desc):
 		marca_historial = {
 			'desc': desc,
 			'snapshot': self.escena.serializacion(),
-			'selection': sel_obj,
+			'selection': self.capturarSeleccionActual(),
 		}
 		return marca_historial
 		
@@ -114,20 +119,38 @@ class HistorialEscena:
 		if DEBUG: print("RHS:", marca_historial['desc'])
 		
 		try:
+			self.deshacer_seleccion_ha_cambiado = False
+			seleccion_anterior = self.capturarSeleccionActual()
+			if DEBUG_SELECCION: print("Nodos seleccionados antes de restaurar:", seleccion_anterior['nodos'])
+			
 			self.escena.deserializacion(marca_historial['snapshot'])
 			
-			# restaurar selección.
+			# Restaurar selección.
+			# Primero se limpia la seleccion.
+			for conexion in self.escena.Conexiones: conexion.GraficosDeConexion.setSelected(False)
+			# Luego, se restauran las selecciones desde el historial.
 			for conexion_id in marca_historial['selection']['conexiones']:
 				for conexion in self.escena.Conexiones:
 					if conexion.id == conexion_id:
 						conexion.GraficosDeConexion.setSelected(True)
 						break
 			
+			for nodo in self.escena.Nodos: nodo.Nodograficas.setSelected(False)
 			for nodo_id in marca_historial['selection']['nodos']:
 				for nodo in self.escena.Nodos:
 					if nodo.id == nodo_id:
 						nodo.Nodograficas.setSelected(True)
 						break
+			
+			seleccion_actual = self.capturarSeleccionActual()
+			if DEBUG_SELECCION: print("Nodos seleccionados después de restaurar:", seleccion_actual['nodos'])
+			
+			self.escena._ultimos_objetos_seleccionados = self.escena.objetosSeleccionados()
+			
+			# Si la selección es diferente antes y después, activar flag.
+			if seleccion_actual['nodos'] != seleccion_anterior['nodos'] or seleccion_actual['conexiones'] != seleccion_anterior['conexiones']:
+				if DEBUG_SELECCION: print("\nESCENA: La seleccion ha cambiado")
+				self.deshacer_seleccion_ha_cambiado = True
 						
 		except Exception as e: dump_exception(e)
 		

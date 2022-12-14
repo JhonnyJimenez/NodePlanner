@@ -40,12 +40,22 @@ class Zocalo(Serializable):
 		self.Zocaloconexiones = []
 	
 	def __str__(self):
-		return "<Zócalo %s %s..%s>" % ("multiconexion" if self.esmulticonexion else "de conexion única", hex(id(self))[2:5], hex(id(self))[-3:])
+		return "<Zócalo #%d %s %s..%s>" % (
+			self.indice, "multiconexion" if self.esmulticonexion else "de conexion única",
+			hex(id(self))[2:5], hex(id(self))[-3:]
+		)
 	
 	def eliminarzocalo(self):
 		self.GraficosZocalos.setParentItem(None)
 		self.nodo.escena.GraficosEsc.removeItem(self.GraficosZocalos)
 		del self.GraficosZocalos
+		
+	def cambiarTipoZocalo(self, nuevo_tipo_zocalo):
+		if self.tipo_zocalo != nuevo_tipo_zocalo:
+			self.tipo_zocalo = nuevo_tipo_zocalo
+			self.GraficosZocalos.cambiarTipoZocalo()
+			return True
+		return False
 	
 	def definir_posicion_del_zocalo(self):
 		self.GraficosZocalos.setPos(*self.nodo.obtener_posicion_zocalo(self.indice, self.posicion, self.cantidad_en_el_lado_actual))
@@ -99,5 +109,6 @@ class Zocalo(Serializable):
 	def deserializacion(self, data, hashmap={}, restaure_id=True):
 		if restaure_id: self.id = data['id']
 		self.esmulticonexion = self.determinarmulticonexion(data)
+		self.cambiarTipoZocalo(data['Tipo_de_zocalo'])
 		hashmap[data['id']] = self
 		return True

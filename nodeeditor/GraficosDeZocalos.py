@@ -17,6 +17,8 @@ class GraficosDeZocalos(QGraphicsItem):
 		
 		self.zocalo = zocalo
 		
+		self.isHighlighted = False
+		
 		self.radio = 6.0
 		self.grosor_contorno = 1.0
 		self.initAssets()
@@ -38,15 +40,18 @@ class GraficosDeZocalos(QGraphicsItem):
 	def initAssets(self):
 		self._color_de_fondo = self.obtenerColorparaelZocalo(self.tipo_zocalo)
 		self._color_contorno = QColor("#FF000000")
+		self._color_highlight = QColor("#FF37A6FF")
 		
 		self._pen = QPen(self._color_contorno)
 		self._pen.setWidthF(self.grosor_contorno)
+		self._pen_highlight = QPen(self._color_highlight)
+		self._pen_highlight.setWidthF(2.0)
 		self._brush = QBrush(self._color_de_fondo)
 		
 	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
 		# Dibujando el círculo
 		painter.setBrush(self._brush)
-		painter.setPen(self._pen)
+		painter.setPen(self._pen if not self.isHighlighted else self._pen_highlight)
 		painter.drawEllipse(QRectF(-self.radio, -self.radio, 2 * self.radio, 2 * self.radio))
 		
 	def boundingRect(self):

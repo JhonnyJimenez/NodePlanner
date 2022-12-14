@@ -197,9 +197,9 @@ class SubVenCalc(EditorDeNodos):
 			
 			if self.escena.obtenerVista().modo == MODO_DIBUJO:
 				# Cuando se dibuja una conexion:
-				zocalo_objetivo = self.definirZocaloObjetivoenelNodo(self.escena.obtenerVista().dibujar_zocalo_inicial.esSalida, nuevo_calcnodo)
+				zocalo_objetivo = self.definirZocaloObjetivoenelNodo(self.escena.obtenerVista().dibujado.zocalo_inicial_de_dibujado.esSalida, nuevo_calcnodo)
 				if zocalo_objetivo is not None:
-					self.escena.obtenerVista().FinalizarDibujadoConexion(zocalo_objetivo.GraficosZocalos)
+					self.escena.obtenerVista().dibujado.FinalizarDibujadoConexion(zocalo_objetivo.GraficosZocalos)
 				self.finalizarNuevoEstadodelNodo()
 				
 			else:
