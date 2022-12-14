@@ -4,7 +4,7 @@ from examples.example_calculator.calc_config import *
 from nodeeditor.Widget_de_nodos import EditorDeNodos
 from examples.example_calculator.calc_nodo_base import *
 from nodeeditor.Conexiones import bezier, recta
-from nodeeditor.GraficosVista import MODO_DIBUJO
+from nodeeditor.GraficosVista import MODO_DIBUJO, MODO_REDIRECCION
 from nodeeditor.Utilidades import dump_exception
 
 DEBUG = False
@@ -14,7 +14,7 @@ DEBUG_CONTEXT = False
 class SubVenCalc(EditorDeNodos):
 	def __init__(self):
 		super().__init__()
-		self.setAttribute(Qt.WA_DeleteOnClose)
+		# self.setAttribute(Qt.WA_DeleteOnClose)
 		
 		self.definirtitulo()
 		
@@ -168,8 +168,23 @@ class SubVenCalc(EditorDeNodos):
 
 		if seleccionado and accion == opcionBezier: seleccionado.tipo_de_conexion = bezier
 		if seleccionado and accion == opcionRecta: seleccionado.tipo_de_conexion = recta
+		
+	# Funciones de apoyo.
+	def definirZocaloObjetivoenelNodo(self, flag_ya_dibujado, nuevo_calcnodo):
+		zocalo_objetivo = None
+		if flag_ya_dibujado:
+			if len(nuevo_calcnodo.entradas) > 0: zocalo_objetivo = nuevo_calcnodo.entradas[0]
+		else:
+			if len(nuevo_calcnodo.salidas) > 0: zocalo_objetivo = nuevo_calcnodo.salidas[0]
+		return zocalo_objetivo
 	
+	def finalizarNuevoEstadodelNodo(self, nuevo_calcnodo):
+		self.escena.hacerDeseleccionarObjetos()
+		nuevo_calcnodo.Nodograficas.hacerSeleccion()
+		nuevo_calcnodo.Nodograficas.seleccionado()
+		
 	def controlMenuContextualNuevoNodo(self, event):
+		
 		if DEBUG_CONTEXT: print("Menú contextual: NUEVO NODO")
 		menu_contextual = self.initMenuContextualNodos()
 		accion = menu_contextual.exec_(self.mapToGlobal(event.pos()))
@@ -182,9 +197,10 @@ class SubVenCalc(EditorDeNodos):
 			
 			if self.escena.obtenerVista().modo == MODO_DIBUJO:
 				# Cuando se dibuja una conexion:
-				self.escena.obtenerVista().FinalizarDibujadoConexion(nuevo_calcnodo.entradas[0].GraficosZocalos)
-				nuevo_calcnodo.hacerSeleccion()
-				# nuevo_calcnodo.entradas[0].Zocaloconexiones[-1].hacerSeleccion()
+				zocalo_objetivo = self.definirZocaloObjetivoenelNodo(self.escena.obtenerVista().dibujar_zocalo_inicial.esSalida, nuevo_calcnodo)
+				if zocalo_objetivo is not None:
+					self.escena.obtenerVista().FinalizarDibujadoConexion(zocalo_objetivo.GraficosZocalos)
+				self.finalizarNuevoEstadodelNodo()
 				
 			else:
 				self.escena.historial.almacenarHistorial("Nodo %s creado" % nuevo_calcnodo.__class__.__name__)

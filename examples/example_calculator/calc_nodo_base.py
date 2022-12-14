@@ -47,6 +47,9 @@ class CalcNodo(Nodo):
 	content_label = None
 	content_label_objname = "calc_nodo_bg"
 	
+	ClaseGraficadeNodo = GraphCalcNodo
+	ClasedelContenidodeNodo = CalcContenido
+	
 	def __init__(self, escena, entradas=[2, 2], salidas=[1]):
 		super().__init__(escena, self.__class__.titulo_op, entradas, salidas)
 		
@@ -54,10 +57,6 @@ class CalcNodo(Nodo):
 		
 		# Es realmente importante marcar los nodos indefinidos por defecto.
 		self.marcarIndefinido()
-	
-	def initClasesInternas(self):
-		self.contenido = CalcContenido(self)
-		self.Nodograficas = GraphCalcNodo(self)
 		
 	def initConfiguraciones(self):
 		super().initConfiguraciones()
@@ -107,7 +106,7 @@ class CalcNodo(Nodo):
 			self.Nodograficas.setToolTip(str(e))
 			dump_exception(e)
 		
-	def DatosdeEntradaCambiados(self, nueva_conexion):
+	def DatosdeEntradaCambiados(self, zocalo=None):
 		print("%s::__DatosdeEntradaCambiados (Nodo base)" % self.__class__.__name__)
 		self.marcarIndefinido()
 		self.evaluar()

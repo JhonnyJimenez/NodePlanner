@@ -7,7 +7,6 @@ class GraficosdelNodo(QGraphicsItem):
 	def __init__(self, nodo, parent=None):
 		super().__init__(parent)
 		self.nodo = nodo
-		self.contenido = self.nodo.contenido
 		
 		# init de señales
 		self.hovered = False
@@ -17,6 +16,19 @@ class GraficosdelNodo(QGraphicsItem):
 		self.initSizes()
 		self.initAssets()
 		self.initUI()
+	
+	@property
+	def contenido(self):
+		return self.nodo.contenido if self.nodo else None
+	
+	@property
+	def nombre(self):
+		return self._titulo
+	
+	@nombre.setter
+	def nombre(self, valor):
+		self._titulo = valor
+		self.titulo_del_objeto.setPlainText(self._titulo)
 	
 	def initUI(self):
 		self.setFlag(QGraphicsItem.ItemIsSelectable)
@@ -82,7 +94,7 @@ class GraficosdelNodo(QGraphicsItem):
 			self.nodo.escena.historial.almacenarHistorial("Nodo movido", setModified=True)
 			
 			self.nodo.escena.restaurarUltimoEstadodeSeleccion()
-			self._ultimo_estado_de_seleccion = True
+			self.hacerSeleccion()
 			
 			# Necesitamos almacenar el último estado de selección porque mover nodos también los selecciona.
 			self.nodo.escena._ultimos_objetos_seleccionados = self.nodo.escena.objetosSeleccionados()
@@ -95,6 +107,9 @@ class GraficosdelNodo(QGraphicsItem):
 			self.nodo.escena.restaurarUltimoEstadodeSeleccion()
 			self._ultimo_estado_de_seleccion = self.isSelected()
 			self.seleccionado()
+			
+	def mouseDoubleClickEvent(self, event):
+		self.nodo.DobleCliqueo(event)
 	
 	def hoverEnterEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
 		self.hovered = True
@@ -103,14 +118,6 @@ class GraficosdelNodo(QGraphicsItem):
 	def hoverLeaveEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
 		self.hovered = False
 		self.update()
-	
-	@property
-	def nombre(self): return self._titulo
-	
-	@nombre.setter
-	def nombre(self, valor):
-		self._titulo = valor
-		self.titulo_del_objeto.setPlainText(self._titulo)
 
 	def boundingRect(self):
 		return QRectF(
@@ -132,10 +139,13 @@ class GraficosdelNodo(QGraphicsItem):
 		)
 	
 	def initContenido(self):
-		self.GraficosContenidoNodo = QGraphicsProxyWidget(self)
-		self.contenido.setGeometry(int(self.sangria_de_la_orilla), int(self.alturaTituloNodo + self.sangria_de_la_orilla),
-								   self.anchoNodo - int((2 * self.sangria_de_la_orilla)), self.altoNodo - int((2 * self.sangria_de_la_orilla) + self.alturaTituloNodo))
-		self.GraficosContenidoNodo.setWidget(self.contenido)
+		if self.contenido is not None:
+			self.contenido.setGeometry(int(self.sangria_de_la_orilla), int(self.alturaTituloNodo + self.sangria_de_la_orilla),
+									   self.anchoNodo - int((2 * self.sangria_de_la_orilla)), self.altoNodo - int((2 * self.sangria_de_la_orilla) + self.alturaTituloNodo))
+			
+		# Obtener el QGraphicsProxy cuando está insertado en los gráficos de la escena.
+		self.GraficosContenidoNodo = self.nodo.escena.GraficosEsc.addWidget(self.contenido)
+		self.GraficosContenidoNodo.setParentItem(self)
 
 	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
 		
@@ -161,7 +171,7 @@ class GraficosdelNodo(QGraphicsItem):
 		
 		# Contorno
 		dibujado_del_contorno = QPainterPath()
-		dibujado_del_contorno.addRoundedRect(0, 0, self.anchoNodo, self.altoNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
+		dibujado_del_contorno.addRoundedRect(-1, -1, self.anchoNodo + 2, self.altoNodo + 2, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
 		painter.setBrush(Qt.NoBrush)
 		if self.hovered:
 			painter.setPen(self._pen_hovered)

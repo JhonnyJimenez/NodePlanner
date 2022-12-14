@@ -1,10 +1,10 @@
 from collections import OrderedDict
 from nodeeditor.GraficosdeConexion import GraficosdeConexion
-from nodeeditor.Nodo import Nodo
 from nodeeditor.Conexiones import Conexion
 
 
-DEBUG = True
+DEBUG = False
+DEBUG_PASTING = False
 
 
 class PortapapelesEscena:
@@ -17,13 +17,13 @@ class PortapapelesEscena:
 		sel_nodos, sel_lineas, sel_zocalos = [], [], {}
 		
 		# Ordenar líneas y zócalos.
-		for item in self.escena.GraficosEsc.selectedItems():
-			if hasattr(item, 'nodo'):
-				sel_nodos.append(item.nodo.serializacion())
-				for zocalos in (item.nodo.entradas + item.nodo.salidas):
+		for objeto in self.escena.GraficosEsc.selectedItems():
+			if hasattr(objeto, 'nodo'):
+				sel_nodos.append(objeto.nodo.serializacion())
+				for zocalos in (objeto.nodo.entradas + objeto.nodo.salidas):
 					sel_zocalos[zocalos.id] = zocalos
-			elif isinstance(item, GraficosdeConexion):
-				sel_lineas.append(item.linea)
+			elif isinstance(objeto, GraficosdeConexion):
+				sel_lineas.append(objeto.linea)
 				
 		
 		# Debug
@@ -32,14 +32,14 @@ class PortapapelesEscena:
 			print("    LINEAS\n     ", sel_lineas)
 			print("    ZOCALOS\n      ", sel_zocalos)
 			
-		# Quitar todos las lineas no conectadas a otro nodo en la lista.
+		# Quitar todos las lineas no conectadas a un editor de nodos en la lista.
 		lineas_a_quitar = []
 		for linea in sel_lineas:
 			if linea.zocalo_origen.id in sel_zocalos and linea.zocalo_final.id in sel_zocalos:
-			#	if DEBUG: print("La línea está bien, está conectada en ambos extremos.")
+				# if DEBUG: print("La línea está bien, está conectada en ambos extremos.")
 				pass
 			else:
-				if DEBUG: print("La línea", linea, "no está conectado en ambos extremos.")
+				# if DEBUG: print("La línea", linea, "no está conectado en ambos extremos.")
 				lineas_a_quitar.append(linea)
 		for linea in lineas_a_quitar:
 			sel_lineas.remove(linea)
@@ -48,6 +48,8 @@ class PortapapelesEscena:
 		lineas_finales = []
 		for linea in sel_lineas:
 			lineas_finales.append(linea.serializacion())
+			
+		if DEBUG: print("La lista final de conexiones es:", lineas_finales)
 		
 		data = OrderedDict([
 			('Nodos', sel_nodos),
@@ -71,37 +73,66 @@ class PortapapelesEscena:
 		mouse_scene_pos = vista.ultima_posicion_mouse_escena
 		
 		# Calcular el contorno delimitador de los objetos seleccionados y su centro.
-		minx, maxx, miny, maxy = 0, 0, 0, 0
+		minx, maxx, miny, maxy = 10000000, -10000000, 10000000, -10000000
 		for data_nodos in data['Nodos']:
 			x, y = data_nodos['Pos_x'], data_nodos['Pos_y']
 			if x < minx: minx = x
 			if x > maxx: maxx = x
 			if y < miny: miny = y
 			if y > maxy: maxy = y
-		centro_x_contenedor = (minx + maxx) / 2
-		centro_y_contenedor = (miny + maxy) / 2
+			
+		# Agregar anchura y altura de un nodo.
+		maxx -= 180
+		maxy +- 100
 		
-		# (Gracias a Dios :v) centro = view.mapToScene(view.rect().center())
+		centro_x = (minx + maxx) / 2 - minx
+		centro_y = (miny + maxy) / 2 - miny
+		
+		if DEBUG_PASTING:
+			print(" *** PASTA:")
+			print("Copied boudaries:\n\tX:", minx, maxx, "   Y:", miny, maxy)
+			print("\tbbox_center:", centro_x, centro_y)
 		
 		# Calcular el offset tehe de los nuevos nodos que se crearán.
-		offset_x = mouse_scene_pos.x() - centro_x_contenedor
-		offset_y = mouse_scene_pos.y() - centro_y_contenedor
+		mouse_x, mouse_y = mouse_scene_pos.x(), mouse_scene_pos.y()
 		
 		# Creación de cada nodo.
+		nodos_creados = []
+		
+		self.escena.configEventosdeSeleccionSilenciosa()
+		
+		self.escena.hacerDeseleccionarObjetos()
+		
 		for data_nodos in data['Nodos']:
 			nuevo_nodo = self.escena.obtener_clase_del_nodo_de_datos(data_nodos)(self.escena)
 			nuevo_nodo.deserializacion(data_nodos, hashmap, restaure_id=False)
+			nodos_creados.append(nuevo_nodo)
 			
 			# Reajuste de posición para el nuevo nodo.
-			pos = nuevo_nodo.pos
-			nuevo_nodo.definirposicion(pos.x() + offset_x, pos.y() + offset_y)
+			
+			# posición actual del nuevo nodo
+			pos_x, pos_y = nuevo_nodo.pos.x(), nuevo_nodo.pos.y()
+			nuevapos_x, nuevapos_y = mouse_x + pos_x - minx, mouse_y + pos_y - miny
+			
+			nuevo_nodo.definirposicion(nuevapos_x, nuevapos_y)
+			
+			nuevo_nodo.hacerSeleccion()
+			
+			if DEBUG_PASTING:
+				print("** PASTA SUM:")
+				print("\tMouse pos:", mouse_x, mouse_y)
+				print("\tnew node pos:", pos_x, pos_y)
+				print("\tFINAL:", nuevapos_x, nuevapos_y)
 		
 		# Creación de cada conexion.
 		if 'Conexiones' in data:
 			for data_conexion in data['Conexiones']:
 				nueva_conexion = Conexion(self.escena)
 				nueva_conexion.deserializacion(data_conexion, hashmap, restaure_id=False)
+				
+		self.escena.configEventosdeSeleccionSilenciosa(False)
 		
 		# Guardar historial.
 		self.escena.historial.almacenarHistorial("Elementos pegados del portapapeles.", setModified=True)
 		
+		return nodos_creados

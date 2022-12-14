@@ -3,17 +3,24 @@ from nodeeditor.Seriabilizador import Serializable
 from nodeeditor.GraficosdelNodo import GraficosdelNodo
 from nodeeditor.ContenidodelNodo import ContenidoDelNodo
 from nodeeditor.Zocalos import *
-from nodeeditor.Utilidades import dump_exception
-
+from nodeeditor.Utilidades import dump_exception, pp
 
 DEBUG = False
 
 
 class Nodo(Serializable):
+	ClaseGraficadeNodo = GraficosdelNodo
+	ClasedelContenidodeNodo = ContenidoDelNodo
+	ClasedeZocalo = Zocalo
+	
 	def __init__(self, escena, titulo="Nodo desconocido", entradas=[], salidas=[]):
 		super().__init__()
 		self._titulo = titulo
 		self.escena = escena
+		
+		# Por si las moscas.
+		self.contenido = None
+		self.Nodograficas = None
 		
 		self.initClasesInternas()
 		self.initConfiguraciones()
@@ -32,9 +39,36 @@ class Nodo(Serializable):
 		self._es_indefinido = False
 		self._es_invalido = False
 	
+	def __str__(self):
+		return "<%s:%s %s..%s>" % (self.titulo, self.__class__.__name__, hex(id(self))[2:5], hex(id(self))[-3:])
+	
+	@property
+	def titulo(self):
+		return self._titulo
+	
+	@titulo.setter
+	def titulo(self, valor):
+		self._titulo = valor
+		self.Nodograficas.nombre = self._titulo
+	
+	@property
+	def pos(self):
+		return self.Nodograficas.pos()  # QPoint
+	
+	def definirposicion(self, x, y):
+		self.Nodograficas.setPos(x, y)
+	
 	def initClasesInternas(self):
-		self.contenido = ContenidoDelNodo(self)
-		self.Nodograficas = GraficosdelNodo(self)
+		clase_nodo_contenido = self.obtenerClasedeContenido()
+		clase_nodo_graficos = self.obtenerClasedeGraficosdeNodo()
+		if clase_nodo_contenido is not None: self.contenido = clase_nodo_contenido(self)
+		if clase_nodo_graficos is not None: self.Nodograficas = clase_nodo_graficos(self)
+	
+	def obtenerClasedeContenido(self):
+		return self.__class__.ClasedelContenidodeNodo
+	
+	def obtenerClasedeGraficosdeNodo(self):
+		return self.__class__.ClaseGraficadeNodo
 	
 	def initConfiguraciones(self):
 		self.espaciadoconectores = 22
@@ -43,6 +77,14 @@ class Nodo(Serializable):
 		self.pos_det_salidas = Derecha_arriba
 		self.entradas_multiconexion = False
 		self.salidas_multiconexion = True
+		self.zocalos_offsets = {
+			Izquierda_arriba: -1,
+			Izquierda_centro: -1,
+			Izquierda_abajo: -1,
+			Derecha_arriba: 1,
+			Derecha_centro: 1,
+			Derecha_abajo: 1,
+		}
 	
 	def initZocalos(self, entradas, salidas, reset=True):
 		# Creación de zócalos para las entradas y salidas.
@@ -58,55 +100,41 @@ class Nodo(Serializable):
 				
 		# Creación de los nuevos zócalos.
 		contador = 0
-		for item in entradas:
-			zocalos = Zocalo(nodo=self, indice=contador, posicion=self.pos_det_entradas,
-							 tipo_zocalo=item, multiconexion=self.entradas_multiconexion,
-							cantidad_en_el_lado_actual=len(entradas), esEntrada=True
-			)
+		for objeto in entradas:
+			zocalo = self.__class__.ClasedeZocalo(nodo=self, indice=contador, posicion=self.pos_det_entradas,
+												  tipo_zocalo=objeto, multiconexion=self.entradas_multiconexion,
+												  cantidad_en_el_lado_actual=len(entradas), esEntrada=True
+												  )
 			contador += 1
-			self.entradas.append(zocalos)
+			self.entradas.append(zocalo)
 		
 		contador = 0
-		for item in salidas:
-			zocalos = Zocalo(nodo=self, indice=contador, posicion=self.pos_det_salidas,
-							 tipo_zocalo=item, multiconexion=self.salidas_multiconexion,
-							cantidad_en_el_lado_actual=len(salidas), esEntrada=False
-			)
+		for objeto in salidas:
+			zocalo = self.__class__.ClasedeZocalo(nodo=self, indice=contador, posicion=self.pos_det_salidas,
+												  tipo_zocalo=objeto, multiconexion=self.salidas_multiconexion,
+												  cantidad_en_el_lado_actual=len(salidas), esEntrada=False
+												  )
 			contador += 1
-			self.salidas.append(zocalos)
+			self.salidas.append(zocalo)
 
 	def DatosdeConexionCambiados(self, conexion):
-		print("%s::DatosdeConexionCambiados" % self.__class__.__name__, conexion)
+		pass
 		
 	def DatosdeEntradaCambiados(self, conexion):
-		print("%s::DatosdeEntradaCambiados" % self.__class__.__name__, conexion)
 		self.marcarIndefinido()
 		self.marcarDescendenciaIndefinido()
+		
+	def DobleCliqueo(self, event):
+		pass
 		
 	def hacerSeleccion(self, nuevo_estado=True):
 		self.Nodograficas.hacerSeleccion(nuevo_estado)
 	
-	def __str__(self):
-		return "<Nodo %s..%s>" % (hex(id(self))[2:5], hex(id(self))[-3:])
-	
-	@property
-	def pos(self):
-		return self.Nodograficas.pos()		#QPoint
-	
-	def definirposicion(self, x, y):
-		self.Nodograficas.setPos(x, y)
-	
-	@property
-	def titulo(self):
-		return self._titulo
-
-	@titulo.setter
-	def titulo(self, valor):
-		self._titulo = valor
-		self.Nodograficas.nombre = self._titulo
+	def estaSeleccionado(self):
+		return self.Nodograficas.isSelected()
 			
 	def obtener_posicion_zocalo(self, indice, posicion, num_out_of=1):
-		x = 0 if (posicion in (Izquierda_arriba, Izquierda_centro, Izquierda_abajo)) else self.Nodograficas.anchoNodo
+		x = self.zocalos_offsets[posicion] if (posicion in (Izquierda_arriba, Izquierda_centro, Izquierda_abajo)) else self.Nodograficas.anchoNodo + self.zocalos_offsets[posicion]
 		
 		if posicion in (Izquierda_abajo, Derecha_abajo):
 			# Comenzando desde abajo.
@@ -191,7 +219,7 @@ class Nodo(Serializable):
 			nodo_hijo.marcarInvalido(nuevo_valor)
 			nodo_hijo.marcarHijoInvalido(nuevo_valor)
 	
-	def evaluar(self):
+	def evaluar(self, indice=0):
 		self.marcarIndefinido(False)
 		self.marcarInvalido(False)
 		return 0
@@ -214,13 +242,13 @@ class Nodo(Serializable):
 		try:
 			conexion = self.entradas[indice].Zocaloconexiones[0]
 			zocalo = conexion.obtenerOtrosZocalos(self.entradas[indice])
-			return zocalo.nodo
+			return zocalo.nodo, zocalo.indice
 		except IndexError:
-			if DEBUG: print("EXC::Se obtiene un índice, pero no hay nada ligado a él:", self)
-			return None
+			# if DEBUG: print("EXC::Se obtiene un índice, pero no hay nada ligado a él:", self)
+			return None, None
 		except Exception as e:
 			dump_exception(e)
-			return None
+			return None, None
 		
 	def obtenerMultiplesEntradas(self, indice=0):
 		entradas = []
@@ -241,6 +269,7 @@ class Nodo(Serializable):
 		entradas, salidas = [], []
 		for Zocalo in self.entradas: entradas.append(Zocalo.serializacion())
 		for Zocalo in self.salidas: salidas.append(Zocalo.serializacion())
+		serializado_del_contenido = self.contenido.serializacion() if isinstance(self.contenido, Serializable) else {}
 		return OrderedDict([
 			('id', self.id),
 			('Titulo', self.titulo),
@@ -248,7 +277,7 @@ class Nodo(Serializable):
 			('Pos_y', self.Nodograficas.scenePos().y()),
 			('Entradas', entradas),
 			('Salidas', salidas),
-			('Contenido', self.contenido.serializacion()),
+			('Contenido', serializado_del_contenido),
 		])
 	
 	def deserializacion(self, data, hashmap={}, restaure_id=True):
@@ -264,24 +293,61 @@ class Nodo(Serializable):
 			num_entradas = len(data['Entradas'])
 			num_salidas = len(data['Salidas'])
 			
-			self.entradas = []
-			for Zocalo_data in data['Entradas']:
-				nuevo_zocalo = Zocalo(nodo=self, indice=Zocalo_data['Indice'], posicion=Zocalo_data['Posicion'],
-									  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'], cantidad_en_el_lado_actual=num_entradas,
-									  esEntrada=True)
-				nuevo_zocalo.deserializacion(Zocalo_data, hashmap, restaure_id)
-				self.entradas.append(nuevo_zocalo)
+			# Una forma de hacer esto es borrar los zocalos existentes. Pero cuando lo hacemos, la deserialización
+			# debe ser reescrita por cada uno de los zocalos que se definan en el constructor de un nodo...
+			# La segunda forma de hacerlo es reusar los zocalos existentes, así no se crean nuevos si no es necesario.
 			
-			self.salidas = []
+			for Zocalo_data in data['Entradas']:
+				# Forma 1: Borrar y crear nuevos nodos.
+				# nuevo_zocalo = self.__class__.ClasedeZocalo(nodo=self, indice=Zocalo_data['Indice'],
+				#											posicion=Zocalo_data['Posicion'],
+				#											tipo_zocalo=Zocalo_data['Tipo_de_zocalo'],
+				#											cantidad_en_el_lado_actual=num_entradas, esEntrada=True)
+				# nuevo_zocalo.deserializacion(Zocalo_data, hashmap, restaure_id)
+				# self.entradas.append(nuevo_zocalo)
+				
+				# Forma 2: Usar los zocalos existentes y crear los faltantes.
+				encontrado = None
+				for zocalo in self.entradas:
+					if zocalo.indice == Zocalo_data['Indice']:
+						encontrado = zocalo
+						break
+				if encontrado is None:
+					encontrado = self.__class__.ClasedeZocalo(nodo=self, indice=Zocalo_data['Indice'],
+															posicion=Zocalo_data['Posicion'],
+															tipo_zocalo=Zocalo_data['Tipo_de_zocalo'],
+															cantidad_en_el_lado_actual=num_entradas, esEntrada=True)
+					self.entradas.append(encontrado)
+					encontrado.deserializacion(Zocalo_data, hashmap, restaure_id)
+			
 			for Zocalo_data in data['Salidas']:
-				nuevo_zocalo = Zocalo(nodo=self, indice=Zocalo_data['Indice'], posicion=Zocalo_data['Posicion'],
-									  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'], cantidad_en_el_lado_actual=num_salidas,
-									  esEntrada=False)
-				nuevo_zocalo.deserializacion(Zocalo_data, hashmap, restaure_id)
-				self.salidas.append(nuevo_zocalo)
+				# Forma 1: Borrar y crear nuevos nodos.
+				# nuevo_zocalo = self.__class__.ClasedeZocalo(nodo=self, indice=Zocalo_data['Indice'],
+				#											posicion=Zocalo_data['Posicion'],
+				#											tipo_zocalo=Zocalo_data['Tipo_de_zocalo'],
+				#											cantidad_en_el_lado_actual=num_entradas, esEntrada=False)
+				# nuevo_zocalo.deserializacion(Zocalo_data, hashmap, restaure_id)
+				# self.salidas.append(nuevo_zocalo)
+				
+				# Forma 2: Usar los zocalos existentes y crear los faltantes.
+				encontrado = None
+				for zocalo in self.salidas:
+					if zocalo.indice == Zocalo_data['Indice']:
+						encontrado = zocalo
+						break
+				if encontrado is None:
+					encontrado = self.__class__.ClasedeZocalo(nodo=self, indice=Zocalo_data['Indice'],
+															  posicion=Zocalo_data['Posicion'],
+															  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'],
+															  cantidad_en_el_lado_actual=num_entradas, esEntrada=True)
+					self.salidas.append(encontrado)
+					encontrado.deserializacion(Zocalo_data, hashmap, restaure_id)
 		except Exception as e: dump_exception(e)
 		
 		# También deserializa el contenido del nodo.
-		res = self.contenido.deserializacion(data['Contenido'], hashmap)
-				
-		return True & res
+		if isinstance(self.contenido, Serializable):
+			res = self.contenido.deserializacion(data['Contenido'], hashmap)
+			return res
+
+		return True
+	

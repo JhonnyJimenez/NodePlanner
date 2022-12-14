@@ -9,6 +9,7 @@ bezier = 2
 DEBUG = False
 DEBUGZOCALOS = DEBUG
 
+
 class Conexion(Serializable):
 	def __init__(self, escena, zocalo_origen=None, zocalo_final=None, tipo_de_conexion=bezier):
 		super().__init__()
@@ -105,21 +106,27 @@ class Conexion(Serializable):
 	
 	def quitar_de_zocalos(self):
 		# if self.zocalo_origen is not None:
-		#	self.zocalo_origen.quitar_conexiones(None)
-		#if self.zocalo_final is not None:
-		#	self.zocalo_final.quitar_conexiones(None)
+			# self.zocalo_origen.quitar_conexiones(None)
+		# if self.zocalo_final is not None:
+			# self.zocalo_final.quitar_conexiones(None)
 		self.zocalo_final = None
 		self.zocalo_origen = None
 		
-	def quitar(self):
+	def quitar(self, zocalo_silenciado=None, silencioso=False):
 		zocalos_antiguos = [self.zocalo_origen, self.zocalo_final]
 		
-		if DEBUG: print('@ Quitando la conexión', self)
-		if DEBUG: print('	Quitando conexiones de todos los zócalos.')
-		self.quitar_de_zocalos()
-		if DEBUG: print('	Quitando los gráficos de las conexiones.')
+		if DEBUG: print(" - Ocultando conexiones")
+		self.GraficosDeConexion.hide()
+		
+		if DEBUG: print("	Quitando los gráficos de las conexiones.", self.GraficosDeConexion)
 		self.escena.GraficosEsc.removeItem(self.GraficosDeConexion)
-		self.GraficosDeConexion = None
+		
+		self.escena.GraficosEsc.update()
+		
+		if DEBUG:
+			print('@ Quitando la conexión', self)
+			print('	Quitando conexiones de todos los zócalos.')
+		self.quitar_de_zocalos()
 		if DEBUG: print('	Quitando conexiones de la escena.')
 		try:
 			self.escena.eliminarconexion(self)
@@ -131,16 +138,22 @@ class Conexion(Serializable):
 			# Notificar a los nodos desde los viejos zócalos.
 			for zocalo in zocalos_antiguos:
 				if zocalo and zocalo.nodo:
+					if silencioso:
+						continue
+					if zocalo_silenciado is not None and zocalo == zocalo_silenciado:
+						continue
+						
+					# Notificar a los nodos de los zócalos.
 					zocalo.nodo.DatosdeConexionCambiados(self)
-					if zocalo.esEntrada: zocalo.nodo.DatosdeEntradaCambiados(self)
+					if zocalo.esEntrada: zocalo.nodo.DatosdeEntradaCambiados(zocalo)
 		except Exception as e: dump_exception(e)
 		
 	def serializacion(self):
 		return OrderedDict([
 			('id', self.id),
 			('Tipo_de_conexion', self.tipo_de_conexion),
-			('Zocalo_de_origen', self.zocalo_origen.id),
-			('Zocalo_de_destino', self.zocalo_final.id),
+			('Zocalo_de_origen', self.zocalo_origen.id if self.zocalo_origen is not None else None),
+			('Zocalo_de_destino', self.zocalo_final.id if self.zocalo_final is not None else None),
 		])
 	
 	def deserializacion(self, data, hashmap={}, restaure_id=True):
@@ -148,3 +161,4 @@ class Conexion(Serializable):
 		self.zocalo_origen = hashmap[data['Zocalo_de_origen']]
 		self.zocalo_final = hashmap[data['Zocalo_de_destino']]
 		self.tipo_de_conexion = data['Tipo_de_conexion']
+		

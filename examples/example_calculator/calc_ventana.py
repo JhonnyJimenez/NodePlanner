@@ -64,6 +64,9 @@ class VenCalc(Ventana):
 		else:
 			self.escribirConfigs()
 			event.accept()
+			# hacky fix for PyQt 5.14.x
+			import sys
+			sys.exit(0)
 
 	def crearAcciones(self):
 		super().crearAcciones()
@@ -93,7 +96,7 @@ class VenCalc(Ventana):
 		except Exception as e: dump_exception(e)
 		
 	def AbrirArchivo(self):
-		fnames, filter = QFileDialog.getOpenFileNames(self, 'Abrir')
+		fnames, filter = QFileDialog.getOpenFileNames(self, 'Abrir', self.obtenerDirectorioFileDialog(), self.obtenerFiltroFileDialog())
 		
 		try:
 			for fname in fnames:

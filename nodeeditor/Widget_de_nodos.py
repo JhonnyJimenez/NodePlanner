@@ -6,9 +6,12 @@ from nodeeditor.GraficosVista import GraficosdelaVistaVP
 from nodeeditor.Escena import Escena, InvalidFile
 from nodeeditor.Nodo import Nodo
 from nodeeditor.Conexiones import Conexion, recta, bezier
+from nodeeditor.Utilidades import CuadroDialogo
 
 
 class EditorDeNodos(QWidget):
+	ClaseEscena = Escena
+	
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		
@@ -23,7 +26,7 @@ class EditorDeNodos(QWidget):
 		self.setLayout(self.AdminDeEspEnPan)
 		
 		# Gráficos (Escena)
-		self.escena = Escena()
+		self.escena = self.__class__.ClaseEscena()
 		
 		# Gráficos (Vista)
 		self.Vista = GraficosdelaVistaVP(self.escena.GraficosEsc, self)
@@ -68,7 +71,8 @@ class EditorDeNodos(QWidget):
 		except InvalidFile as e:
 			print(e)
 			QApplication.restoreOverrideCursor()
-			QMessageBox.warning(self, "Error al abrir %s" % os.path.basename(filename), str(e))
+			CuadroDialogo(self, "Warning", "Error al abrir %s" % (os.path.basename(filename)),
+						  "%s no es un archivo JSON válido" % (os.path.basename(filename)))
 			return False
 		finally:
 			QApplication.restoreOverrideCursor()
@@ -82,15 +86,16 @@ class EditorDeNodos(QWidget):
 		return True
 	
 	def agregadodenodos(self):
-		nodo1 = Nodo(self.escena, "Nodo cronista", entradas=[0, 0, 0], salidas=[1])
-		nodo2 = Nodo(self.escena, "Nodo de personaje", entradas=[3, 3, 3], salidas=[1])
-		nodo3 = Nodo(self.escena, "Nodo de juguete", entradas=[2, 2, 2], salidas=[1])
+		nodo1 = Nodo(self.escena, "Mi asombroso nodo 1", entradas=[0, 0, 0], salidas=[1])
+		nodo2 = Nodo(self.escena, "Mi asombroso nodo 2", entradas=[3, 3, 3], salidas=[1])
+		nodo3 = Nodo(self.escena, "Mi asombroso nodo 3", entradas=[2, 2, 2], salidas=[1])
 		nodo1.definirposicion(-350, -250)
 		nodo2.definirposicion(-75, 0)
-		nodo3.definirposicion(200, -150)
+		nodo3.definirposicion(200, -200)
 		
 		conexion1 = Conexion(self.escena, nodo1.salidas[0], nodo2.entradas[0])
 		conexion2 = Conexion(self.escena, nodo2.salidas[0], nodo3.entradas[0])
+		conexion3 = Conexion(self.escena, nodo1.salidas[0], nodo3.entradas[2])
 		
 		self.escena.historial.marcaInicialdelHistorial()
 		

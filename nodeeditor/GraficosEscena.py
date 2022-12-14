@@ -5,7 +5,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 
-class GraficosdelaEscenaVP(QGraphicsScene):
+class GraficosEscena(QGraphicsScene):
 	objetoSeleccionado = pyqtSignal()
 	objetosNoSeleccionados = pyqtSignal()
 	

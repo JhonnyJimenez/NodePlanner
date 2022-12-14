@@ -3,10 +3,12 @@ import json
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from nodeeditor.Widget_de_nodos import EditorDeNodos
-from nodeeditor.Botones import CuadroDialogo
+from nodeeditor.Utilidades import CuadroDialogo, pp
 
 
 class Ventana(QMainWindow):
+	ClaseEditordeNodos = EditorDeNodos
+	
 	def __init__(self):
 		super().__init__()
 		
@@ -25,16 +27,19 @@ class Ventana(QMainWindow):
 		self.crearAcciones()
 		self.crearMenus()
 		
-		self.Editor_de_nodos = EditorDeNodos(self)
+		self.Editor_de_nodos = self.__class__.ClaseEditordeNodos(self)
 		self.Editor_de_nodos.escena.agregarElementosModificadosListener(self.definirtitulo)
 		self.setCentralWidget(self.Editor_de_nodos)
 		
 		self.crearBarradeEstado()
 
 		# Tamaño de la ventana
-		self.setGeometry(100, 100, 800, 600)
+		# self.setGeometry(100, 100, 800, 600)
 		self.definirtitulo()
 		self.show()
+		
+	def sizeHint(self):
+		return QSize(800, 600)
 		
 	def crearBarradeEstado(self):
 		self.statusBar().showMessage("")
@@ -57,11 +62,13 @@ class Ventana(QMainWindow):
 		self.ActEliminar = QAction('&Eliminar', self, shortcut='Del', statusTip='Elimina los elementos seleccionados.', triggered=self.EliminarMEditar)
 		
 	def crearMenus(self):
-		menu_principal = self.menuBar()
-		
 		# Inicialización del menú.
-		# Menú archivo.
-		self.menu_archivo = menu_principal.addMenu('&Archivo')
+		menu_principal = self.menuBar()
+		self.menuArchivo(menu_principal)
+		self.menuEditar(menu_principal)
+		
+	def menuArchivo(self, menu_superior):
+		self.menu_archivo = menu_superior.addMenu('&Archivo')
 		self.menu_archivo.addAction(self.ActNuevo)
 		self.menu_archivo.addSeparator()
 		self.menu_archivo.addAction(self.ActAbrir)
@@ -70,8 +77,8 @@ class Ventana(QMainWindow):
 		self.menu_archivo.addSeparator()
 		self.menu_archivo.addAction(self.ActSalir)
 		
-		# Menú edición.
-		self.menu_edicion = menu_principal.addMenu('&Edición')
+	def menuEditar(self, menu_superior):
+		self.menu_edicion = menu_superior.addMenu('&Edición')
 		self.menu_edicion.addAction(self.ActDeshacer)
 		self.menu_edicion.addAction(self.ActRehacer)
 		self.menu_edicion.addSeparator()
@@ -115,10 +122,15 @@ class Ventana(QMainWindow):
 			return False
 		
 		return True
-
 		
 	def NuevaPosEscena(self, x, y):
 		self.status_mouse_pos.setText("Posición: [%d, %d]" % (x, y))
+		
+	def obtenerDirectorioFileDialog(self):
+		return ''
+	
+	def obtenerFiltroFileDialog(self):
+		return 'Graph (*.json);;All files (*)'
 		
 	def NuevoArchivo(self):
 		if self.confirmarCierre():
@@ -149,7 +161,7 @@ class Ventana(QMainWindow):
 	def GuardarArchivoComo(self):
 		actual_editor_de_nodos = self.obtenerActualEditordeNodos()
 		if actual_editor_de_nodos is not None:
-			fname, filter = QFileDialog.getSaveFileName(self, 'Guardar como')
+			fname, filter = QFileDialog.getSaveFileName(self, 'Guardar como', self.obtenerDirectorioFileDialog(), self.obtenerFiltroFileDialog())
 			if fname == '': return False
 
 			actual_editor_de_nodos.guardararchivo(fname)
@@ -199,7 +211,7 @@ class Ventana(QMainWindow):
 				print("¡Los datos no contienen ningún nodo!")
 				return
 			
-			self.obtenerActualEditordeNodos().escena.portapapeles.deserializacionDesdePortapapeles(data)
+			return self.obtenerActualEditordeNodos().escena.portapapeles.deserializacionDesdePortapapeles(data)
 	
 	def leerConfigs(self):
 		config = QSettings(self.compania, self.nombre_del_producto)

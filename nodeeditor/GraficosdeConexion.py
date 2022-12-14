@@ -3,9 +3,6 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
-
-from nodeeditor.Zocalos import *
-
 Conexion_CP_Redondez = 100
 
 
@@ -123,9 +120,10 @@ class ConexionLBezier(GraficosdeConexion):
 		cpy_d = 0
 		
 		if self.linea.zocalo_origen is not None:
-			zocalo_inicial_pos = self.linea.zocalo_origen.posicion
+			zoc_ini = self.linea.zocalo_origen.esEntrada
+			zoc_fin = self.linea.zocalo_origen.esSalida
 			
-			if (o[0] > d[0] and zocalo_inicial_pos in (Derecha_arriba, Derecha_abajo)) or (o[0] < d[0] and zocalo_inicial_pos in (Izquierda_arriba, Izquierda_abajo)):
+			if (o[0] > d[0] and zoc_fin) or (o[0] < d[0] and zoc_ini):
 				cpx_d *= -1
 				cpx_o *= -1
 				
