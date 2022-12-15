@@ -51,10 +51,13 @@ class CalcNodoDivision(CalcNodo):
 	content_label_objname = "calc_nodo_div"
 	
 	def realizarOperacion(self, entrada1, entrada2):
-		if entrada2 != 0:
-			return entrada1 / entrada2
+		if 0 in (entrada1, entrada2):
+			if entrada1 == 0 and entrada2 == 0:
+				return "ERROR"
+			else:
+				return entrada1 if entrada1 != 0 else entrada2
 		else:
-			return entrada1
+			return entrada1 / entrada2
 
 # Forma de registro mediante el llamado de su función.
 # registrar_nodo_ahora(NODO_SUMA, CalcNodo_Suma)

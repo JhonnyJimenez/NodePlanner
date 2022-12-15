@@ -249,15 +249,14 @@ class Nodo(Serializable):
 	
 	def obtenerEntrada(self, indice=0):
 		try:
-			conexion = self.entradas[indice].Zocaloconexiones[0]
-			zocalo = conexion.obtenerOtrosZocalos(self.entradas[indice])
-			return zocalo.nodo, zocalo.indice
-		except IndexError:
-			# if DEBUG: print("EXC::Se obtiene un índice, pero no hay nada ligado a él:", self)
-			return None, None
+			zocalo_entrada = self.entradas[indice]
+			if len(zocalo_entrada.Zocaloconexiones) == 0: return None
+			conexion_conectada = zocalo_entrada.Zocaloconexiones[0]
+			contrazocalo = conexion_conectada.obtenerOtrosZocalos(self.entradas[indice])
+			return contrazocalo.nodo
 		except Exception as e:
 			dump_exception(e)
-			return None, None
+			return None
 		
 	def obtenerMultiplesEntradas(self, indice=0):
 		entradas = []

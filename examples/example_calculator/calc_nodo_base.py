@@ -90,7 +90,7 @@ class CalcNodo(Nodo):
 	
 	def evaluar(self):
 		if not self.esIndefinido() and not self.esInvalido():
-			print(" _> devolver valor %s en cache:" % self.__class__.__name__, self.valor)
+			# print(" _> devolver valor %s en cache:" % self.__class__.__name__, self.valor)
 			return self.valor
 		
 		try:
@@ -107,7 +107,7 @@ class CalcNodo(Nodo):
 			dump_exception(e)
 		
 	def DatosdeEntradaCambiados(self, zocalo=None):
-		print("%s::__DatosdeEntradaCambiados (Nodo base)" % self.__class__.__name__)
+		# print("%s::__DatosdeEntradaCambiados (Nodo base)" % self.__class__.__name__)
 		self.marcarIndefinido()
 		self.evaluar()
 		

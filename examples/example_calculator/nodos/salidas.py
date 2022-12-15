@@ -42,9 +42,14 @@ class CalcNodoSalida(CalcNodo):
 			self.marcarInvalido()
 			return
 		
+		if val == "ERROR":
+			self.contenido.lbl.setText(val)
+			return
+		
 		decimal, entero = math.modf(val)
 		self.contenido.lbl.setText("%s" % (int(val) if decimal == 0.0 else round(val, 3)))
-		print(round(val, 3))
+		self.marcarInvalido(False)
 		self.marcarIndefinido(False)
 		self.Nodograficas.setToolTip("")
+		
 		return val
