@@ -21,7 +21,10 @@ class Conexion(Serializable):
 		
 		self.zocalo_origen = zocalo_origen
 		self.zocalo_final = zocalo_final
-		self.tipo_de_conexion = tipo_de_conexion
+		self._tipo_de_conexion = tipo_de_conexion
+		
+		# Crear instancia de Graficos de conexión.
+		self.GraficosDeConexion = self.crearInstanciadeClasedeConexion()
 		
 		self.escena.agregarconexion(self)
 	
@@ -65,29 +68,29 @@ class Conexion(Serializable):
 			self.zocalo_final.agregar_conexion(self)
 			
 	@property
-	def tipo_de_conexion(self): return self._tipo_de_conexion
+	def tipo_de_conexion(self):
+		return self._tipo_de_conexion
 	
 	@tipo_de_conexion.setter
 	def tipo_de_conexion(self, value):
-		if hasattr(self, 'GraficosDeConexion') and self.GraficosDeConexion is not None:
-			self.escena.GraficosEsc.removeItem(self.GraficosDeConexion)
-		
+		# Se asigna un nuevo valor.
 		self._tipo_de_conexion = value
-		self.GraficosDeConexion = self.crearInstanciadeClasedeConexion(self.tipo_de_conexion)
 		
-		self.escena.GraficosEsc.addItem(self.GraficosDeConexion)
+		# Actualizar el calculador de ruta.
+		self.GraficosDeConexion.crearCalculadordeRutadeConexion()
 		
 		if self.zocalo_origen is not None:
 			self.posiciones_actualizadas()
 		
-	def determinarClaseConexion(self, tipo_de_conexion):
-		if self.tipo_de_conexion == recta: return ConexionLRecta
-		else: return ConexionLBezier
+	def obtenerClasedeGraficosdeConexion(self):
+		return GraficosdeConexion
 		
-	def crearInstanciadeClasedeConexion(self, tipo_de_conexion):
-		ClasedeConexion = self.determinarClaseConexion(tipo_de_conexion)
-		conexion = ClasedeConexion(self)
-		return conexion
+	def crearInstanciadeClasedeConexion(self):
+		self.GraficosDeConexion = self.obtenerClasedeGraficosdeConexion()(self)
+		self.escena.GraficosEsc.addItem(self.GraficosDeConexion)
+		if self.zocalo_origen is not None:
+			self.posiciones_actualizadas()
+		return self.GraficosDeConexion
 	
 	def posiciones_actualizadas(self):
 		posicion_base = self.zocalo_origen.posicion_zocalo()

@@ -11,6 +11,7 @@ from nodeeditor.Utilidades import CuadroDialogo
 
 class EditorDeNodos(QWidget):
 	ClaseEscena = Escena
+	ClaseGraficosVista = GraficosdelaVistaVP
 	
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -29,7 +30,7 @@ class EditorDeNodos(QWidget):
 		self.escena = self.__class__.ClaseEscena()
 		
 		# Gráficos (Vista)
-		self.Vista = GraficosdelaVistaVP(self.escena.GraficosEsc, self)
+		self.Vista = self.__class__.ClaseGraficosVista(self.escena.GraficosEsc, self)
 		self.AdminDeEspEnPan.addWidget(self.Vista)
 
 	def haycambios(self):
