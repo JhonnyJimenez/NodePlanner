@@ -131,7 +131,8 @@ class GraficosdelaVistaVP(QGraphicsView):
 			print('   Nodo:')
 			for nodo in self.escena.escena.Nodos: print("\t", nodo)
 			print('   Conexión:')
-			for conexion in self.escena.escena.Conexiones: print("\t", conexion, "\n\t\tConexion:", conexion.GraficosDeConexion if conexion.GraficosDeConexion is not None else None)
+			# for conexion in self.escena.escena.Conexiones: print("\t", conexion, "\n\t\tConexion:", conexion.GraficosDeConexion if conexion.GraficosDeConexion is not None else None)
+			for conexion in self.escena.escena.Conexiones: print("\t", conexion)
 			
 			if event.modifiers() & Qt.CTRL:
 				print("  Objetos graficos en la escena gráfica:")
@@ -300,7 +301,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 			p1 = self.linea_de_recorte.linea_puntos[ix]
 			p2 = self.linea_de_recorte.linea_puntos[ix + 1]
 		
-			for conexion in self.escena.escena.Conexiones:
+			for conexion in self.escena.escena.Conexiones.copy():
 				if conexion.GraficosDeConexion.cruzadocon(p1, p2):
 					conexion.quitar()
 		self.escena.escena.historial.almacenarHistorial("Conexión cortada borrada", setModified=True)

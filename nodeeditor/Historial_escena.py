@@ -149,7 +149,7 @@ class HistorialEscena:
 			
 			# Si la selección es diferente antes y después, activar flag.
 			if seleccion_actual['nodos'] != seleccion_anterior['nodos'] or seleccion_actual['conexiones'] != seleccion_anterior['conexiones']:
-				if DEBUG_SELECCION: print("\nESCENA: La seleccion ha cambiado")
+				if DEBUG_SELECCION: print("\nESCENA: La selección ha cambiado")
 				self.deshacer_seleccion_ha_cambiado = True
 						
 		except Exception as e: dump_exception(e)

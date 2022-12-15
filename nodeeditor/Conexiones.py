@@ -11,6 +11,8 @@ DEBUGZOCALOS = DEBUG
 
 
 class Conexion(Serializable):
+	Validantes_de_conexion = []
+	
 	def __init__(self, escena, zocalo_origen=None, zocalo_final=None, tipo_de_conexion=bezier):
 		super().__init__()
 		self.escena = escena
@@ -27,12 +29,6 @@ class Conexion(Serializable):
 		self.GraficosDeConexion = self.crearInstanciadeClasedeConexion()
 		
 		self.escena.agregarconexion(self)
-	
-	def obtenerOtrosZocalos(self, zocalo_conocido):
-		return self.zocalo_origen if zocalo_conocido == self.zocalo_final else self.zocalo_final
-	
-	def hacerSeleccion(self, nuevo_estado=True):
-		self.GraficosDeConexion.hacerSeleccion(nuevo_estado)
 	
 	def __str__(self):
 		return "<Conexion %s..%s -- S:%s E:%s>" % (hex(id(self))[2:5], hex(id(self))[-3:], self.zocalo_origen, self.zocalo_final)
@@ -81,6 +77,27 @@ class Conexion(Serializable):
 		
 		if self.zocalo_origen is not None:
 			self.posiciones_actualizadas()
+			
+	@classmethod
+	def obtenerValidantesdeConexion(cls):
+		return cls.Validantes_de_conexion
+	
+	@classmethod
+	def agregarValidantesdeConexion(cls, validator_callback):
+		cls.Validantes_de_conexion.append(validator_callback)
+	
+	@classmethod
+	def validarConexion(cls, zocalo_origen, zocalo_final):
+		for validantes in cls.obtenerValidantesdeConexion():
+			if not validantes(zocalo_origen, zocalo_final):
+				return False
+		return True
+			
+	def reconectar(self, del_zocalo, al_zocalo):
+		if self.zocalo_origen == del_zocalo:
+			self.zocalo_origen = al_zocalo
+		if self.zocalo_final == del_zocalo:
+			self.zocalo_final = al_zocalo
 		
 	def obtenerClasedeGraficosdeConexion(self):
 		return GraficosdeConexion
@@ -91,6 +108,12 @@ class Conexion(Serializable):
 		if self.zocalo_origen is not None:
 			self.posiciones_actualizadas()
 		return self.GraficosDeConexion
+	
+	def obtenerOtrosZocalos(self, zocalo_conocido):
+		return self.zocalo_origen if zocalo_conocido == self.zocalo_final else self.zocalo_final
+	
+	def hacerSeleccion(self, nuevo_estado=True):
+		self.GraficosDeConexion.hacerSeleccion(nuevo_estado)
 	
 	def posiciones_actualizadas(self):
 		posicion_base = self.zocalo_origen.posicion_zocalo()
@@ -164,9 +187,17 @@ class Conexion(Serializable):
 			('Zocalo_de_destino', self.zocalo_final.id if self.zocalo_final is not None else None),
 		])
 	
-	def deserializacion(self, data, hashmap={}, restaure_id=True):
+	def deserializacion(self, data, hashmap={}, restaure_id=True, *args, **kwargs):
 		if restaure_id: self.id = data['id']
 		self.zocalo_origen = hashmap[data['Zocalo_de_origen']]
 		self.zocalo_final = hashmap[data['Zocalo_de_destino']]
 		self.tipo_de_conexion = data['Tipo_de_conexion']
-		
+
+# Ejemplo de uso de validantes para conexiones.
+# Puedes registrar (en mi codigo lo llame «agregar») los validantes que  gustes, pero...
+# Sin embargo, si usas una conexion sobreescrita, tienes que llamar obtenerValidantesdeConexion en la clase sobreescrita.
+
+from nodeeditor.ValidantesdeConexion import *
+# Conexion.agregarValidantesdeConexion(edge_validator_debug)
+Conexion.agregarValidantesdeConexion(invalidar_conexion_de_doble_entrada_o_salida)
+Conexion.agregarValidantesdeConexion(invalidar_conexiones_entre_el_mismo_nodo)

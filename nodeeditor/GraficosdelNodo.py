@@ -94,12 +94,16 @@ class GraficosdelNodo(QGraphicsItem):
 			self.nodo.escena.historial.almacenarHistorial("Nodo movido", setModified=True)
 			
 			self.nodo.escena.restaurarUltimoEstadodeSeleccion()
-			self.hacerSeleccion()
+			# ToDo: Esta función ↓↓↓ hace que el historial almacene el cambio de seleccion que de hecho, se quiere evitar
+			#  al mover el nodo. Lo desactivé hasta hallar la solución en futuros tutoriales o para solucionarlo yo
+			#  mismo. El punto es que la señal que emite la variable en GraficosEscena activa el almacenamiento
+			#  del historia por alguna razón.
+			# self.hacerSeleccion()
 			
 			# Necesitamos almacenar el último estado de selección porque mover nodos también los selecciona.
 			self.nodo.escena._ultimos_objetos_seleccionados = self.nodo.escena.objetosSeleccionados()
 			
-			# Ahora queremos saltarnos la selección de almacenamiento.
+			# Ahora queremos saltarnos el almacenamiento en el historial de la selección.
 			return
 			
 		# Control para cuando se selecciona el nodo.

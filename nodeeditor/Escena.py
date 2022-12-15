@@ -20,6 +20,8 @@ class Escena(Serializable):
 		self.Nodos = []
 		self.Conexiones = []
 		
+		self.nombre_de_archivo = None
+		
 		self.Escena_Ancho = 64000
 		self.Escena_Alto = 64000
 		
@@ -163,6 +165,7 @@ class Escena(Serializable):
 			print("Guardado exitosamente en", archivo)
 			
 			self.elementos_modificados = False
+			self.nombre_de_archivo = archivo
 			
 	def abrirArchivo(self, archivo):
 		with open(archivo, "r") as file:
@@ -172,6 +175,7 @@ class Escena(Serializable):
 				# En el tutorial añade un «enconding='utf-8'», pero al añadirla yo,
 				# el parametro encoding no aparece, y ejecutar este codigo al presionar las respectivas
 				# teclas da error. Decidí eliminarlo y dejar esta nota por si surge algún error luego por esto.
+				self.nombre_de_archivo = archivo
 				self.deserializacion(data)
 				self.elementos_modificados = False
 			except json.JSONDecodeError:
@@ -201,7 +205,7 @@ class Escena(Serializable):
 			('Conexiones', conexiones),
 		])
 	
-	def deserializacion(self, data, hashmap={}, restaure_id=True):
+	def deserializacion(self, data, hashmap={}, restaure_id=True, *args, **kwargs):
 		hashmap = {}
 		
 		if restaure_id: self.id = data['id']
@@ -217,17 +221,22 @@ class Escena(Serializable):
 					break
 			
 			if not encontrado:
-				nuevo_nodo = self.obtener_clase_del_nodo_de_datos(datos_nodo)(self)
-				nuevo_nodo.deserializacion(datos_nodo, hashmap, restaure_id)
-				nuevo_nodo.AlDeserializar(datos_nodo)
+				try:
+					nuevo_nodo = self.obtener_clase_del_nodo_de_datos(datos_nodo)(self)
+					nuevo_nodo.deserializacion(datos_nodo, hashmap, restaure_id, *args, **kwargs)
+					nuevo_nodo.AlDeserializar(datos_nodo)
+				except:
+					dump_exception()
 			else:
-				encontrado.deserializacion(datos_nodo, hashmap, restaure_id)
-				encontrado.AlDeserializar(datos_nodo)
-				todos_los_nodos.remove(encontrado)
-				
+				try:
+					encontrado.deserializacion(datos_nodo, hashmap, restaure_id, *args, **kwargs)
+					encontrado.AlDeserializar(datos_nodo)
+					todos_los_nodos.remove(encontrado)
+				except: dump_exception()
+					
 		while todos_los_nodos != []:
 			nodo = todos_los_nodos.pop()
-			nodo.remove()
+			nodo.quitar()
 			
 		# Conexiones.
 		todas_las_conexiones = self.Conexiones.copy()
@@ -240,13 +249,13 @@ class Escena(Serializable):
 					break
 			
 			if not encontrado:
-				nueva_conexion = Conexion(self).deserializacion(datos_conexion, hashmap, restaure_id)
+				nueva_conexion = Conexion(self).deserializacion(datos_conexion, hashmap, restaure_id, *args, **kwargs)
 			else:
-				encontrado.deserializacion(datos_conexion, hashmap, restaure_id)
+				encontrado.deserializacion(datos_conexion, hashmap, restaure_id, *args, **kwargs)
 				todas_las_conexiones.remove(encontrado)
 				
 		while todas_las_conexiones != []:
 			conexion = todas_las_conexiones.pop()
-			conexion.remove()
+			conexion.quitar()
 		
 		return True

@@ -9,8 +9,15 @@ from examples.example_calculator.calc_subventana import SubVenCalc
 from examples.example_calculator.calc_drag_listbox import Listbox
 from examples.example_calculator.calc_config import *
 
+from nodeeditor.Conexiones import Conexion
+from nodeeditor.ValidantesdeConexion import *
+# Conexion.agregarValidantesdeConexion(edge_validator_debug)
+Conexion.agregarValidantesdeConexion(invalidar_conexion_de_doble_entrada_o_salida)
+Conexion.agregarValidantesdeConexion(invalidar_conexiones_entre_el_mismo_nodo)
+
 # Imágenes para la skin negra.
 import examples.example_calculator.qss.nodeeditor_dark_resources
+
 
 DEBUG = False
 
@@ -247,11 +254,12 @@ class VenCalc(Ventana):
 			event.ignore()
 	
 	def encontrarSubVentana(self, filename):
-		for window in self.mdiArea.subWindowList():
-			if window.widget().filename == filename:
-				return window
+		for ventana in self.mdiArea.subWindowList():
+			if ventana.widget().filename == filename:
+				return ventana
 		return None
 	
-	def configSubVentanaActiva(self):
-		if window:
-			self.mdiArea.setActiveSubWindow(window)
+	def configSubVentanaActiva(self, ventana):
+		if ventana:
+			self.mdiArea.setActiveSubWindow(ventana)
+			

@@ -8,6 +8,9 @@ DEBUG = False
 class DibujadodeConexion:
 	def __init__(self, graficos_vista):
 		self.graficos_vista = graficos_vista
+		# Inicializado de variables que usaremos en esta clase.
+		self.dibujar_conexion = None
+		self.zocalo_inicial_de_dibujado = None
 		
 	def obtenerClasedeConexion(self):
 		return self.graficos_vista.escena.escena.obtenerClasedeConexion()
@@ -31,18 +34,33 @@ class DibujadodeConexion:
 		except Exception as e: dump_exception(e)
 	
 	def FinalizarDibujadoConexion(self, objeto):
-		# Devuelve verdadero si se salta el resto del código
-		self.graficos_vista.reiniciarModo()
+		# Salida rápida - si se cliquea en cualquier cosa que no sea un zocalo.
+		if not isinstance(objeto, GraficosDeZocalos):
+			self.graficos_vista.reiniciarModo()
+			if DEBUG: print('Vista: FDibujadoConexion - Fin rápido de dibujado')
+			self.dibujar_conexion.quitar(silencioso=True)
+			self.dibujar_conexion = None
 		
-		if DEBUG: print('Vista: FDibujadoConexion - Termina de dibujar la conexión.')
-		self.dibujar_conexion.quitar(silencioso=True)
-		self.dibujar_conexion = None
+		# Clicado en zócalo.
+		if isinstance(objeto, GraficosDeZocalos):
+			
+			# Confirmación para una conexion válida.
+			if not self.dibujar_conexion.validarConexion(self.zocalo_inicial_de_dibujado, objeto.zocalo):
+				# print("Conexion no válida")
+				return False
 		
-		try:
-			if isinstance(objeto, GraficosDeZocalos):
+			# Proceso regular de dibujado:
+			# Devuelve verdadero si se salta el resto del código
+			self.graficos_vista.reiniciarModo()
+		
+			if DEBUG: print('Vista: FDibujadoConexion - Termina de dibujar la conexión.')
+			self.dibujar_conexion.quitar(silencioso=True)
+			self.dibujar_conexion = None
+		
+			try:
 				if objeto.zocalo != self.zocalo_inicial_de_dibujado:
-					# Si soltamos el dibujado sobre un zocalo distinto al de inicio
-					
+				# Si soltamos el dibujado sobre un zocalo distinto al de inicio
+				
 					# Primero quitamos las conexiones viejas y enviamos notificacion.
 					for zocalo in (objeto.zocalo, self.zocalo_inicial_de_dibujado):
 						if not zocalo.esmulticonexion:
@@ -51,23 +69,23 @@ class DibujadodeConexion:
 								zocalo.quitar_todas_las_conexiones(silencioso=True)
 							else:
 								zocalo.quitar_todas_las_conexiones(silencioso=False)
-					
+				
 					# Crear nuevas conexiones.
 					nueva_conexion = self.obtenerClasedeConexion()(objeto.zocalo.nodo.escena,
 																   self.zocalo_inicial_de_dibujado, objeto.zocalo,
 																   tipo_de_conexion=bezier)
 					if DEBUG: print('Vista: FDibujadoConexion - Nueva conexión creada:', nueva_conexion, 'conecta',
 									nueva_conexion.zocalo_origen, 'y', nueva_conexion.zocalo_final)
-					
+				
 					# Manda notificaciones para la nueva conexion.
 					for zocalo in [self.zocalo_inicial_de_dibujado, objeto.zocalo]:
 						zocalo.nodo.DatosdeConexionCambiados(nueva_conexion)
 						if zocalo.esEntrada: zocalo.nodo.DatosdeEntradaCambiados(zocalo)
 					
 					self.graficos_vista.escena.escena.historial.almacenarHistorial("Conexion creada mediante dibujado",
-																			setModified=True)
+																				   setModified=True)
 					return True
-		except Exception as e: dump_exception(e)
+			except Exception as e: dump_exception(e)
 		
 		if DEBUG: print('Vista: FDibujadoConexion - Todo bien')
 		return False

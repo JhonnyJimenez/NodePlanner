@@ -64,7 +64,7 @@ class PortapapelesEscena:
 		
 		return data
 	
-	def deserializacionDesdePortapapeles(self, data):
+	def deserializacionDesdePortapapeles(self, data, *args, **kwargs):
 	
 		hashmap = {}
 		
@@ -105,7 +105,7 @@ class PortapapelesEscena:
 		
 		for data_nodos in data['Nodos']:
 			nuevo_nodo = self.escena.obtener_clase_del_nodo_de_datos(data_nodos)(self.escena)
-			nuevo_nodo.deserializacion(data_nodos, hashmap, restaure_id=False)
+			nuevo_nodo.deserializacion(data_nodos, hashmap, restaure_id=False, *args, **kwargs)
 			nodos_creados.append(nuevo_nodo)
 			
 			# Reajuste de posición para el nuevo nodo.
@@ -128,7 +128,7 @@ class PortapapelesEscena:
 		if 'Conexiones' in data:
 			for data_conexion in data['Conexiones']:
 				nueva_conexion = Conexion(self.escena)
-				nueva_conexion.deserializacion(data_conexion, hashmap, restaure_id=False)
+				nueva_conexion.deserializacion(data_conexion, hashmap, restaure_id=False, *args, **kwargs)
 				
 		self.escena.configEventosdeSeleccionSilenciosa(False)
 		

@@ -13,21 +13,21 @@
                     "id": 1737593591184,
                     "Indice": 0,
                     "Multiconexion": false,
-                    "Posicion": 2,
+                    "Posicion": 3,
                     "Tipo_de_zocalo": 0
                 },
                 {
                     "id": 1737593591248,
                     "Indice": 1,
                     "Multiconexion": false,
-                    "Posicion": 2,
+                    "Posicion": 3,
                     "Tipo_de_zocalo": 0
                 },
                 {
                     "id": 1737593591952,
                     "Indice": 2,
                     "Multiconexion": false,
-                    "Posicion": 2,
+                    "Posicion": 3,
                     "Tipo_de_zocalo": 0
                 }
             ],
@@ -36,7 +36,7 @@
                     "id": 1737593592656,
                     "Indice": 0,
                     "Multiconexion": true,
-                    "Posicion": 3,
+                    "Posicion": 4,
                     "Tipo_de_zocalo": 1
                 }
             ],
@@ -52,21 +52,21 @@
                     "id": 1737593594832,
                     "Indice": 0,
                     "Multiconexion": false,
-                    "Posicion": 2,
+                    "Posicion": 3,
                     "Tipo_de_zocalo": 3
                 },
                 {
                     "id": 1737593594896,
                     "Indice": 1,
                     "Multiconexion": false,
-                    "Posicion": 2,
+                    "Posicion": 3,
                     "Tipo_de_zocalo": 3
                 },
                 {
                     "id": 1737593595600,
                     "Indice": 2,
                     "Multiconexion": false,
-                    "Posicion": 2,
+                    "Posicion": 3,
                     "Tipo_de_zocalo": 3
                 }
             ],
@@ -75,7 +75,7 @@
                     "id": 1737593596304,
                     "Indice": 0,
                     "Multiconexion": true,
-                    "Posicion": 3,
+                    "Posicion": 4,
                     "Tipo_de_zocalo": 1
                 }
             ],

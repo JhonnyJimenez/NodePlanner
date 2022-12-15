@@ -105,7 +105,8 @@ class Ventana(QMainWindow):
 		return self.centralWidget()
 	
 	def ArchivoModificado(self):
-		return self.obtenerActualEditordeNodos().escena.haycambios()
+		editor_de_nodos = self.obtenerActualEditordeNodos()
+		return editor_de_nodos.escena.haycambios() if editor_de_nodos else False
 			
 	def confirmarCierre(self):
 		if not self.ArchivoModificado():
@@ -163,7 +164,8 @@ class Ventana(QMainWindow):
 		if actual_editor_de_nodos is not None:
 			fname, filter = QFileDialog.getSaveFileName(self, 'Guardar como', self.obtenerDirectorioFileDialog(), self.obtenerFiltroFileDialog())
 			if fname == '': return False
-
+			
+			self.antesdeGuardarComo(actual_editor_de_nodos, fname)
 			actual_editor_de_nodos.guardararchivo(fname)
 			self.statusBar().showMessage("Guardado éxitosamente en %s" % actual_editor_de_nodos.filename, 5000)
 
@@ -171,6 +173,9 @@ class Ventana(QMainWindow):
 			if hasattr(actual_editor_de_nodos, "definirtitulo"): actual_editor_de_nodos.definirtitulo()
 			else: self.definirtitulo()
 			return True
+		
+	def antesdeGuardarComo(self, editor_actual, nombre_de_archivo):
+		pass
 		
 	def DeshacerMEditar(self):
 		if self.obtenerActualEditordeNodos():

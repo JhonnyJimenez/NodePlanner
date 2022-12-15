@@ -6,7 +6,7 @@ from nodeeditor.GraficosVista import GraficosdelaVistaVP
 from nodeeditor.Escena import Escena, InvalidFile
 from nodeeditor.Nodo import Nodo
 from nodeeditor.Conexiones import Conexion, recta, bezier
-from nodeeditor.Utilidades import CuadroDialogo
+from nodeeditor.Utilidades import CuadroDialogo, dump_exception
 
 
 class EditorDeNodos(QWidget):
@@ -69,9 +69,14 @@ class EditorDeNodos(QWidget):
 			self.escena.historial.historial_nuevo()
 			self.escena.historial.marcaInicialdelHistorial()
 			return True
+		except FileNotFoundError as e:
+			dump_exception(e)
+			CuadroDialogo(self, "Warning", "Error al abrir %s" % (os.path.basename(filename)),
+						  "¡%s no existe!" % (os.path.basename(filename)))
+			return False
 		except InvalidFile as e:
-			print(e)
-			QApplication.restoreOverrideCursor()
+			dump_exception(e)
+			# QApplication.restoreOverrideCursor()
 			CuadroDialogo(self, "Warning", "Error al abrir %s" % (os.path.basename(filename)),
 						  "%s no es un archivo JSON válido" % (os.path.basename(filename)))
 			return False

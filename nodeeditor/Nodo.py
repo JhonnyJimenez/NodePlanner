@@ -179,8 +179,9 @@ class Nodo(Serializable):
 		if DEBUG: print('> Quitando el nodo', self)
 		if DEBUG: print('	Quitando todos las conexiones de los zócalos.')
 		for zocalo in (self.entradas + self.salidas):
+			# zocalo.quitar_todas_las_conexiones(silencioso=True)
 			# if zocalo.tieneconexiones():
-			for conexion in zocalo.Zocaloconexiones:
+			for conexion in zocalo.Zocaloconexiones.copy():
 				if DEBUG: print('		Quitando', conexion, 'del', zocalo)
 				conexion.quitar()
 		if DEBUG: print('	Quitando los gráficos del nodo.')
@@ -207,7 +208,7 @@ class Nodo(Serializable):
 	def marcarDescendenciaIndefinido(self, nuevo_valor=True):
 		for nodo_hijo in self.obtenerNodosHijos():
 			nodo_hijo.marcarIndefinido(nuevo_valor)
-			nodo_hijo.marcarHijoIndefinido(nuevo_valor)
+			nodo_hijo.marcarDescendenciaIndefinido(nuevo_valor)
 		
 	def esInvalido(self):
 		return self._es_invalido
@@ -225,7 +226,7 @@ class Nodo(Serializable):
 	def marcarDescendenciaInvalido(self, nuevo_valor=True):
 		for nodo_hijo in self.obtenerNodosHijos():
 			nodo_hijo.marcarInvalido(nuevo_valor)
-			nodo_hijo.marcarHijoInvalido(nuevo_valor)
+			nodo_hijo.marcarDescendenciaInvalido(nuevo_valor)
 	
 	def evaluar(self, indice=0):
 		self.marcarIndefinido(False)
@@ -288,7 +289,7 @@ class Nodo(Serializable):
 			('Contenido', serializado_del_contenido),
 		])
 	
-	def deserializacion(self, data, hashmap={}, restaure_id=True):
+	def deserializacion(self, data, hashmap={}, restaure_id=True, *args, **kwargs):
 		try:
 			if restaure_id: self.id = data['id']
 			hashmap[data['id']] = self
@@ -322,11 +323,11 @@ class Nodo(Serializable):
 						break
 				if encontrado is None:
 					encontrado = self.__class__.ClasedeZocalo(nodo=self, indice=Zocalo_data['Indice'],
-															posicion=Zocalo_data['Posicion'],
-															tipo_zocalo=Zocalo_data['Tipo_de_zocalo'],
-															cantidad_en_el_lado_actual=num_entradas, esEntrada=True)
+															  posicion=Zocalo_data['Posicion'],
+															  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'],
+															  cantidad_en_el_lado_actual=num_entradas, esEntrada=True)
 					self.entradas.append(encontrado)
-					encontrado.deserializacion(Zocalo_data, hashmap, restaure_id)
+				encontrado.deserializacion(Zocalo_data, hashmap, restaure_id)
 			
 			for Zocalo_data in data['Salidas']:
 				# Forma 1: Borrar y crear nuevos nodos.
@@ -347,9 +348,9 @@ class Nodo(Serializable):
 					encontrado = self.__class__.ClasedeZocalo(nodo=self, indice=Zocalo_data['Indice'],
 															  posicion=Zocalo_data['Posicion'],
 															  tipo_zocalo=Zocalo_data['Tipo_de_zocalo'],
-															  cantidad_en_el_lado_actual=num_salidas, esEntrada=True)
+															  cantidad_en_el_lado_actual=num_salidas, esEntrada=False)
 					self.salidas.append(encontrado)
-					encontrado.deserializacion(Zocalo_data, hashmap, restaure_id)
+				encontrado.deserializacion(Zocalo_data, hashmap, restaure_id)
 		except Exception as e: dump_exception(e)
 		
 		# También deserializa el contenido del nodo.
