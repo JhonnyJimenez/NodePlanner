@@ -1,0 +1,325 @@
+{
+    "id": 3204704376656,
+    "Escena_Ancho": 64000,
+    "Escena_Alto": 64000,
+    "Nodos": [
+        {
+            "id": 3204704377616,
+            "Titulo": "Entrada",
+            "Pos_x": -231.0,
+            "Pos_y": -126.0,
+            "Entradas": [],
+            "Salidas": [
+                {
+                    "id": 3204704386192,
+                    "Indice": 0,
+                    "Multiconexion": true,
+                    "Posicion": 5,
+                    "Tipo_de_zocalo": 3
+                }
+            ],
+            "Contenido": {
+                "Valor": "4"
+            },
+            "Codigo_op": 1
+        },
+        {
+            "id": 3204704421136,
+            "Titulo": "Entrada",
+            "Pos_x": -233.0,
+            "Pos_y": -8.0,
+            "Entradas": [],
+            "Salidas": [
+                {
+                    "id": 3204704421264,
+                    "Indice": 0,
+                    "Multiconexion": true,
+                    "Posicion": 5,
+                    "Tipo_de_zocalo": 3
+                }
+            ],
+            "Contenido": {
+                "Valor": "2"
+            },
+            "Codigo_op": 1
+        },
+        {
+            "id": 3204704430864,
+            "Titulo": "Multiplicaci\u00f3n",
+            "Pos_x": 24.0,
+            "Pos_y": -169.0,
+            "Entradas": [
+                {
+                    "id": 3204693809360,
+                    "Indice": 0,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 2
+                },
+                {
+                    "id": 3204704431184,
+                    "Indice": 1,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 2
+                }
+            ],
+            "Salidas": [
+                {
+                    "id": 3204704431312,
+                    "Indice": 0,
+                    "Multiconexion": true,
+                    "Posicion": 5,
+                    "Tipo_de_zocalo": 1
+                }
+            ],
+            "Contenido": {},
+            "Codigo_op": 5
+        },
+        {
+            "id": 3204704435472,
+            "Titulo": "Divisi\u00f3n",
+            "Pos_x": 30.20312499999997,
+            "Pos_y": 130.421875,
+            "Entradas": [
+                {
+                    "id": 3204704435728,
+                    "Indice": 0,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 2
+                },
+                {
+                    "id": 3204693272016,
+                    "Indice": 1,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 2
+                }
+            ],
+            "Salidas": [
+                {
+                    "id": 3204704435792,
+                    "Indice": 0,
+                    "Multiconexion": true,
+                    "Posicion": 5,
+                    "Tipo_de_zocalo": 1
+                }
+            ],
+            "Contenido": {},
+            "Codigo_op": 6
+        },
+        {
+            "id": 3204704493712,
+            "Titulo": "Suma",
+            "Pos_x": 38.28125,
+            "Pos_y": -73.765625,
+            "Entradas": [
+                {
+                    "id": 3204704493456,
+                    "Indice": 0,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 2
+                },
+                {
+                    "id": 3204704493520,
+                    "Indice": 1,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 2
+                }
+            ],
+            "Salidas": [
+                {
+                    "id": 3204704493776,
+                    "Indice": 0,
+                    "Multiconexion": true,
+                    "Posicion": 5,
+                    "Tipo_de_zocalo": 1
+                }
+            ],
+            "Contenido": {},
+            "Codigo_op": 3
+        },
+        {
+            "id": 3204704498448,
+            "Titulo": "Resta",
+            "Pos_x": 41.0,
+            "Pos_y": 34.0,
+            "Entradas": [
+                {
+                    "id": 3204652964432,
+                    "Indice": 0,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 2
+                },
+                {
+                    "id": 3204693270032,
+                    "Indice": 1,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 2
+                }
+            ],
+            "Salidas": [
+                {
+                    "id": 3204704498832,
+                    "Indice": 0,
+                    "Multiconexion": true,
+                    "Posicion": 5,
+                    "Tipo_de_zocalo": 1
+                }
+            ],
+            "Contenido": {},
+            "Codigo_op": 4
+        },
+        {
+            "id": 3204704520720,
+            "Titulo": "Salida",
+            "Pos_x": 297.35937500000006,
+            "Pos_y": -72.43750000000009,
+            "Entradas": [
+                {
+                    "id": 3204693269840,
+                    "Indice": 0,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 1
+                }
+            ],
+            "Salidas": [],
+            "Contenido": {},
+            "Codigo_op": 2
+        },
+        {
+            "id": 3204704524240,
+            "Titulo": "Salida",
+            "Pos_x": 297.64062500000006,
+            "Pos_y": 34.73437499999996,
+            "Entradas": [
+                {
+                    "id": 3204704524624,
+                    "Indice": 0,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 1
+                }
+            ],
+            "Salidas": [],
+            "Contenido": {},
+            "Codigo_op": 2
+        },
+        {
+            "id": 2738114815888,
+            "Titulo": "Salida",
+            "Pos_x": 288.7187500000002,
+            "Pos_y": 144.64062499999977,
+            "Entradas": [
+                {
+                    "id": 2738114817552,
+                    "Indice": 0,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 1
+                }
+            ],
+            "Salidas": [],
+            "Contenido": {},
+            "Codigo_op": 2
+        },
+        {
+            "id": 2738114912336,
+            "Titulo": "Salida",
+            "Pos_x": 294.5781250000003,
+            "Pos_y": -174.109375,
+            "Entradas": [
+                {
+                    "id": 2738114912848,
+                    "Indice": 0,
+                    "Multiconexion": false,
+                    "Posicion": 2,
+                    "Tipo_de_zocalo": 1
+                }
+            ],
+            "Salidas": [],
+            "Contenido": {},
+            "Codigo_op": 2
+        }
+    ],
+    "Conexiones": [
+        {
+            "id": 3204704611472,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704386192,
+            "Zocalo_de_destino": 3204704493456
+        },
+        {
+            "id": 3204704601808,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704386192,
+            "Zocalo_de_destino": 3204652964432
+        },
+        {
+            "id": 3204704612944,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704421264,
+            "Zocalo_de_destino": 3204704493520
+        },
+        {
+            "id": 3204704609040,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704421264,
+            "Zocalo_de_destino": 3204693270032
+        },
+        {
+            "id": 2738114598800,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704386192,
+            "Zocalo_de_destino": 3204693809360
+        },
+        {
+            "id": 2738114572432,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704421264,
+            "Zocalo_de_destino": 3204704431184
+        },
+        {
+            "id": 2738114602960,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704421264,
+            "Zocalo_de_destino": 3204704435728
+        },
+        {
+            "id": 2738114574736,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704421264,
+            "Zocalo_de_destino": 3204693272016
+        },
+        {
+            "id": 2738114493200,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704498832,
+            "Zocalo_de_destino": 3204704524624
+        },
+        {
+            "id": 2738114820880,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704435792,
+            "Zocalo_de_destino": 2738114817552
+        },
+        {
+            "id": 2738114492560,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704493776,
+            "Zocalo_de_destino": 3204693269840
+        },
+        {
+            "id": 2738213037520,
+            "Tipo_de_conexion": 2,
+            "Zocalo_de_origen": 3204704431312,
+            "Zocalo_de_destino": 2738114912848
+        }
+    ]
+}
