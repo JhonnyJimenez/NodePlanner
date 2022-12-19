@@ -2,9 +2,8 @@ import os
 import sys
 import inspect
 from PyQt5.QtWidgets import *
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
+# La siguiente linea tiene que estar antes que las importaciones locales ya que este archivo está en una ruta diferente.
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 from lib.nodeeditor.Utilidades import loadstylesheets
 from lib.nodeeditor.Ventana import Ventana
 

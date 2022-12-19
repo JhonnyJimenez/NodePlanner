@@ -11,10 +11,6 @@ class Ventana(QMainWindow):
 	
 	def __init__(self):
 		super().__init__()
-		
-		self.compania = 'Blenderfreak'
-		self.nombre_del_producto = 'Editor de nodos'
-		
 		self.initUI()
 		
 #		QApplication.instance().clipboard().dataChanged.connect(self.onClipboardChange)
@@ -24,6 +20,9 @@ class Ventana(QMainWindow):
 #		print("Clipboard changed:", clip.text())
 	
 	def initUI(self):
+		self.compania = 'Blenderfreak'
+		self.nombre_del_producto = 'Editor de nodos'
+		
 		self.crearAcciones()
 		self.crearMenus()
 		
