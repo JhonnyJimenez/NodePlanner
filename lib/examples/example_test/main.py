@@ -1,10 +1,10 @@
 import os
 import sys
 import inspect
+
 from PyQt5.QtWidgets import *
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-
 from lib.nodeeditor.Utilidades import loadstylesheets
 from lib.nodeeditor.Ventana import Ventana
 

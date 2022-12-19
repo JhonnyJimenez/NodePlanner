@@ -42,8 +42,8 @@ class Escena(Serializable):
 		self.historial = HistorialEscena(self)
 		self.portapapeles = PortapapelesEscena(self)
 		
-		self.GraficosEsc.objetoSeleccionado.connect(self.objetoSeleccionado)
-		self.GraficosEsc.objetosNoSeleccionados.connect(self.objetosNoSeleccionados)
+		self.graficador_de_la_escena.objetoSeleccionado.connect(self.objetoSeleccionado)
+		self.graficador_de_la_escena.objetosNoSeleccionados.connect(self.objetosNoSeleccionados)
 	
 	@property
 	def elementos_modificados(self):
@@ -61,8 +61,8 @@ class Escena(Serializable):
 		self._elementos_modificados = value
 		
 	def initUI(self):
-		self.GraficosEsc = GraficosEscena(self)
-		self.GraficosEsc.config_esc(self.Escena_Ancho, self.Escena_Alto)
+		self.graficador_de_la_escena = GraficosEscena(self)
+		self.graficador_de_la_escena.config_esc(self.Escena_Ancho, self.Escena_Alto)
 		
 	def obtenerNodoporID(self, id_nodo):
 		for nodo in self.Nodos:
@@ -98,7 +98,7 @@ class Escena(Serializable):
 		return self.elementos_modificados
 	
 	def objetosSeleccionados(self):
-		return self.GraficosEsc.selectedItems()
+		return self.graficador_de_la_escena.selectedItems()
 	
 	def hacerDeseleccionarObjetos(self, silencioso=False):
 		for objeto in self.objetosSeleccionados():
@@ -130,7 +130,7 @@ class Escena(Serializable):
 			conexion.GraficosDeConexion._ultimo_estado_de_seleccion = False
 	
 	def obtenerVista(self):
-		return self.GraficosEsc.views()[0]
+		return self.graficador_de_la_escena.views()[0]
 	
 	def obtenerObjetoAl(self, pos):
 		return self.obtenerVista().itemAt(pos)

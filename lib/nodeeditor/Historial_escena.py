@@ -100,7 +100,7 @@ class HistorialEscena:
 			'conexiones': [],
 		}
 		
-		for objeto in self.escena.GraficosEsc.selectedItems():
+		for objeto in self.escena.graficador_de_la_escena.selectedItems():
 			if isinstance(objeto, GraficosdelNodo):
 				sel_obj['nodos'].append(objeto.nodo.id)
 			elif isinstance(objeto, GraficosdeConexion):

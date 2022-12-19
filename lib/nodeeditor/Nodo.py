@@ -28,7 +28,7 @@ class Nodo(Serializable):
 		self.titulo = titulo
 		
 		self.escena.agregarnodo(self)
-		self.escena.GraficosEsc.addItem(self.Nodograficas)
+		self.escena.graficador_de_la_escena.addItem(self.Nodograficas)
 		
 		# Creación de conectores para entradas y salidas de nodos.
 		self.entradas = []
@@ -94,7 +94,7 @@ class Nodo(Serializable):
 			if hasattr(self, 'entradas') and hasattr(self, 'salidas'):
 				# Quitar zócalos de la escena.
 				for zocalo in (self.entradas + self.salidas):
-					self.escena.GraficosEsc.removeItem(zocalo.GraficosZocalos)
+					self.escena.graficador_de_la_escena.removeItem(zocalo.GraficosZocalos)
 				self.entradas = []
 				self.salidas = []
 				
@@ -185,7 +185,7 @@ class Nodo(Serializable):
 				if DEBUG: print('		Quitando', conexion, 'del', zocalo)
 				conexion.quitar()
 		if DEBUG: print('	Quitando los gráficos del nodo.')
-		self.escena.GraficosEsc.removeItem(self.Nodograficas)
+		self.escena.graficador_de_la_escena.removeItem(self.Nodograficas)
 		self.Nodograficas = None
 		if DEBUG: print('	Quitando el nodo de la escena.')
 		self.escena.eliminarnodo(self)

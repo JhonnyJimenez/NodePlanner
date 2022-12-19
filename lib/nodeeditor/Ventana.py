@@ -1,7 +1,9 @@
 import os
 import json
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+
 from lib.nodeeditor.Widget_de_nodos import EditorDeNodos
 from lib.nodeeditor.Utilidades import CuadroDialogo, pp
 
@@ -45,7 +47,7 @@ class Ventana(QMainWindow):
 		self.statusBar().showMessage("")
 		self.status_mouse_pos = QLabel("")
 		self.statusBar().addPermanentWidget(self.status_mouse_pos)
-		self.Editor_de_nodos.Vista.cambioPosEscena.connect(self.NuevaPosEscena)
+		self.Editor_de_nodos.graficador_visual.cambioPosEscena.connect(self.NuevaPosEscena)
 		
 	def crearAcciones(self):
 		self.ActNuevo = QAction('&Nuevo', self, shortcut='Ctrl+N', statusTip='Crea nuevas gráficas', triggered=self.NuevoArchivo)

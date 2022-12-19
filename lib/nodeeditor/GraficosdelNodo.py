@@ -69,7 +69,7 @@ class GraficosdelNodo(QGraphicsItem):
 		self._relleno_fondo_nodo = QBrush(QColor("#E3303030"))
 	
 	def seleccionado(self):
-		self.nodo.escena.GraficosEsc.objetoSeleccionado.emit()
+		self.nodo.escena.graficador_de_la_escena.objetoSeleccionado.emit()
 		
 	def hacerSeleccion(self, nuevo_estado=True):
 		self.setSelected(nuevo_estado)
@@ -148,7 +148,7 @@ class GraficosdelNodo(QGraphicsItem):
 									   self.anchoNodo - int((2 * self.sangria_de_la_orilla)), self.altoNodo - int((2 * self.sangria_de_la_orilla) + self.alturaTituloNodo))
 			
 		# Obtener el QGraphicsProxy cuando está insertado en los gráficos de la escena.
-		self.GraficosContenidoNodo = self.nodo.escena.GraficosEsc.addWidget(self.contenido)
+		self.GraficosContenidoNodo = self.nodo.escena.graficador_de_la_escena.addWidget(self.contenido)
 		self.GraficosContenidoNodo.setParentItem(self)
 
 	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):

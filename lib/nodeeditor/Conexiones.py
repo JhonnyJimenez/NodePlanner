@@ -104,7 +104,7 @@ class Conexion(Serializable):
 		
 	def crearInstanciadeClasedeConexion(self):
 		self.GraficosDeConexion = self.obtenerClasedeGraficosdeConexion()(self)
-		self.escena.GraficosEsc.addItem(self.GraficosDeConexion)
+		self.escena.graficador_de_la_escena.addItem(self.GraficosDeConexion)
 		if self.zocalo_origen is not None:
 			self.posiciones_actualizadas()
 		return self.GraficosDeConexion
@@ -149,10 +149,10 @@ class Conexion(Serializable):
 		self.GraficosDeConexion.hide()
 		
 		if DEBUG: print("	Quitando los gráficos de las conexiones.", self.GraficosDeConexion)
-		self.escena.GraficosEsc.removeItem(self.GraficosDeConexion)
+		self.escena.graficador_de_la_escena.removeItem(self.GraficosDeConexion)
 		if DEBUG: print("   Graficos de conexión:", self.GraficosDeConexion)
 		
-		self.escena.GraficosEsc.update()
+		self.escena.graficador_de_la_escena.update()
 		
 		if DEBUG:
 			print('@ Quitando la conexión', self)

@@ -73,7 +73,7 @@ class GraficosdeConexion(QGraphicsPathItem):
 		self.cambiarColor(self.linea.zocalo_origen.GraficosZocalos.obtenerColorparaelZocalo(tipo_zocalo_origen))
 		
 	def seleccionado(self):
-		self.linea.escena.GraficosEsc.objetoSeleccionado.emit()
+		self.linea.escena.graficador_de_la_escena.objetoSeleccionado.emit()
 		
 	def hacerSeleccion(self, nuevo_estado=True):
 		self.setSelected(nuevo_estado)

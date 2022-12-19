@@ -47,7 +47,7 @@ class Zocalo(Serializable):
 	
 	def eliminarzocalo(self):
 		self.GraficosZocalos.setParentItem(None)
-		self.nodo.escena.GraficosEsc.removeItem(self.GraficosZocalos)
+		self.nodo.escena.graficador_de_la_escena.removeItem(self.GraficosZocalos)
 		del self.GraficosZocalos
 		
 	def cambiarTipoZocalo(self, nuevo_tipo_zocalo):

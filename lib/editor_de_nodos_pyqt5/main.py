@@ -1,6 +1,6 @@
 import sys
 
-from PyQt6.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication
 from ventana import EditorDeNodos
 
 # Al ejecutar un programa, Python guarda «__main__» en la variable __name__

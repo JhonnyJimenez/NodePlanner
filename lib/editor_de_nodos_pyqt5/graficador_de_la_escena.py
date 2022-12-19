@@ -1,8 +1,8 @@
 import math
 
-from PyQt6.QtWidgets import QGraphicsScene
-from PyQt6.QtCore import QLineF
-from PyQt6.QtGui import QColor, QPen
+from PyQt5.QtWidgets import QGraphicsScene
+from PyQt5.QtCore import QLineF
+from PyQt5.QtGui import QColor, QPen
 
 # Estas dos variables siempre son números enteros.
 TAMAÑO_DE_LA_CUADRÍCULA = 20
@@ -39,9 +39,9 @@ class GraficadorDeLaEscena(QGraphicsScene):
 		#   La escena comienza desde la mitad de su tamaño negativo para terminar en la mitad positiva.
 		#   La doble barra hace division devolviendo un número entero.
 		self.setSceneRect(
-							(self.anchura_de_la_escena // -2), (self.altura_de_la_escena // -2),
-							self.anchura_de_la_escena, self.altura_de_la_escena
-							)
+				(self.anchura_de_la_escena // -2), (self.altura_de_la_escena // -2),
+				self.anchura_de_la_escena, self.altura_de_la_escena
+				)
 
 		#   Rellenado del fondo.
 		self.setBackgroundBrush(self._color_para_el_fondo)

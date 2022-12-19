@@ -17,7 +17,7 @@ class PortapapelesEscena:
 		sel_nodos, sel_lineas, sel_zocalos = [], [], {}
 		
 		# Ordenar líneas y zócalos.
-		for objeto in self.escena.GraficosEsc.selectedItems():
+		for objeto in self.escena.graficador_de_la_escena.selectedItems():
 			if hasattr(objeto, 'nodo'):
 				sel_nodos.append(objeto.nodo.serializacion())
 				for zocalos in (objeto.nodo.entradas + objeto.nodo.salidas):

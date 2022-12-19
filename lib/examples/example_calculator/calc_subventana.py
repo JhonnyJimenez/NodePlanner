@@ -90,7 +90,7 @@ class SubVenCalc(EditorDeNodos):
 			text = dataStream.readQString()
 			
 			mouse_pos = event.pos()
-			escena_pos = self.escena.GraficosEsc.views()[0].mapToScene(mouse_pos)
+			escena_pos = self.escena.graficador_de_la_escena.views()[0].mapToScene(mouse_pos)
 			
 			if DEBUG: print("Objeto soltado: [%d] '%s'" % (codigo_op, text), "Mouse:", mouse_pos, "Escena:", escena_pos)
 			
