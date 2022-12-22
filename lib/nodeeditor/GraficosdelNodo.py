@@ -52,10 +52,10 @@ class GraficosdelNodo(QGraphicsItem):
 		
 	def initAssets(self):
 		self._ColorDelTitulo = Qt.white
-		self._FuenteDelTitulo = QFont("Rounded Mgen+ 1c regular", 9)
+		self._FuenteDelTitulo = QFont("Ubuntu", 9)
 		
 		self._color = QColor("#7F000000")
-		self._color_seleccionado = QColor("#FFFFFFFF")
+		self._color_seleccionado = QColor("#FFFFA637")
 		self._color_hovered = QColor("#FF37A6FF")
 		
 		self._pen_default = QPen(self._color)
@@ -65,8 +65,8 @@ class GraficosdelNodo(QGraphicsItem):
 		self._pen_hovered = QPen(self._color_hovered)
 		self._pen_hovered.setWidthF(3.0)
 		
-		self._relleno_titulo_nodo = QBrush(QColor("#FF246283"))
-		self._relleno_fondo_nodo = QBrush(QColor("#E3303030"))
+		self._relleno_titulo_nodo = QBrush(QColor("#FF313131"))
+		self._relleno_fondo_nodo = QBrush(QColor("#E3212121"))
 	
 	def seleccionado(self):
 		self.nodo.escena.GraficosEsc.objetoSeleccionado.emit()
