@@ -5,14 +5,14 @@ from np_enlistado_de_nodos import *
 class NodoCadena_Graficador(Entradas_Graficador):
 	def initSizes(self):
 		super().initSizes()
-		self.altoNodo = 54
+		self.altoNodo = 64
+		self.calculo_de_altura_disponible()
+
 
 class NodoCadena_Contenido(Entradas_Contenido):
-	def initui(self):
-		super().initui()
+	def contenidos(self):
+		self.entrada = self.entrada_de_línea(1, "")
 
-	def objetos(self):
-		self.entrada = self.linea("", 1)
 
 @registrar_nodo(NODO_ENTRADA_CADENA)
 class NodoCadena(Entradas):

@@ -5,14 +5,14 @@ from np_enlistado_de_nodos import *
 class NodoNúmero_Graficador(Entradas_Graficador):
 	def initSizes(self):
 		super().initSizes()
-		self.altoNodo = 54
+		self.altoNodo = 64
+		self.calculo_de_altura_disponible()
+
 
 class NodoNúmero_Contenido(Entradas_Contenido):
-	def initui(self):
-		super().initui()
+	def contenidos(self):
+		self.entrada = self.entrada_de_línea(1, "0", validante = QDoubleValidator())
 
-	def objetos(self):
-		self.entrada = self.linea("0", 1, QDoubleValidator())
 
 @registrar_nodo(NODO_ENTRADA_NÚMERO)
 class NodoNúmero(Entradas):

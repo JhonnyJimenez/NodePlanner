@@ -42,14 +42,14 @@ class GraficosdelNodo(QGraphicsItem):
 		self.initContenido()
 		
 	def initSizes(self):
-		self.anchoNodo = 180
-		self.altoNodo = 240
 		self.redondezdelaOrilladelNodo = 10.0
 		self.sangria_de_la_orilla = 10.0
 		self.alturaTituloNodo = 24.0
 		self.sangria_del_titulo = 4.0
 		self.sangria_vertical_del_titulo = 4.0
-		
+		self.anchoNodo = 180
+		self.altoNodo = 240
+
 	def initAssets(self):
 		self._ColorDelTitulo = Qt.white
 		self._FuenteDelTitulo = QFont("Ubuntu", 9)

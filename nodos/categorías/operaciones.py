@@ -9,6 +9,7 @@ class Operaciones_Graficador(NodoBase_Graficador):
 		super().initSizes()
 		self.anchoNodo = 120
 		self.altoNodo = 54
+		self.calculo_de_altura_disponible()
 
 	def initAssets(self):
 		super().initAssets()

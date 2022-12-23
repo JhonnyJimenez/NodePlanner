@@ -9,22 +9,16 @@ class Salidas_Graficador(NodoBase_Graficador):
 	def initSizes(self):
 		super().initSizes()
 		self.anchoNodo = 120
-		self.altoNodo = 54
+		self.altoNodo = 64
+		self.calculo_de_altura_disponible()
 
 	def initAssets(self):
 		super().initAssets()
 		self._relleno_titulo_nodo = QBrush(QColor("#FF3C1D26"))
 
 class Salidas_Contenido(NodoBase_Contenido):
-	def initui(self):
-		super().initui()
-		self.pantalla = QLabel("", self)
-		self.pantalla.setStyleSheet('background: transparent;')
-		self.pantalla.setGeometry(-1, 0, self.anchoNodo, self.altoNodo - int(self.alturaTituloNodo))
-		self.pantalla.setAlignment(Qt.AlignCenter)
-		self.pantalla.setObjectName(self.nodo.content_label_objname)
-		self.pantalla.setFont(QFont("Ubuntu"))
-
+	def contenidos(self):
+		self.pantalla = self.etiqueta("", "Centro", altura = self.altura_disponible)
 
 # @registrar_nodo(CATEGORIA_SALIDAS)
 class Salidas(NodoBase):
@@ -39,6 +33,9 @@ class Salidas(NodoBase):
 	def __init__(self, escena, titulo = titulo_op, entradas = [3], salidas = []):
 		super().__init__(escena, titulo, entradas, salidas)
 		self.evaluar()
+
+	def ediciones_de_espaciado(self):
+		pass
 
 	def ImplementarEvaluacion(self):
 		nodo_de_entrada = self.obtenerEntrada(0)

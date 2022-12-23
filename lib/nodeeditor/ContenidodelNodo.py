@@ -15,7 +15,7 @@ class ContenidoDelNodo(QWidget, Serializable):
 		self.lienzo.setContentsMargins(0, 0, 0, 0)
 		self.setLayout(self.lienzo)
 		
-		self.wdg_label = QLabel("Some title")
+		self.wdg_label = QLabel("Algún título")
 		self.lienzo.addWidget(self.wdg_label)
 		self.lienzo.addWidget(EditordeTexto("Mira, un texto"))
 		

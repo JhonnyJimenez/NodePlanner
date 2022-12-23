@@ -5,11 +5,12 @@ from np_enlistado_de_nodos import *
 class NodoBooleana_Graficador(Entradas_Graficador):
 	def initSizes(self):
 		super().initSizes()
-		self.altoNodo = 54
+		self.altoNodo = 64
+		self.calculo_de_altura_disponible()
 
 class NodoBooleana_Contenido(Entradas_Contenido):
-	def initui(self):
-		super().initui()
+	def contenidos(self):
+		self.check = self.entrada_booleana(1)
 
 	def objetos(self):
 		self.check = self.booleana("Valor", 1)

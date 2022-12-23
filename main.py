@@ -5,7 +5,7 @@ from np_ventana import NodePlannerVentana
 if __name__ == '__main__':
 	programa = QApplication(sys.argv)
 
-	programa .setStyle("Fusion")
+	programa.setStyle("fusion")
 	ventana = NodePlannerVentana()
 	ventana.show()
 

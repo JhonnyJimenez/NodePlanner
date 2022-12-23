@@ -1,6 +1,3 @@
-from PyQt5.QtWidgets import QLineEdit, QCheckBox
-from PyQt5.QtGui import QFont
-
 from np_nodo_base import *
 
 imagen = "C:/Users/Maste/Downloads/icons/edit.svg"
@@ -9,7 +6,8 @@ class Entradas_Graficador(NodoBase_Graficador):
 	def initSizes(self):
 		super().initSizes()
 		self.anchoNodo = 120
-		self.altoNodo = 79
+		self.altoNodo = 89
+		self.calculo_de_altura_disponible()
 
 	def initAssets(self):
 		super().initAssets()
@@ -17,34 +15,10 @@ class Entradas_Graficador(NodoBase_Graficador):
 
 
 class Entradas_Contenido(NodoBase_Contenido):
-	def initui(self):
-		super().initui()
-		self.objetos()
+	def contenidos(self):
+		self.entrada = self.entrada_de_línea(1, "")
+		self.check = self.entrada_booleana(2, 0, "Valor")
 
-	def objetos(self):
-		self.entrada = self.linea("", 1)
-		self.check = self.booleana("Valor", 2, True)
-
-	def linea(self, valor, zocalo: int = None, validante = None):
-		linea = QLineEdit(valor, self)
-		linea.zocalo = zocalo - 1
-		validante = validante
-
-		linea.setGeometry(5, 5, self.anchoNodo - 14, 20)
-		linea.setAlignment(Qt.AlignCenter)
-		linea.setObjectName(self.nodo.content_label_objname)
-		linea.setFont(QFont("Ubuntu"))
-		linea.setValidator(validante)
-		return linea
-
-	def booleana(self, etiqueta,  zocalo: int = None, indeterminado: bool = False):
-		booleana = QCheckBox(etiqueta, self)
-		booleana.zocalo = zocalo - 1
-		booleana.setTristate(indeterminado)
-		booleana.setGeometry(5, 30, self.anchoNodo - 14, 20)
-		booleana.setObjectName(self.nodo.content_label_objname)
-		booleana.setFont(QFont("Ubuntu"))
-		return booleana
 
 # @registrar_nodo(CATEGORIA_ENTRADAS)
 class Entradas(NodoBase):
@@ -64,6 +38,9 @@ class Entradas(NodoBase):
 	def actualizacion(self):
 		self.contenido.entrada.textChanged.connect(self.DatosdeEntradaCambiados)
 		self.contenido.check.stateChanged.connect(self.DatosdeEntradaCambiados)
+
+	def ediciones_de_espaciado(self):
+		pass
 
 	def ImplementarEvaluacion(self):
 		self.EvaluacionNumerica()

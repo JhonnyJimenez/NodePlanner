@@ -18,7 +18,10 @@ DEBUG_REMOVE_WARNINGS = False
 class Zocalo(Serializable):
 	ClaseGraficadeZocalos = GraficosDeZocalos
 	
-	def __init__(self, nodo, indice, posicion, tipo_zocalo=1, multiconexion=True, cantidad_en_el_lado_actual=1, esEntrada=False):
+	def __init__(
+			self, nodo, indice, posicion, tipo_zocalo=1, multiconexion=True, cantidad_en_el_lado_actual=1,
+			esEntrada=False
+			):
 		super().__init__()
 		
 		self.nodo = nodo
