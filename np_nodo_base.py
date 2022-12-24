@@ -1,3 +1,6 @@
+import math
+import numpy
+
 from PyQt5.QtWidgets import QLineEdit, QLabel, QCheckBox, QComboBox, QCalendarWidget, QDateEdit
 from PyQt5.QtGui import QColor, QPainter, QBrush, QImage, QFont, QDoubleValidator
 from PyQt5.QtCore import Qt, QPointF, QRectF
@@ -10,7 +13,7 @@ from lib.nodeeditor.Zocalos import *
 
 from np_enlistado_de_nodos import *
 
-CREANDO = True
+CREANDO = False
 DEBUG = False
 imagen = "C:/Users/Maste/Downloads/icons/help (2).svg"
 
@@ -203,7 +206,7 @@ class NodoBase_Contenido(ContenidoDelNodo):
 		if zocalo == 0:
 			línea.zocalo = zocalo
 		elif zocalo is None:
-			línea.zocalo = 0
+			pass
 		else:
 			línea.zocalo = zocalo - 1
 
@@ -245,7 +248,7 @@ class NodoBase_Contenido(ContenidoDelNodo):
 		if zocalo == 0:
 			booleana.zocalo = zocalo
 		elif zocalo is None:
-			booleana.zocalo = 0
+			pass
 		else:
 			booleana.zocalo = zocalo - 1
 
@@ -272,7 +275,7 @@ class NodoBase_Contenido(ContenidoDelNodo):
 		if zocalo == 0:
 			lista.zocalo = zocalo
 		elif zocalo is None:
-			lista.zocalo = 0
+			pass
 		else:
 			lista.zocalo = zocalo - 1
 
@@ -377,7 +380,7 @@ class NodoBase_Contenido(ContenidoDelNodo):
 # Nodo
 
 
-@registrar_nodo(NODO_BASE)
+# @registrar_nodo(NODO_BASE)
 class NodoBase(Nodo):
 	icono = imagen
 	codigo_op = NODO_BASE
@@ -392,8 +395,8 @@ class NodoBase(Nodo):
 	def __init__(self, escena, titulo = titulo_op, entradas=[], salidas=[1, 2, 3, 4]):
 		super().__init__(escena, titulo, entradas, salidas)
 		self.marcarIndefinido()
-		self.evaluar()
 		self.actualizacion()
+		self.evaluar()
 
 	def initConfiguraciones(self):
 		super().initConfiguraciones()
@@ -413,12 +416,14 @@ class NodoBase(Nodo):
 				self.entradas = []
 				self.salidas = []
 
+		self.valores_entrantes = []
 		self.valores = []
 		self.espaciado_entradas = []
 		self.espaciado_salidas = []
 
 		for zocalo in entradas:
 			self.espaciado_entradas.append(0)
+			self.valores_entrantes.append(None)
 
 		for zocalo in salidas:
 			self.espaciado_salidas.append(0)
@@ -570,16 +575,15 @@ class NodoBase(Nodo):
 				if not nodo_de_entrada:
 					zocalo.GraficosZocalos.setToolTip(no_calculado)
 				else:
-					valor = nodo_de_entrada.valores[contrazocalo.indice]
-					valor_resuelto = self.solucion_booleana(valor, True)
-					zocalo.GraficosZocalos.setToolTip(valor_resuelto)
+					valor = self.textualizador(nodo_de_entrada.valores[contrazocalo.indice])
+					zocalo.GraficosZocalos.setToolTip(valor)
 			elif zocalo.esSalida:
 				valor = self.valores[zocalo.indice]
 				if valor is None:
 					zocalo.GraficosZocalos.setToolTip("El valor de zócalo aún no ha sido calculado")
 				elif valor is not None:
-					valor_resuelto = self.solucion_booleana(valor, True)
-					zocalo.GraficosZocalos.setToolTip(valor_resuelto)
+					valor = self.textualizador(valor)
+					zocalo.GraficosZocalos.setToolTip(valor)
 				else:
 					# En teoría, esta tooltip nunca debería salir.
 					zocalo.GraficosZocalos.setToolTip("Puede haber un error.")
@@ -588,6 +592,11 @@ class NodoBase(Nodo):
 				# conexiones.
 				print("Hubo un problema al crear los tooltips de los zócalos. Revisa la evaluación del nodo base.")
 				pass
+
+	def textualizador(self, valor):
+		valor_resuelto = self.solucion_booleana(valor, True)
+		valor = str(valor_resuelto)
+		return valor
 
 	def solucion_booleana(self, valor, especificacion: bool = False):
 		if type(valor) == Qt.CheckState:

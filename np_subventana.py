@@ -8,6 +8,7 @@ from lib.nodeeditor.Conexiones import bezier, recta
 from lib.nodeeditor.GraficosVista import MODO_DIBUJO
 
 from np_enlistado_de_nodos import *
+from nodos.categorías.salidas import Salidas
 
 DEBUG = False
 DEBUG_CONTEXT = False
@@ -38,7 +39,7 @@ class NodePlannerSubVentana(EditorDeNodos):
 	def hacerEvaluaciondeSalidas(self):
 		# Evaluar todos los nodos de salida.
 		for nodo in self.escena.Nodos:
-			if nodo.__class__.__name__ == "CalcNodoSalida":
+			if isinstance(nodo, Salidas):
 				nodo.evaluar()
 
 	def alRestaurarHistorial(self):

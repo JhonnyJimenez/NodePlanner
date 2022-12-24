@@ -40,8 +40,6 @@ class Entradas(NodoBase):
 
 	def __init__(self, escena, titulo = titulo_op, entradas = [], salidas = [1, 2]):
 		super().__init__(escena, titulo, entradas, salidas)
-		self.evaluar()
-		self.actualizacion()
 
 	def actualizacion(self):
 		self.contenido.objeto_1.textChanged.connect(self.DatosdeEntradaCambiados)

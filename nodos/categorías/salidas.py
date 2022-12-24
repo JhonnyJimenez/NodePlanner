@@ -38,7 +38,6 @@ class Salidas(NodoBase):
 
 	def __init__(self, escena, titulo = titulo_op, entradas = [8], salidas = []):
 		super().__init__(escena, titulo, entradas, salidas)
-		self.evaluar()
 
 	def actualizacion(self):
 		pass
@@ -57,13 +56,15 @@ class Salidas(NodoBase):
 		contrazocalo = self.obtenerContrazocalo(0)
 		valor = nodo_de_entrada.valores[contrazocalo.indice]
 
-		if valor == '':
+		if valor == '' or valor is None:
 			self.Nodograficas.setToolTip("No hay datos en el nodo conectado.")
 			self.marcarIndefinido()
 			self.contenido.etiqueta_1.setText("Sin datos.")
 			return
 
 		valor = self.solucion_booleana(valor)
+
+		valor = str(valor)
 
 		self.contenido.etiqueta_1.setText(valor)
 		self.marcarIndefinido(False)

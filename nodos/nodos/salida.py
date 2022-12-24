@@ -9,4 +9,3 @@ class Salida(Salidas):
 
 	def __init__(self, escena, titulo = titulo_op, entradas = [8], salidas = []):
 		super().__init__(escena, titulo, entradas, salidas)
-		self.evaluar()
