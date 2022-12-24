@@ -10,11 +10,13 @@ class NodoBooleana_Graficador(Entradas_Graficador):
 
 class NodoBooleana_Contenido(Entradas_Contenido):
 	def contenidos(self):
-		self.check = self.entrada_booleana(1)
+		self.objeto_1 = self.entrada_booleana(1)
 
-	def objetos(self):
-		self.check = self.booleana("Valor", 1)
-		self.check.setGeometry(5, 5, self.anchoNodo - 14, 20)
+	def lista_a_serializar(self, res):
+		res['Objeto_1'] = self.objeto_1.checkState()
+
+	def lista_a_desearializar(self, data):
+		self.objeto_1.setCheckState(data['Objeto_1'])
 
 @registrar_nodo(NODO_ENTRADA_BOOLEANA)
 class NodoBooleana(Entradas):
@@ -30,8 +32,8 @@ class NodoBooleana(Entradas):
 		super().__init__(escena, titulo, entradas, salidas)
 
 	def actualizacion(self):
-		self.contenido.check.stateChanged.connect(self.DatosdeEntradaCambiados)
+		self.contenido.objeto_1.stateChanged.connect(self.DatosdeEntradaCambiados)
 
 	def ImplementarEvaluacion(self):
-		self.EvaluacionBooleana()
+		self.EvaluacionBooleana(self.contenido.objeto_1)
 		self.evaluarHijos()

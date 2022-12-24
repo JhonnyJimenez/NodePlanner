@@ -11,7 +11,13 @@ class NodoCadena_Graficador(Entradas_Graficador):
 
 class NodoCadena_Contenido(Entradas_Contenido):
 	def contenidos(self):
-		self.entrada = self.entrada_de_línea(1, "")
+		self.objeto_1 = self.entrada_de_línea(1, "")
+
+	def lista_a_serializar(self, res):
+		res['Objeto_1'] = self.objeto_1.text()
+
+	def lista_a_desearializar(self, data):
+		self.objeto_1.setText(data['Objeto_1'])
 
 
 @registrar_nodo(NODO_ENTRADA_CADENA)
@@ -28,9 +34,9 @@ class NodoCadena(Entradas):
 		super().__init__(escena, titulo, entradas, salidas)
 
 	def actualizacion(self):
-		# self.contenido.entrada.editingFinished.connect(self.DatosdeEntradaCambiados)
-		self.contenido.entrada.textChanged.connect(self.DatosdeEntradaCambiados)
+		# self.contenido.objeto_1.editingFinished.connect(self.DatosdeEntradaCambiados)
+		self.contenido.objeto_1.textChanged.connect(self.DatosdeEntradaCambiados)
 
 	def ImplementarEvaluacion(self):
-		self.EvaluacionNumerica()
+		self.EvaluacionNumerica(self.contenido.objeto_1)
 		self.evaluarHijos()

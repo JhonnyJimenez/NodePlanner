@@ -1,12 +1,12 @@
 from nodos.categorías.salidas import *
 
-@registrar_nodo(CATEGORIA_SALIDAS)
+@registrar_nodo(NODO_SALIDA)
 class Salida(Salidas):
 	icono = imagen
-	codigo_op = CATEGORIA_SALIDAS
+	codigo_op = NODO_SALIDA
 	titulo_op = "Salida"
 	content_label_objname = "Salida"
 
-	def __init__(self, escena, titulo = titulo_op, entradas = [3], salidas = []):
+	def __init__(self, escena, titulo = titulo_op, entradas = [8], salidas = []):
 		super().__init__(escena, titulo, entradas, salidas)
 		self.evaluar()

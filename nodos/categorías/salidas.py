@@ -18,7 +18,13 @@ class Salidas_Graficador(NodoBase_Graficador):
 
 class Salidas_Contenido(NodoBase_Contenido):
 	def contenidos(self):
-		self.pantalla = self.etiqueta("", "Centro", altura = self.altura_disponible)
+		self.etiqueta_1 = self.etiqueta("", "Centro", altura = self.altura_disponible)
+
+	def lista_a_serializar(self, res):
+		pass
+
+	def lista_a_desearializar(self, data):
+		pass
 
 # @registrar_nodo(CATEGORIA_SALIDAS)
 class Salidas(NodoBase):
@@ -30,9 +36,12 @@ class Salidas(NodoBase):
 	ClaseGraficadeNodo = Salidas_Graficador
 	ClasedelContenidodeNodo = Salidas_Contenido
 
-	def __init__(self, escena, titulo = titulo_op, entradas = [3], salidas = []):
+	def __init__(self, escena, titulo = titulo_op, entradas = [8], salidas = []):
 		super().__init__(escena, titulo, entradas, salidas)
 		self.evaluar()
+
+	def actualizacion(self):
+		pass
 
 	def ediciones_de_espaciado(self):
 		pass
@@ -42,7 +51,7 @@ class Salidas(NodoBase):
 		if not nodo_de_entrada:
 			self.Nodograficas.setToolTip("No hay un nodo conectado.")
 			self.marcarInvalido()
-			self.contenido.pantalla.setText("Sin datos.")
+			self.contenido.etiqueta_1.setText("Sin datos.")
 			return
 
 		contrazocalo = self.obtenerContrazocalo(0)
@@ -51,18 +60,12 @@ class Salidas(NodoBase):
 		if valor == '':
 			self.Nodograficas.setToolTip("No hay datos en el nodo conectado.")
 			self.marcarIndefinido()
-			self.contenido.pantalla.setText("Sin datos.")
+			self.contenido.etiqueta_1.setText("Sin datos.")
 			return
 
-		if type(valor) == Qt.CheckState:
-			if valor == 0:
-				valor = 'Falso'
-			if valor == 1:
-				valor = 'Indeterminado'
-			if valor == 2:
-				valor = 'Verdadero'
+		valor = self.solucion_booleana(valor)
 
-		self.contenido.pantalla.setText(valor)
+		self.contenido.etiqueta_1.setText(valor)
 		self.marcarIndefinido(False)
 		self.marcarInvalido(False)
 		self.Nodograficas.setToolTip("")

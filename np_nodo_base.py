@@ -10,7 +10,7 @@ from lib.nodeeditor.Zocalos import *
 
 from np_enlistado_de_nodos import *
 
-CREANDO = False
+CREANDO = True
 DEBUG = False
 imagen = "C:/Users/Maste/Downloads/icons/help (2).svg"
 
@@ -18,42 +18,26 @@ imagen = "C:/Users/Maste/Downloads/icons/help (2).svg"
 # Zócalos y sus gráficos.
 
 COLORES_DE_ZOCALOS = [
-		QColor("#FFcca6d6"),  # 0. Zócalo para listas desplegables
-		QColor("#FF598c5c"),  # 1. Zócalo númerico
-		QColor("#FFcca6d6"),  # 2. Zócalo booleano
-		QColor("#FF6363c7"),  # 3. Zócalo vectorial
-		QColor("#FF70b2ff"),  # 4. Zócalo de texto
-		QColor("#FFc7c729"),  # 5. Zócalo de color
-		QColor("#FFed9e5c"),  # 6. Zócalo de objeto
-		QColor("#FF633863"),  # 7. Zócalo de imagen
+		QColor("#FFcca6d6"),  # 0. Zócalo de entrada y salida todoterreno
+		QColor("#FF70b2ff"),  # 1. Zócalo de texto
+		QColor("#FF598c5c"),  # 2. Zócalo númerico
+		QColor("#FFcca6d6"),  # 3. Zócalo booleano
+		QColor("#FF633863"),  # 4. Zócalo para listas desplegables
+		QColor("#FF6363c7"),  # 5. Zócalo vectorial
+		QColor("#FFc7c729"),  # 6. Zócalo de color
+		QColor("#FFed9e5c"),  # 7. Zócalo de objeto
 		QColor("#FF00d6a3"),  # 8. Zócalo de geometría (Únicamente para zócalos de entrada en un nodo Salida)
 		QColor("#FFf5f5f5"),  # 9. Zócalo de colecciones
 		QColor("#FF9e4fa3"),  # 10. Zócalo de texturas
 		QColor("#FFeb7582"),  # 11. Zócalo de material
 		]
 
-USOS_DE_ZOCALOS = [
-		"Zócalo decimal",
-		"Zócalo entero",
-		"Zócalo booleano",
-		"Zócalo vectorial",
-		"Zócalo de texto",
-		"Zócalo de color",
-		"Zócalo de objeto",
-		"Zócalo de imagen",
-		"Zócalo de geometría",
-		"Zócalo de colecciones",
-		"Zócalo de texturas",
-		"Zócalo de material",
-		]
-
-ZOCALOS_ROMBOS = [0, 1, 2, 3, 5]
+ZOCALOS_ROMBOS = [0, 2, 3, 4, 5]
 
 
 class NodoBase_Zocalos_Graficador(GraficosDeZocalos):
 	def initAssets(self):
 		super().initAssets()
-		self.setToolTip(USOS_DE_ZOCALOS[self.tipo_zocalo])
 
 	def obtenerColorparaelZocalo(self, key):
 		if type(key) == int:
@@ -178,11 +162,11 @@ class NodoBase_Contenido(ContenidoDelNodo):
 			print("La altura del nodo %s debe ser:" % self.nodo.__class__.__name__, self.calculo_de_altura)
 
 	def contenidos(self):
-		muestra1 = self.etiqueta("Tipos de entrada", 'Centro')
-		muestra2 = self.entrada_de_línea(1, "Cadena")
-		muestra3 = self.entrada_de_línea(2, '0', 'Númerica', QDoubleValidator())
-		muestra4 = self.entrada_booleana(3, 1, "Booleana", True)
-		muestra5 = self.lista_desplegable('Lista')
+		self.etiqueta_1 = self.etiqueta("Tipos de entrada", 'Centro')
+		self.objeto_1 = self.entrada_de_línea(1, "Cadena")
+		self.objeto_2 = self.entrada_de_línea(2, '0', 'Númerica', QDoubleValidator())
+		self.objeto_3 = self.entrada_booleana(3, 1, "Booleana", True)
+		self.objeto_4 = self.lista_desplegable(4, 'Lista')
 
 	def etiqueta(self, texto_inicial = None, alineado: int | str = 1, fuente = None, altura: int = None):
 		if fuente is None:
@@ -274,7 +258,7 @@ class NodoBase_Contenido(ContenidoDelNodo):
 		return booleana
 
 	def lista_desplegable(
-			self, texto_etiqueta: str = None, elementos_visibles: int = 10, listado: list = None,
+			self, zocalo = None, texto_etiqueta: str = None, elementos_visibles: int = 10, listado: list = None,
 			separadores: list = None, popup: bool = False, fuente = None, altura: str = 20
 			):
 		if fuente is None:
@@ -284,6 +268,14 @@ class NodoBase_Contenido(ContenidoDelNodo):
 		posicion_y = self.posicion_libre[-1]
 
 		lista = QComboBox(self)
+
+		if zocalo == 0:
+			lista.zocalo = zocalo
+		elif zocalo is None:
+			lista.zocalo = 0
+		else:
+			lista.zocalo = zocalo - 1
+
 		if texto_etiqueta == '' or texto_etiqueta is None:
 			lista.setGeometry(0, posicion_y, self.ancho_disponible, altura)
 		else:
@@ -354,11 +346,38 @@ class NodoBase_Contenido(ContenidoDelNodo):
 		# Fuente
 		self.fuente = QFont("Ubuntu")
 
+	def serializacion(self):
+		res = super().serializacion()
+		self.lista_a_serializar(res)
+		return res
+
+	def deserializacion(self, data, hashmap={}):
+		res = super().deserializacion(data, hashmap)
+		try:
+			self.lista_a_desearializar(data)
+			return True
+		except Exception as e:
+			dump_exception(e)
+		return res
+
+	def lista_a_serializar(self, res):
+		res['Objeto_1'] = self.objeto_1.text()
+		res['Objeto_2'] = self.objeto_2.text()
+		res['Objeto_3'] = self.objeto_3.checkState()
+		res['Objeto_4'] = self.objeto_4.currentText()
+
+	def lista_a_desearializar(self, data):
+		self.objeto_1.setText(data['Objeto_1'])
+		self.objeto_2.setText(data['Objeto_2'])
+		self.objeto_3.setCheckState(data['Objeto_3'])
+		self.objeto_4.setCurrentText(data['Objeto_4'])
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 # Nodo
 
 
-# @registrar_nodo(NODO_BASE)
+@registrar_nodo(NODO_BASE)
 class NodoBase(Nodo):
 	icono = imagen
 	codigo_op = NODO_BASE
@@ -370,10 +389,11 @@ class NodoBase(Nodo):
 	ClasedelContenidodeNodo = NodoBase_Contenido
 	ClasedeZocalo = NodoBase_Zocalos
 
-	def __init__(self, escena, titulo = titulo_op, entradas=[4, 2, 3, 0], salidas=[4, 2, 3, 0]):
+	def __init__(self, escena, titulo = titulo_op, entradas=[], salidas=[1, 2, 3, 4]):
 		super().__init__(escena, titulo, entradas, salidas)
 		self.marcarIndefinido()
 		self.evaluar()
+		self.actualizacion()
 
 	def initConfiguraciones(self):
 		super().initConfiguraciones()
@@ -514,12 +534,23 @@ class NodoBase(Nodo):
 		# las modificaciones que le hice al método "obtener_posicion_zocalo".
 		pass
 
+	def actualizacion(self):
+		self.contenido.objeto_1.textChanged.connect(self.DatosdeEntradaCambiados)
+		self.contenido.objeto_2.textChanged.connect(self.DatosdeEntradaCambiados)
+		self.contenido.objeto_3.stateChanged.connect(self.DatosdeEntradaCambiados)
+		self.contenido.objeto_4.currentTextChanged.connect(self.DatosdeEntradaCambiados)
+
 	def ImplementarEvaluacion(self):
-		pass
+		self.EvaluacionNumerica(self.contenido.objeto_1)
+		self.EvaluacionNumerica(self.contenido.objeto_2)
+		self.EvaluacionBooleana(self.contenido.objeto_3)
+		self.EvaluacionListado(self.contenido.objeto_4)
+		self.evaluarHijos()
 
 	def evaluar(self):
 		try:
 			evaluacion = self.ImplementarEvaluacion()
+			self.zocalos_tooltip()
 			return evaluacion
 		except ValueError as e:
 			self.marcarInvalido()
@@ -528,6 +559,73 @@ class NodoBase(Nodo):
 			self.marcarInvalido()
 			self.Nodograficas.setToolTip(str(e))
 			dump_exception(e)
+
+	def zocalos_tooltip(self):
+		no_calculado = "El valor de zócalo aún no ha sido calculado"
+
+		for zocalo in (self.entradas + self.salidas):
+			if zocalo.esEntrada:
+				nodo_de_entrada = self.obtenerEntrada(0)
+				contrazocalo = self.obtenerContrazocalo(0)
+				if not nodo_de_entrada:
+					zocalo.GraficosZocalos.setToolTip(no_calculado)
+				else:
+					valor = nodo_de_entrada.valores[contrazocalo.indice]
+					valor_resuelto = self.solucion_booleana(valor, True)
+					zocalo.GraficosZocalos.setToolTip(valor_resuelto)
+			elif zocalo.esSalida:
+				valor = self.valores[zocalo.indice]
+				if valor is None:
+					zocalo.GraficosZocalos.setToolTip("El valor de zócalo aún no ha sido calculado")
+				elif valor is not None:
+					valor_resuelto = self.solucion_booleana(valor, True)
+					zocalo.GraficosZocalos.setToolTip(valor_resuelto)
+				else:
+					# En teoría, esta tooltip nunca debería salir.
+					zocalo.GraficosZocalos.setToolTip("Puede haber un error.")
+			else:
+				# Esto es para evitar crasheos por si algún día llego a implementar los zocalos para redireccionar
+				# conexiones.
+				print("Hubo un problema al crear los tooltips de los zócalos. Revisa la evaluación del nodo base.")
+				pass
+
+	def solucion_booleana(self, valor, especificacion: bool = False):
+		if type(valor) == Qt.CheckState:
+			if valor == 0:
+				valor = 'Falso'
+			if valor == 1:
+				valor = 'Indeterminado'
+			if valor == 2:
+				valor = 'Verdadero'
+			if especificacion:
+				valor += ' (Booleana)'
+		return valor
+
+	def EvaluacionNumerica(self, objeto):
+		self.valores[objeto.zocalo] = objeto.text()
+
+		if self.valores[objeto.zocalo] == '':
+			self.marcarInvalido()
+		else:
+			self.marcarIndefinido(False)
+			self.marcarInvalido(False)
+			self.Nodograficas.setToolTip("")
+
+		return self.valores[objeto.zocalo]
+
+	def EvaluacionBooleana(self, objeto):
+		self.valores[objeto.zocalo] = objeto.checkState()
+		self.marcarIndefinido(False)
+		self.marcarInvalido(False)
+
+		return self.valores[objeto.zocalo]
+
+	def EvaluacionListado(self, objeto):
+		self.valores[objeto.zocalo] = objeto.currentText()
+		self.marcarIndefinido(False)
+		self.marcarInvalido(False)
+
+		return self.valores[objeto.zocalo]
 
 	def DatosdeEntradaCambiados(self, zocalo = None):
 		self.marcarIndefinido()
