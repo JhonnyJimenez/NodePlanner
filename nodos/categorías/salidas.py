@@ -1,20 +1,20 @@
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtGui import QFont
-
 from np_nodo_base import *
 
 imagen = "C:/Users/Maste/Downloads/icons/visibility.svg"
+
 
 class Salidas_Graficador(NodoBase_Graficador):
 	def initSizes(self):
 		super().initSizes()
 		self.anchoNodo = 120
 		self.altoNodo = 64
+		self.altoNodoparaCalculos = self.altoNodo
 		self.calculo_de_altura_disponible()
 
 	def initAssets(self):
 		super().initAssets()
 		self._relleno_titulo_nodo = QBrush(QColor("#FF3C1D26"))
+
 
 class Salidas_Contenido(NodoBase_Contenido):
 	def contenidos(self):
@@ -26,6 +26,7 @@ class Salidas_Contenido(NodoBase_Contenido):
 	def lista_a_desearializar(self, data):
 		pass
 
+
 # @registrar_nodo(CATEGORIA_SALIDAS)
 class Salidas(NodoBase):
 	icono = imagen
@@ -36,7 +37,7 @@ class Salidas(NodoBase):
 	ClaseGraficadeNodo = Salidas_Graficador
 	ClasedelContenidodeNodo = Salidas_Contenido
 
-	def __init__(self, escena, titulo = titulo_op, entradas = [8], salidas = []):
+	def __init__(self, escena, titulo = titulo_op, entradas = [0], salidas = []):
 		super().__init__(escena, titulo, entradas, salidas)
 
 	def actualizacion(self):
@@ -62,7 +63,7 @@ class Salidas(NodoBase):
 			self.contenido.etiqueta_1.setText("Sin datos.")
 			return
 
-		valor = self.solucion_booleana(valor)
+		valor = self.textualizador(valor)
 
 		valor = str(valor)
 

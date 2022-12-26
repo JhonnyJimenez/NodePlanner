@@ -131,7 +131,7 @@ class Conexion(Serializable):
 		if DEBUGZOCALOS:
 			print(" Origen:", self.zocalo_origen)
 			print(" Final:", self.zocalo_final)
-			
+
 		self.GraficosDeConexion.update()
 	
 	def quitar_de_zocalos(self):
@@ -175,7 +175,8 @@ class Conexion(Serializable):
 						continue
 						
 					# Notificar a los nodos de los zócalos.
-					zocalo.nodo.DatosdeConexionCambiados(self)
+					zocalo.nodo.DatosdeConexionCambiados(self)  # (Comenté está línea porque el método está vacío y me
+					# daba error al tratar de implementar algo en ese método vacío).
 					if zocalo.esEntrada: zocalo.nodo.DatosdeEntradaCambiados(zocalo)
 		except Exception as e: dump_exception(e)
 		

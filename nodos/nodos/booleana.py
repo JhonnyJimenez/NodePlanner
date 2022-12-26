@@ -6,6 +6,7 @@ class NodoBooleana_Graficador(Entradas_Graficador):
 	def initSizes(self):
 		super().initSizes()
 		self.altoNodo = 64
+		self.altoNodoparaCalculos = self.altoNodo
 		self.calculo_de_altura_disponible()
 
 class NodoBooleana_Contenido(Entradas_Contenido):
@@ -28,7 +29,7 @@ class NodoBooleana(Entradas):
 	ClaseGraficadeNodo = NodoBooleana_Graficador
 	ClasedelContenidodeNodo = NodoBooleana_Contenido
 
-	def __init__(self, escena, titulo = titulo_op, entradas = [], salidas = [2]):
+	def __init__(self, escena, titulo = titulo_op, entradas = [], salidas = [3]):
 		super().__init__(escena, titulo, entradas, salidas)
 
 	def actualizacion(self):

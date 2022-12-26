@@ -65,7 +65,7 @@ class Zocalo(Serializable):
 	
 	def posicion_zocalo(self):
 		if DEBUG: print("   GSP:", self.indice, self.posicion, "Editor de nodos:", self.nodo)
-		res =  self.nodo.obtener_posicion_zocalo(self.indice, self.posicion, self.cantidad_en_el_lado_actual)
+		res = self.nodo.obtener_posicion_zocalo(self.indice, self.posicion, self.cantidad_en_el_lado_actual)
 		if DEBUG: print("   res:", res)
 		return res
 	

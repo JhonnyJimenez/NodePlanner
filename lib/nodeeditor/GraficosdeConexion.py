@@ -65,11 +65,38 @@ class GraficosdeConexion(QGraphicsPathItem):
 		self._color = QColor(color) if type(color) == str else color
 		self._pen = QPen(self._color)
 		self._pen.setWidthF(3.0)
+
+
+	# Esta método es adición mía.
+	def cambiarColorGradiente(self, color_1, color_2):
+		origen_x = self.linea.zocalo_origen.nodo.obtenerPosiciondeZocaloenEscena(self.linea.zocalo_origen)[0]
+		origen_y = self.linea.zocalo_origen.nodo.obtenerPosiciondeZocaloenEscena(self.linea.zocalo_origen)[1]
+		final_x = self.linea.zocalo_final.nodo.obtenerPosiciondeZocaloenEscena(self.linea.zocalo_final)[0]
+		final_y = self.linea.zocalo_final.nodo.obtenerPosiciondeZocaloenEscena(self.linea.zocalo_final)[1]
+
+		gradiente = QLinearGradient(origen_x, origen_y, final_x, final_y)
+
+		nuevo_color_1 = QColor(color_1) if type(color_1) == str else color_1
+		nuevo_color_2 = QColor(color_2) if type(color_2) == str else color_2
+
+		gradiente.setColorAt(0.49, nuevo_color_1)
+		gradiente.setColorAt(0.51, nuevo_color_2)
+
+		self._color = gradiente
+		self._brush = QBrush(self._color)
+		self._pen = QPen(self._brush, 3.0)
+		#self._pen.setWidthF(3.0)
+
 	
 	def definirColordesdeelZocalo(self):
-		tipo_zocalo_origen = self.linea.zocalo_inicial_de_dibujado.tipo_zocalo
+		tipo_zocalo_origen = self.linea.zocalo_origen.tipo_zocalo
+		# Esta es la línea original: tipo_zocalo_origen = self.linea.zocalo_inicial_de_dibujado.tipo_zocalo
 		tipo_zocalo_final = self.linea.zocalo_final.tipo_zocalo
-		if tipo_zocalo_origen != tipo_zocalo_final: return False
+		if tipo_zocalo_origen != tipo_zocalo_final:
+			return self.cambiarColorGradiente(
+					self.linea.zocalo_origen.GraficosZocalos.obtenerColorparaelZocalo(tipo_zocalo_origen),
+					self.linea.zocalo_origen.GraficosZocalos.obtenerColorparaelZocalo(tipo_zocalo_final)
+					)
 		self.cambiarColor(self.linea.zocalo_origen.GraficosZocalos.obtenerColorparaelZocalo(tipo_zocalo_origen))
 		
 	def seleccionado(self):

@@ -9,6 +9,7 @@ class Matemáticas_Graficador(Entradas_Graficador):
 		super().initSizes()
 		self.anchoNodo = 120
 		self.altoNodo = 164
+		self.altoNodoparaCalculos = self.altoNodo
 
 		self.calculo_de_altura_disponible()
 
@@ -53,7 +54,7 @@ class Matemáticas(Entradas):
 	ClaseGraficadeNodo = Matemáticas_Graficador
 	ClasedelContenidodeNodo = Matemáticas_Contenido
 
-	def __init__(self, escena, titulo = titulo_op, entradas = [0, 0, 0], salidas = [0]):
+	def __init__(self, escena, titulo = titulo_op, entradas = [2, 2, 2], salidas = [2]):
 		super().__init__(escena, titulo, entradas, salidas)
 
 	def actualizacion(self):
@@ -113,14 +114,12 @@ class Matemáticas(Entradas):
 		else:
 			valor_3 = 0.5
 
-		## Para cuando se implemente la altura adaptable en los nodos (en otras palabras, dar una altura fija,
-		# para calculos de posición estables y otra para ubicación y dibujado visual).
-		# if self.oculto_por_metodo_2 and self.oculto_por_metodo_3:
-		# 	self.Nodograficas.altoNodo = 114
-		# elif self.oculto_por_metodo_3:
-		# 	self.Nodograficas.altoNodo = 139
-		# else:
-		# 	self.Nodograficas.altoNodo = 164
+		if self.oculto_por_metodo_2 and self.oculto_por_metodo_3:
+			self.Nodograficas.altoNodo = 114
+		elif self.oculto_por_metodo_3:
+			self.Nodograficas.altoNodo = 139
+		else:
+			self.Nodograficas.altoNodo = 164
 
 		self.definir_entradas(operacion, valor_1, valor_2, valor_3)
 

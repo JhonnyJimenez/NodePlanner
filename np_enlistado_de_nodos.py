@@ -2,18 +2,19 @@ LISTBOX_MIMETYPE = "application/x-item"
 
 NODO_BASE = 0
 
-# 1 - 5
-CATEGORIA_ENTRADAS = NODO_BASE + 1
-NODO_ENTRADA_NÚMERO = CATEGORIA_ENTRADAS + 1
-NODO_ENTRADA_CADENA = NODO_ENTRADA_NÚMERO + 1
-NODO_ENTRADA_BOOLEANA = NODO_ENTRADA_CADENA + 1
-NODO_MATEMÁTICO = NODO_ENTRADA_BOOLEANA + 1
+# 1 - 6
+CATEGORIA_ENTRADAS = 1
+NODO_ENTRADA_ENTERO = 2
+NODO_ENTRADA_DECIMAL = 3
+NODO_ENTRADA_CADENA = 4
+NODO_ENTRADA_BOOLEANA = 5
+NODO_MATEMÁTICO = 6
 
-# 6 - 7
-CATEGORIA_SALIDAS = NODO_MATEMÁTICO + 1
-NODO_SALIDA = CATEGORIA_SALIDAS + 1
+# 7 - 8
+CATEGORIA_SALIDAS = 7
+NODO_SALIDA = 8
 
-# 8 - ???
+# 9 - ???
 DESCONOCIDO = NODO_SALIDA + 1
 
 NODEPLANNER_NODOS = {
@@ -55,6 +56,7 @@ def obtener_clase_del_codigo_op(codigo_op):
 	if codigo_op not in NODEPLANNER_NODOS:
 		raise CodigoopNoRegistrado("El código op '%d' no está registrado" % codigo_op)
 	return NODEPLANNER_NODOS[codigo_op]
+
 
 # Importado de todos los nodos y su registro.
 from np_nodo_base import NodoBase
