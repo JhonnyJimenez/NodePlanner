@@ -46,8 +46,8 @@ class GraficosdelaVistaVP(QGraphicsView):
 		
 		self.ultima_posicion_del_mouse = QPoint(0, 0)
 		self.FactorAcercamiento = 1.25
-		self.ZoomClamp = False
-		self.Zoom = 10
+		self.ZoomClamp = True
+		self.Zoom = 6
 		self.NiveldeZoom = 1
 		self.RangodeZoom = [0, 10]
 		

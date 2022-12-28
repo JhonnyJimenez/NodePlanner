@@ -1,9 +1,9 @@
 import math
 import numpy
 
-from PyQt5.QtWidgets import QLineEdit, QLabel, QCheckBox, QComboBox, QCalendarWidget, QDateEdit
-from PyQt5.QtGui import QColor, QPainter, QBrush, QImage, QFont, QDoubleValidator, QIntValidator
-from PyQt5.QtCore import Qt, QPointF, QRectF
+from PyQt5.QtWidgets import QLineEdit, QLabel, QCheckBox, QComboBox
+from PyQt5.QtGui import QColor, QPainter, QBrush, QImage, QFont, QRegExpValidator
+from PyQt5.QtCore import Qt, QPointF, QRectF, QRegExp
 
 from lib.nodeeditor.Nodo import Nodo
 from lib.nodeeditor.Utilidades import dump_exception
@@ -18,12 +18,17 @@ DEBUG = False
 imagen = "C:/Users/Maste/Downloads/icons/help (2).svg"
 
 # ---------------------------------------------------------------------------------------------------------------------
+# Bloqueadores de entrada de texto.
+
+VALIDANTE_NUMÉRICO = QRegExpValidator(QRegExp("^[-+]?[0-9]{1,3}(\s?[0-9]{3})*\.?[0-9]*([eE][-+]?[0-9]+)?$"))
+
+# ---------------------------------------------------------------------------------------------------------------------
 # Zócalos y sus gráficos.
 
 COLORES_DE_ZOCALOS = [
 		QColor("#FFcca6d6"),  # 0. Zócalo de entrada y salida todoterreno
-		QColor("#FF598c5c"),  # 1. Zócalo entero
-		QColor("#FFa1a1a1"),  # 2. Zócalo decimal
+		QColor("#FF598c5c"),  # 1. Zócalo númerico
+		QColor("#FFa1a1a1"),  # 2. Zócalo temporal
 		QColor("#FFcca6d6"),  # 3. Zócalo booleano
 		QColor("#FF70b2ff"),  # 4. Zócalo de texto
 		QColor("#FF633863"),  # 5. Zócalo para listas desplegables
@@ -114,7 +119,7 @@ class NodoBase_Graficador(GraficosdelNodo):
 	def initSizes(self):
 		super().initSizes()
 
-		self.redondezdelaOrilladelNodo = 10.0
+		self.redondezdelaOrilladelNodo = 6.0
 		self.sangria_de_la_orilla = 10.0  # Es el márgen desde cada orilla, arriba desde la etiqueta.
 		# self.alturaTituloNodo = 24.0  # Es la altura de la etiqueta donde está el título.
 		self.sangria_del_titulo = 10.0
@@ -168,6 +173,7 @@ class NodoBase_Contenido(ContenidoDelNodo):
 	def initui(self):
 		self.configuraciones()
 		self.posicion_libre = [0]
+		self.lista_de_contenidos = []
 		self.contenidos()
 
 		self.calculo_de_altura = (
@@ -181,20 +187,21 @@ class NodoBase_Contenido(ContenidoDelNodo):
 	def contenidos(self):
 		self.etiqueta_1 = self.etiqueta("Tipos de entrada", 'Centro')
 		self.objeto_1 = self.entrada_de_línea(1, "Cadena")
-		self.objeto_2 = self.entrada_de_línea(2, '0', 'Númerica', QDoubleValidator())
+		self.objeto_2 = self.entrada_de_línea(2, '0', 'Entero')
 		self.objeto_3 = self.entrada_booleana(3, 1, "Booleana", True)
 		self.objeto_4 = self.lista_desplegable(4, 'Lista')
 
 	def etiqueta(self, texto_inicial = None, alineado: int | str = 1, fuente = None, altura: int = None):
+		etiqueta = QLabel(texto_inicial, self)
+
 		if fuente is None:
 			fuente = self.fuente
 		if altura is None:
 			altura = self.altura_por_defecto
-		posicion_y = self.posicion_libre[-1]
+		etiqueta.posicion_y = self.posicion_libre[-1]
 
-		etiqueta = QLabel(texto_inicial, self)
 		etiqueta.setStyleSheet('padding-left: 1px; background: transparent')
-		etiqueta.setGeometry(0, posicion_y, self.ancho_disponible, altura)
+		etiqueta.setGeometry(0, etiqueta.posicion_y, self.ancho_disponible, altura)
 		if alineado in (1, 'Izquierda'):
 			etiqueta.setAlignment(Qt.AlignLeft)
 		elif alineado in (2, 'Centro'):
@@ -202,20 +209,22 @@ class NodoBase_Contenido(ContenidoDelNodo):
 		elif alineado in (3, 'Derecha'):
 			etiqueta.setAlignment(Qt.AlignRight)
 		etiqueta.setFont(fuente)
-		self.posicion_libre.append(posicion_y + altura + self.espaciado_entre_objetos_del_nodo)
+		self.posicion_libre.append(etiqueta.posicion_y + altura + self.espaciado_entre_objetos_del_nodo)
+		self.lista_de_contenidos.append(etiqueta)
 		return etiqueta
 
 	def entrada_de_línea(
 			self, zocalo: int = None, texto_inicial: object = '', texto_etiqueta: str = None, validante: object = None,
 			altura: int = None, fuente: object = None
 			):
+		línea = QLineEdit(texto_inicial, self)
+
 		if fuente is None:
 			fuente = self.fuente
 		if altura is None:
 			altura = self.altura_por_defecto
-		posicion_y = self.posicion_libre[-1]
-
-		línea = QLineEdit(texto_inicial, self)
+		línea.altura = altura
+		línea.posicion_y = self.posicion_libre[-1]
 
 		if zocalo == 0:
 			línea.zocalo = zocalo
@@ -225,39 +234,40 @@ class NodoBase_Contenido(ContenidoDelNodo):
 			línea.zocalo = zocalo - 1
 
 		if texto_etiqueta == '' or texto_etiqueta is None:
-			línea.setGeometry(0, posicion_y, self.ancho_disponible, altura)
+			línea.setGeometry(0, línea.posicion_y, self.ancho_disponible, línea.altura)
 		else:
 			if texto_etiqueta[-1] != ':':
 				texto_etiqueta += ':'
-			etiqueta = QLabel(texto_etiqueta, self)
-			etiqueta.setGeometry(0, posicion_y, self.ancho_etiqueta, altura)
-			etiqueta.setStyleSheet('padding-left: 1px; background: transparent')
-			etiqueta.setAlignment(Qt.AlignVCenter)
-			etiqueta.setFont(fuente)
+			línea.etiqueta = QLabel(texto_etiqueta, self)
+			línea.etiqueta.setGeometry(0, línea.posicion_y, self.ancho_etiqueta, línea.altura)
+			línea.etiqueta.setStyleSheet('padding-left: 1px; background: transparent')
+			línea.etiqueta.setAlignment(Qt.AlignVCenter)
+			línea.etiqueta.setFont(fuente)
 			línea.setGeometry(
 					self.ubicación_elemento,
-					posicion_y,
+					línea.posicion_y,
 					self.ancho_elemento,
-					altura)
+					línea.altura)
 
 		línea.setAlignment(Qt.AlignCenter)
 
 		línea.setFont(fuente)
 		línea.setValidator(validante)
-		self.posicion_libre.append(posicion_y + altura + self.espaciado_entre_objetos_del_nodo)
+		self.posicion_libre.append(línea.posicion_y + línea.altura + self.espaciado_entre_objetos_del_nodo)
+		self.lista_de_contenidos.append(línea)
 		return línea
 
 	def entrada_booleana(
 			self, zocalo: int = None, valor_inicial: int = 0, texto_etiqueta: str = 'Valor',
 			indeterminado: bool = False, altura: int = 20, fuente = None
 			):
+		booleana = QCheckBox(texto_etiqueta, self)
+
 		if fuente is None:
 			fuente = self.fuente
 		if altura is None:
 			altura = self.altura_por_defecto
-		posicion_y = self.posicion_libre[-1]
-
-		booleana = QCheckBox(texto_etiqueta, self)
+		booleana.posicion_y = self.posicion_libre[-1]
 
 		if zocalo == 0:
 			booleana.zocalo = zocalo
@@ -266,25 +276,26 @@ class NodoBase_Contenido(ContenidoDelNodo):
 		else:
 			booleana.zocalo = zocalo - 1
 
-		booleana.setGeometry(0, posicion_y, self.ancho_disponible, altura)
+		booleana.setGeometry(0, booleana.posicion_y, self.ancho_disponible, altura)
 		booleana.setStyleSheet('padding-left: 1px; color: #fff; background: transparent')
 		booleana.setTristate(indeterminado)
 		booleana.setCheckState(valor_inicial)
 		booleana.setFont(fuente)
-		self.posicion_libre.append(posicion_y + altura + self.espaciado_entre_objetos_del_nodo)
+		self.posicion_libre.append(booleana.posicion_y + altura + self.espaciado_entre_objetos_del_nodo)
+		self.lista_de_contenidos.append(booleana)
 		return booleana
 
 	def lista_desplegable(
 			self, zocalo = None, texto_etiqueta: str = None, elementos_visibles: int = 10, listado: list = None,
 			separadores: list = None, popup: bool = False, fuente = None, altura: str = 20
 			):
+		lista = QComboBox(self)
+
 		if fuente is None:
 			fuente = self.fuente
 		if altura is None:
 			altura = self.altura_por_defecto
-		posicion_y = self.posicion_libre[-1]
-
-		lista = QComboBox(self)
+		lista.posicion_y = self.posicion_libre[-1]
 
 		if zocalo == 0:
 			lista.zocalo = zocalo
@@ -294,18 +305,18 @@ class NodoBase_Contenido(ContenidoDelNodo):
 			lista.zocalo = zocalo - 1
 
 		if texto_etiqueta == '' or texto_etiqueta is None:
-			lista.setGeometry(0, posicion_y, self.ancho_disponible, altura)
+			lista.setGeometry(0, lista.posicion_y, self.ancho_disponible, altura)
 		else:
 			if texto_etiqueta[-1] != ':':
 				texto_etiqueta += ':'
 			etiqueta = QLabel(texto_etiqueta, self)
-			etiqueta.setGeometry(0, posicion_y, self.ancho_etiqueta, altura)
+			etiqueta.setGeometry(0, lista.posicion_y, self.ancho_etiqueta, altura)
 			etiqueta.setStyleSheet('padding-left: 1px; background: transparent')
 			etiqueta.setAlignment(Qt.AlignVCenter)
 			etiqueta.setFont(fuente)
 			lista.setGeometry(
 					self.ubicación_elemento,
-					posicion_y,
+					lista.posicion_y,
 					self.ancho_elemento,
 					altura
 					)
@@ -321,7 +332,7 @@ class NodoBase_Contenido(ContenidoDelNodo):
 				lista.addItems(lista_por_defecto)
 		else:
 			lista.addItems(lista_por_defecto)
-
+		
 		cantidad_separadores = 0
 		if separadores is not None:
 			if len(separadores) != 0:
@@ -334,7 +345,8 @@ class NodoBase_Contenido(ContenidoDelNodo):
 		if not popup:
 			lista.setStyleSheet('combobox-popup: 0; background: #808080')
 
-		self.posicion_libre.append(posicion_y + altura + self.espaciado_entre_objetos_del_nodo)
+		self.posicion_libre.append(lista.posicion_y + altura + self.espaciado_entre_objetos_del_nodo)
+		self.lista_de_contenidos.append(lista)
 		return lista
 
 	def configuraciones(self):
@@ -389,7 +401,6 @@ class NodoBase_Contenido(ContenidoDelNodo):
 		self.objeto_3.setCheckState(data['Objeto_3'])
 		self.objeto_4.setCurrentText(data['Objeto_4'])
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # Nodo
 
@@ -406,7 +417,7 @@ class NodoBase(Nodo):
 	ClasedelContenidodeNodo = NodoBase_Contenido
 	ClasedeZocalo = NodoBase_Zocalos
 
-	def __init__(self, escena, titulo = titulo_op, entradas=[], salidas=[1, 2, 3, 4]):
+	def __init__(self, escena, titulo = titulo_op, entradas=[], salidas=[4, 1, 3, 5]):
 		super().__init__(escena, titulo, entradas, salidas)
 		self.marcarIndefinido()
 		self.actualizacion()
@@ -493,7 +504,7 @@ class NodoBase(Nodo):
 				self.Nodograficas.altoNodoparaCalculos
 				- self.Nodograficas.redondezdelaOrilladelNodo
 				- self.Nodograficas.sangria_vertical_del_titulo
-				- radio
+				- (radio * 1.5)
 				- (((num_out_of - 1) - indice) * self.espaciadoconectores)
 				- espaciado
 				)
@@ -517,7 +528,7 @@ class NodoBase(Nodo):
 					+ self.Nodograficas.sangria_vertical_del_titulo
 					+ self.Nodograficas.redondezdelaOrilladelNodo
 					+ (indice * self.espaciadoconectores)
-					+ radio
+					+ (radio * 1.5)
 					+ espaciado
 					)
 		else:
@@ -563,8 +574,8 @@ class NodoBase(Nodo):
 		self.contenido.objeto_4.currentTextChanged.connect(self.DatosdeEntradaCambiados)
 
 	def ImplementarEvaluacion(self):
-		self.EvaluacionNumerica(self.contenido.objeto_1)
-		self.EvaluacionNumerica(self.contenido.objeto_2)
+		self.Evaluacion_de_texto(self.contenido.objeto_1)
+		self.evaluacion_númerica(self.contenido.objeto_2)
 		self.EvaluacionBooleana(self.contenido.objeto_3)
 		self.EvaluacionListado(self.contenido.objeto_4)
 		self.evaluarHijos()
@@ -591,8 +602,8 @@ class NodoBase(Nodo):
 
 		for zocalo in (self.entradas + self.salidas):
 			if zocalo.esEntrada:
-				nodo_de_entrada = self.obtenerEntrada(0)
-				contrazocalo = self.obtenerContrazocalo(0)
+				nodo_de_entrada = self.obtenerEntrada(zocalo.indice)
+				contrazocalo = self.obtenerContrazocalo(zocalo.indice)
 				if not nodo_de_entrada:
 					zocalo.GraficosZocalos.setToolTip(no_calculado)
 				else:
@@ -631,9 +642,11 @@ class NodoBase(Nodo):
 			if type(valor) == str:
 				valor_resuelto = valor + ' (Cadena)'
 			elif type(valor) == int:
-				valor_resuelto = str(valor) + ' (Entero)'
+				valor_resuelto = self.formato_de_números(valor)
+				valor_resuelto += ' (Entero)'
 			elif type(valor) == float:
-				valor_resuelto = str(valor) + ' (Decimal)'
+				valor_resuelto = self.formato_de_números(valor)
+				valor_resuelto += ' (Decimal)'
 			elif type(valor) == Qt.CheckState:
 				valor_resuelto = respuesta_booleana + ' (Booleana)'
 		else:
@@ -642,9 +655,14 @@ class NodoBase(Nodo):
 			elif type(valor) == str:
 				valor_resuelto = valor
 			else:
-				valor_resuelto = str(valor)
+				valor_resuelto = self.formato_de_números(valor)
 
 		return valor_resuelto
+
+	def formato_de_números(self, número: float | int):
+		número = "{:,}".format(número)
+		número = número.replace(",", " ")
+		return número
 
 	def Evaluacion_de_texto(self, objeto):
 		self.valores[objeto.zocalo] = objeto.text()
@@ -655,22 +673,20 @@ class NodoBase(Nodo):
 
 		return self.valores[objeto.zocalo]
 
-	def Evaluacion_de_enteros(self, objeto):
-		if self.valores[objeto.zocalo] == '':
-			self.valores[objeto.zocalo] = 0
+	def evaluacion_númerica(self, objeto):
+		if objeto.text() in ('', '.', '-', '+'):
+			valor = 0
+		else:
+			valor = "".join(objeto.text().split())
 
-		self.valores[objeto.zocalo] = int(objeto.text())
-		self.marcarIndefinido(False)
-		self.marcarInvalido(False)
-		self.Nodograficas.setToolTip("")
+		valor = float(valor)
 
-		return self.valores[objeto.zocalo]
+		decimales, entero = math.modf(valor)
 
-	def Evaluacion_de_decimales(self, objeto):
-		if self.valores[objeto.zocalo] == '':
-			self.valores[objeto.zocalo] = 0.0
+		if decimales == 0.0:
+			valor = int(valor)
 
-		self.valores[objeto.zocalo] = float(objeto.text())
+		self.valores[objeto.zocalo] = valor
 		self.marcarIndefinido(False)
 		self.marcarInvalido(False)
 		self.Nodograficas.setToolTip("")

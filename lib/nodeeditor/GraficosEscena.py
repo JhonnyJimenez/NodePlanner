@@ -60,10 +60,12 @@ class GraficosEscena(QGraphicsScene):
 				lineas_claras.append(QLine(izquierda, y, derecha, y))
 			else:
 				lineas_oscuras.append(QLine(izquierda, y, derecha, y))
-				
+
 		# Las líneas.
-		painter.setPen(self._LapizClaro)
-		painter.drawLines(*lineas_claras)
-		
-		painter.setPen(self._LapizOscuro)
-		painter.drawLines(*lineas_oscuras)
+		if lineas_claras != []:
+			painter.setPen(self._LapizClaro)
+			painter.drawLines(*lineas_claras)
+
+		if lineas_oscuras != []:
+			painter.setPen(self._LapizOscuro)
+			painter.drawLines(*lineas_oscuras)

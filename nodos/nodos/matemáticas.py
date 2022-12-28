@@ -28,9 +28,9 @@ class Matemáticas_Contenido(Entradas_Contenido):
 				"Coseno, hiperbólico", "Tangente hiperbólica", "A radianes", "A grados"
 				]
 		self.objeto_1 = self.lista_desplegable(elementos_visibles = 8, listado = operaciones)
-		self.objeto_2 = self.entrada_de_línea(1, "0.500", validante = QDoubleValidator())
-		self.objeto_3 = self.entrada_de_línea(2, "0.500", validante = QDoubleValidator())
-		self.objeto_4 = self.entrada_de_línea(3, "0.500", validante = QDoubleValidator())
+		self.objeto_2 = self.entrada_de_línea(1, "0.500", validante = VALIDANTE_NUMÉRICO)
+		self.objeto_3 = self.entrada_de_línea(2, "0.500", validante = VALIDANTE_NUMÉRICO)
+		self.objeto_4 = self.entrada_de_línea(3, "0.500", validante = VALIDANTE_NUMÉRICO)
 
 	def lista_a_serializar(self, res):
 		res['Objeto_1'] = self.objeto_1.currentText()
@@ -61,6 +61,7 @@ class Matemáticas(Entradas):
 		self.contenido.objeto_1.currentTextChanged.connect(self.DatosdeEntradaCambiados)
 		self.contenido.objeto_2.textChanged.connect(self.DatosdeEntradaCambiados)
 		self.contenido.objeto_3.textChanged.connect(self.DatosdeEntradaCambiados)
+		self.contenido.objeto_4.textChanged.connect(self.DatosdeEntradaCambiados)
 
 	def ImplementarEvaluacion(self):
 		operacion = self.contenido.objeto_1.currentText()
@@ -328,10 +329,14 @@ class Matemáticas(Entradas):
 				print("Indice %s: Valor por defecto" % contador)
 			else:
 				try:
-					if valor in ('-', '.', ''):
+					if valor in ('-', '.', '', '+'):
 						valor = 0
 					else:
-						valor = float(valor)
+						if type(valor) is str:
+							valor = "".join(valor.split())
+							valor = float(valor)
+						else:
+							pass
 				except:
 					if operacion == 'Adicionar' and type(valor) == str:
 						pass
