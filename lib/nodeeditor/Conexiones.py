@@ -26,9 +26,9 @@ class Conexion(Serializable):
 		self._tipo_de_conexion = tipo_de_conexion
 		
 		# Crear instancia de Graficos de conexión.
-		self.GraficosDeConexion = self.crearInstanciadeClasedeConexion()
+		self.graficador_de_conexiones = self.crear_instancia_de_la_clase_de_conexion()
 		
-		self.escena.agregarconexion(self)
+		self.escena.agregar_conexión(self)
 	
 	def __str__(self):
 		return "<Conexion %s..%s -- S:%s E:%s>" % (hex(id(self))[2:5], hex(id(self))[-3:], self.zocalo_origen, self.zocalo_final)
@@ -73,22 +73,22 @@ class Conexion(Serializable):
 		self._tipo_de_conexion = value
 		
 		# Actualizar el calculador de ruta.
-		self.GraficosDeConexion.crearCalculadordeRutadeConexion()
+		self.graficador_de_conexiones.crear_calculador_de_la_ruta()
 		
 		if self.zocalo_origen is not None:
 			self.posiciones_actualizadas()
 			
 	@classmethod
-	def obtenerValidantesdeConexion(cls):
+	def obtener_validantes_de_conexiones(cls):
 		return cls.Validantes_de_conexion
 	
 	@classmethod
-	def agregarValidantesdeConexion(cls, validator_callback):
+	def agregar_validantes_de_conexiones(cls, validator_callback):
 		cls.Validantes_de_conexion.append(validator_callback)
 	
 	@classmethod
-	def validarConexion(cls, zocalo_origen, zocalo_final):
-		for validantes in cls.obtenerValidantesdeConexion():
+	def validar_conexión(cls, zocalo_origen, zocalo_final):
+		for validantes in cls.obtener_validantes_de_conexiones():
 			if not validantes(zocalo_origen, zocalo_final):
 				return False
 		return True
@@ -99,40 +99,40 @@ class Conexion(Serializable):
 		if self.zocalo_final == del_zocalo:
 			self.zocalo_final = al_zocalo
 		
-	def obtenerClasedeGraficosdeConexion(self):
+	def obtener_clase_del_graficador_de_conexion(self):
 		return GraficosdeConexion
 		
-	def crearInstanciadeClasedeConexion(self):
-		self.GraficosDeConexion = self.obtenerClasedeGraficosdeConexion()(self)
-		self.escena.GraficosEsc.addItem(self.GraficosDeConexion)
+	def crear_instancia_de_la_clase_de_conexion(self):
+		self.graficador_de_conexiones = self.obtener_clase_del_graficador_de_conexion()(self)
+		self.escena.graficador_de_la_escena.addItem(self.graficador_de_conexiones)
 		if self.zocalo_origen is not None:
 			self.posiciones_actualizadas()
-		return self.GraficosDeConexion
+		return self.graficador_de_conexiones
 	
-	def obtenerOtrosZocalos(self, zocalo_conocido):
+	def obtener_otros_zocalos(self, zocalo_conocido):
 		return self.zocalo_origen if zocalo_conocido == self.zocalo_final else self.zocalo_final
 	
-	def hacerSeleccion(self, nuevo_estado=True):
-		self.GraficosDeConexion.hacerSeleccion(nuevo_estado)
+	def hacer_selección(self, nuevo_estado=True):
+		self.graficador_de_conexiones.hacer_selección(nuevo_estado)
 	
 	def posiciones_actualizadas(self):
 		posicion_base = self.zocalo_origen.posicion_zocalo()
 		posicion_base[0] += self.zocalo_origen.nodo.Nodograficas.pos().x()
 		posicion_base[1] += self.zocalo_origen.nodo.Nodograficas.pos().y()
-		self.GraficosDeConexion.punto_origen(*posicion_base)
+		self.graficador_de_conexiones.punto_origen(*posicion_base)
 		if self.zocalo_final is not None:
 			posicion_final = self.zocalo_final.posicion_zocalo()
 			posicion_final[0] += self.zocalo_final.nodo.Nodograficas.pos().x()
 			posicion_final[1] += self.zocalo_final.nodo.Nodograficas.pos().y()
-			self.GraficosDeConexion.punto_destino(*posicion_final)
+			self.graficador_de_conexiones.punto_destino(*posicion_final)
 		else:
-			self.GraficosDeConexion.punto_destino(*posicion_base)
+			self.graficador_de_conexiones.punto_destino(*posicion_base)
 			
 		if DEBUGZOCALOS:
 			print(" Origen:", self.zocalo_origen)
 			print(" Final:", self.zocalo_final)
 
-		self.GraficosDeConexion.update()
+		self.graficador_de_conexiones.update()
 	
 	def quitar_de_zocalos(self):
 		# if self.zocalo_origen is not None:
@@ -146,13 +146,13 @@ class Conexion(Serializable):
 		zocalos_antiguos = [self.zocalo_origen, self.zocalo_final]
 		
 		if DEBUG: print(" - Ocultando conexiones")
-		self.GraficosDeConexion.hide()
+		self.graficador_de_conexiones.hide()
 		
-		if DEBUG: print("	Quitando los gráficos de las conexiones.", self.GraficosDeConexion)
-		self.escena.GraficosEsc.removeItem(self.GraficosDeConexion)
-		if DEBUG: print("   Graficos de conexión:", self.GraficosDeConexion)
+		if DEBUG: print("	Quitando los gráficos de las conexiones.", self.graficador_de_conexiones)
+		self.escena.graficador_de_la_escena.removeItem(self.graficador_de_conexiones)
+		if DEBUG: print("   Graficos de conexión:", self.graficador_de_conexiones)
 		
-		self.escena.GraficosEsc.update()
+		self.escena.graficador_de_la_escena.update()
 		
 		if DEBUG:
 			print('@ Quitando la conexión', self)
@@ -160,7 +160,7 @@ class Conexion(Serializable):
 		self.quitar_de_zocalos()
 		if DEBUG: print('	Quitando conexiones de la escena.')
 		try:
-			self.escena.eliminarconexion(self)
+			self.escena.eliminar_conexión(self)
 		except ValueError:
 			pass
 		if DEBUG: print('	Todo salió bien.')
@@ -175,30 +175,30 @@ class Conexion(Serializable):
 						continue
 						
 					# Notificar a los nodos de los zócalos.
-					zocalo.nodo.DatosdeConexionCambiados(self)  # (Comenté está línea porque el método está vacío y me
+					zocalo.nodo.datos_de_conexion_cambiados(self)  # (Comenté está línea porque el método está vacío y me
 					# daba error al tratar de implementar algo en ese método vacío).
-					if zocalo.esEntrada: zocalo.nodo.DatosdeEntradaCambiados(zocalo)
+					if zocalo.es_entrada: zocalo.nodo.datos_de_entrada_cambiados(zocalo)
 		except Exception as e: dump_exception(e)
 		
-	def serializacion(self):
+	def serialización(self):
 		return OrderedDict([
-			('id', self.id),
-			('Tipo_de_conexion', self.tipo_de_conexion),
-			('Zocalo_de_origen', self.zocalo_origen.id if self.zocalo_origen is not None else None),
-			('Zocalo_de_destino', self.zocalo_final.id if self.zocalo_final is not None else None),
+			('ID', self.id),
+			('Tipo de conexión', self.tipo_de_conexion),
+			('Zócalo de origen', self.zocalo_origen.id if self.zocalo_origen is not None else None),
+			('Zócalo de destino', self.zocalo_final.id if self.zocalo_final is not None else None),
 		])
 	
-	def deserializacion(self, data, hashmap={}, restaure_id=True, *args, **kwargs):
-		if restaure_id: self.id = data['id']
-		self.zocalo_origen = hashmap[data['Zocalo_de_origen']]
-		self.zocalo_final = hashmap[data['Zocalo_de_destino']]
-		self.tipo_de_conexion = data['Tipo_de_conexion']
+	def deserialización(self, data, hashmap={}, restaure_id=True, *args, **kwargs):
+		if restaure_id: self.id = data['ID']
+		self.zocalo_origen = hashmap[data['Zócalo de origen']]
+		self.zocalo_final = hashmap[data['Zócalo de destino']]
+		self.tipo_de_conexion = data['Tipo de conexión']
 
 # Ejemplo de uso de validantes para conexiones.
 # Puedes registrar (en mi codigo lo llame «agregar») los validantes que  gustes, pero...
-# Sin embargo, si usas una conexion sobreescrita, tienes que llamar obtenerValidantesdeConexion en la clase sobreescrita.
+# Sin embargo, si usas una conexion sobreescrita, tienes que llamar obtener_validantes_de_conexiones en la clase sobreescrita.
 
 from lib.nodeeditor.ValidantesdeConexion import *
-# Conexion.agregarValidantesdeConexion(edge_validator_debug)
-Conexion.agregarValidantesdeConexion(invalidar_conexion_de_doble_entrada_o_salida)
-Conexion.agregarValidantesdeConexion(invalidar_conexiones_entre_el_mismo_nodo)
+# Conexion.agregar_validantes_de_conexiones(edge_validator_debug)
+Conexion.agregar_validantes_de_conexiones(invalidar_conexion_de_doble_entrada_o_salida)
+Conexion.agregar_validantes_de_conexiones(invalidar_conexiones_entre_el_mismo_nodo)

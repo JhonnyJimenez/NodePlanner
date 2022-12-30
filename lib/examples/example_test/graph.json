@@ -1,109 +1,109 @@
 {
-    "id": 1605609370816,
-    "Escena_Ancho": 64000,
-    "Escena_Alto": 64000,
+    "ID": 1605609370816,
+    "Anchura de la escena": 64000,
+    "Altura de la escena": 64000,
     "Nodos": [
         {
-            "id": 1605609453696,
-            "Titulo": "Nodo cronista",
-            "Pos_x": -83.0,
-            "Pos_y": -257.0,
+            "ID": 1605609453696,
+            "Título": "Nodo cronista",
+            "Posición X": -83.0,
+            "Posición Y": -257.0,
             "Entradas": [
                 {
-                    "id": 1605609679952,
-                    "Indice": 0,
-                    "Posicion": 1,
-                    "Tipo_de_zocalo": 0
+                    "ID": 1605609679952,
+                    "Índice": 0,
+                    "Posición": 1,
+                    "Tipo de zócalo": 0
                 },
                 {
-                    "id": 1605609680000,
-                    "Indice": 1,
-                    "Posicion": 1,
-                    "Tipo_de_zocalo": 0
+                    "ID": 1605609680000,
+                    "Índice": 1,
+                    "Posición": 1,
+                    "Tipo de zócalo": 0
                 },
                 {
-                    "id": 1605609680048,
-                    "Indice": 2,
-                    "Posicion": 1,
-                    "Tipo_de_zocalo": 0
+                    "ID": 1605609680048,
+                    "Índice": 2,
+                    "Posición": 1,
+                    "Tipo de zócalo": 0
                 }
             ],
             "Salidas": [
                 {
-                    "id": 1605609680192,
-                    "Indice": 0,
-                    "Posicion": 4,
-                    "Tipo_de_zocalo": 1
+                    "ID": 1605609680192,
+                    "Índice": 0,
+                    "Posición": 4,
+                    "Tipo de zócalo": 1
                 }
             ],
             "Contenido": {}
         },
         {
-            "id": 1605609453744,
-            "Titulo": "Nodo de personaje",
-            "Pos_x": 170.0,
-            "Pos_y": -24.0,
+            "ID": 1605609453744,
+            "Título": "Nodo de personaje",
+            "Posición X": 170.0,
+            "Posición Y": -24.0,
             "Entradas": [
                 {
-                    "id": 1605609680480,
-                    "Indice": 0,
-                    "Posicion": 2,
-                    "Tipo_de_zocalo": 3
+                    "ID": 1605609680480,
+                    "Índice": 0,
+                    "Posición": 2,
+                    "Tipo de zócalo": 3
                 },
                 {
-                    "id": 1605609680528,
-                    "Indice": 1,
-                    "Posicion": 2,
-                    "Tipo_de_zocalo": 3
+                    "ID": 1605609680528,
+                    "Índice": 1,
+                    "Posición": 2,
+                    "Tipo de zócalo": 3
                 },
                 {
-                    "id": 1605609680624,
-                    "Indice": 2,
-                    "Posicion": 2,
-                    "Tipo_de_zocalo": 3
+                    "ID": 1605609680624,
+                    "Índice": 2,
+                    "Posición": 2,
+                    "Tipo de zócalo": 3
                 }
             ],
             "Salidas": [
                 {
-                    "id": 1605609680720,
-                    "Indice": 0,
-                    "Posicion": 5,
-                    "Tipo_de_zocalo": 1
+                    "ID": 1605609680720,
+                    "Índice": 0,
+                    "Posición": 5,
+                    "Tipo de zócalo": 1
                 }
             ],
             "Contenido": {}
         },
         {
-            "id": 1605609453792,
-            "Titulo": "Nodo de juguete",
-            "Pos_x": -320.0,
-            "Pos_y": -14.0,
+            "ID": 1605609453792,
+            "Título": "Nodo de juguete",
+            "Posición X": -320.0,
+            "Posición Y": -14.0,
             "Entradas": [
                 {
-                    "id": 1605609681008,
-                    "Indice": 0,
-                    "Posicion": 3,
-                    "Tipo_de_zocalo": 2
+                    "ID": 1605609681008,
+                    "Índice": 0,
+                    "Posición": 3,
+                    "Tipo de zócalo": 2
                 },
                 {
-                    "id": 1605609681056,
-                    "Indice": 1,
-                    "Posicion": 3,
-                    "Tipo_de_zocalo": 2
+                    "ID": 1605609681056,
+                    "Índice": 1,
+                    "Posición": 3,
+                    "Tipo de zócalo": 2
                 },
                 {
-                    "id": 1605609681152,
-                    "Indice": 2,
-                    "Posicion": 3,
-                    "Tipo_de_zocalo": 2
+                    "ID": 1605609681152,
+                    "Índice": 2,
+                    "Posición": 3,
+                    "Tipo de zócalo": 2
                 }
             ],
             "Salidas": [
                 {
-                    "id": 1605609681248,
-                    "Indice": 0,
-                    "Posicion": 6,
-                    "Tipo_de_zocalo": 1
+                    "ID": 1605609681248,
+                    "Índice": 0,
+                    "Posición": 6,
+                    "Tipo de zócalo": 1
                 }
             ],
             "Contenido": {}
@@ -111,22 +111,22 @@
     ],
     "Conexiones": [
         {
-            "id": 1605609684800,
-            "Tipo_de_conexion": 2,
-            "Zocalo_de_origen": 1605609681248,
-            "Zocalo_de_destino": 1605609680048
+            "ID": 1605609684800,
+            "Tipo de conexión": 2,
+            "Zócalo de origen": 1605609681248,
+            "Zócalo de destino": 1605609680048
         },
         {
-            "id": 1605609743520,
-            "Tipo_de_conexion": 2,
-            "Zocalo_de_origen": 1605609680192,
-            "Zocalo_de_destino": 1605609680528
+            "ID": 1605609743520,
+            "Tipo de conexión": 2,
+            "Zócalo de origen": 1605609680192,
+            "Zócalo de destino": 1605609680528
         },
         {
-            "id": 1605609680432,
-            "Tipo_de_conexion": 2,
-            "Zocalo_de_origen": 1605609680720,
-            "Zocalo_de_destino": 1605609681008
+            "ID": 1605609680432,
+            "Tipo de conexión": 2,
+            "Zócalo de origen": 1605609680720,
+            "Zócalo de destino": 1605609681008
         }
     ]
 }

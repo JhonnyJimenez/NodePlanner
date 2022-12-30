@@ -5,8 +5,8 @@ imagen = "C:/Users/Maste/Downloads/icons/square foot.svg"
 
 
 class Matemáticas_Graficador(Entradas_Graficador):
-	def initSizes(self):
-		super().initSizes()
+	def init_sizes(self):
+		super().init_sizes()
 		self.anchoNodo = 120
 		self.altoNodo = 164
 		self.altoNodoparaCalculos = self.altoNodo
@@ -44,7 +44,7 @@ class Matemáticas_Contenido(Entradas_Contenido):
 		self.objeto_3.setText(data['Objeto_3'])
 		self.objeto_4.setText(data['Objeto_4'])
 
-@registrar_nodo(NODO_MATEMÁTICO)
+# @registrar_nodo(NODO_MATEMÁTICO)
 class Matemáticas(Entradas):
 	icono = imagen
 	codigo_op = NODO_MATEMÁTICO
@@ -58,10 +58,10 @@ class Matemáticas(Entradas):
 		super().__init__(escena, titulo, entradas, salidas)
 
 	def actualizacion(self):
-		self.contenido.objeto_1.currentTextChanged.connect(self.DatosdeEntradaCambiados)
-		self.contenido.objeto_2.textChanged.connect(self.DatosdeEntradaCambiados)
-		self.contenido.objeto_3.textChanged.connect(self.DatosdeEntradaCambiados)
-		self.contenido.objeto_4.textChanged.connect(self.DatosdeEntradaCambiados)
+		self.contenido.objeto_1.currentTextChanged.connect(self.datos_de_entrada_cambiados)
+		self.contenido.objeto_2.textChanged.connect(self.datos_de_entrada_cambiados)
+		self.contenido.objeto_3.textChanged.connect(self.datos_de_entrada_cambiados)
+		self.contenido.objeto_4.textChanged.connect(self.datos_de_entrada_cambiados)
 
 	def ImplementarEvaluacion(self):
 		operacion = self.contenido.objeto_1.currentText()
@@ -116,11 +116,11 @@ class Matemáticas(Entradas):
 			valor_3 = 0.5
 
 		if self.oculto_por_metodo_2 and self.oculto_por_metodo_3:
-			self.Nodograficas.altoNodo = 114
+			self.Nodograficas.altura_del_nodo = 114
 		elif self.oculto_por_metodo_3:
-			self.Nodograficas.altoNodo = 139
+			self.Nodograficas.altura_del_nodo = 139
 		else:
-			self.Nodograficas.altoNodo = 164
+			self.Nodograficas.altura_del_nodo = 164
 
 		self.definir_entradas(operacion, valor_1, valor_2, valor_3)
 
@@ -135,10 +135,10 @@ class Matemáticas(Entradas):
 
 		self.valores[0] = resultado
 
-		self.marcarIndefinido(False)
-		self.marcarInvalido(False)
+		self.marcar_indefinido(False)
+		self.marcar_inválido(False)
 		self.Nodograficas.setToolTip("")
-		self.evaluarHijos()
+		self.evaluar_hijos()
 
 		return self.valores[0]
 

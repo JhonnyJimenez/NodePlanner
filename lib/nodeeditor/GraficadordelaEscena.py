@@ -5,9 +5,9 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 
-class GraficosEscena(QGraphicsScene):
-	objetoSeleccionado = pyqtSignal()
-	objetosNoSeleccionados = pyqtSignal()
+class GraficadordelaEscena(QGraphicsScene):
+	objeto_seleccionado = pyqtSignal()
+	objetos_no_seleccionados = pyqtSignal()
 	
 	def __init__(self, escena, parent=None):
 		super().__init__(parent)

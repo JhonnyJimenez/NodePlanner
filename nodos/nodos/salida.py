@@ -1,6 +1,6 @@
 from nodos.categorías.salidas import *
 
-@registrar_nodo(NODO_SALIDA)
+# @registrar_nodo(NODO_SALIDA)
 class Salida(Salidas):
 	icono = imagen
 	codigo_op = NODO_SALIDA

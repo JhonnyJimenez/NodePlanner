@@ -1,22 +1,22 @@
-from np_nodo_base import *
+from nodos.nodo_base.np_nodo_base import *
 
 imagen = "C:/Users/Maste/Downloads/icons/edit.svg"
 
 
-class Entradas_Graficador(NodoBase_Graficador):
-	def initSizes(self):
-		super().initSizes()
+class Entradas_Graficador(NodoBaseGraficador):
+	def init_sizes(self):
+		super().init_sizes()
 		self.anchoNodo = 120
 		self.altoNodo = 139
 		self.altoNodoparaCalculos = self.altoNodo
 		self.calculo_de_altura_disponible()
 
-	def initAssets(self):
-		super().initAssets()
+	def init_assets(self):
+		super().init_assets()
 		self._relleno_titulo_nodo = QBrush(QColor("#FF83314A"))
 
 
-class Entradas_Contenido(NodoBase_Contenido):
+class Entradas_Contenido(NodoBaseContenido):
 	def contenidos(self):
 		self.objeto_1 = self.entrada_de_línea(1, "")
 		self.objeto_2 = self.entrada_de_línea(2, "0", validante = QIntValidator())
@@ -50,10 +50,10 @@ class Entradas(NodoBase):
 		super().__init__(escena, titulo, entradas, salidas)
 
 	def actualizacion(self):
-		self.contenido.objeto_1.textChanged.connect(self.DatosdeEntradaCambiados)
-		self.contenido.objeto_2.textChanged.connect(self.DatosdeEntradaCambiados)
-		self.contenido.objeto_3.textChanged.connect(self.DatosdeEntradaCambiados)
-		self.contenido.objeto_4.stateChanged.connect(self.DatosdeEntradaCambiados)
+		self.contenido.objeto_1.textChanged.connect(self.datos_de_entrada_cambiados)
+		self.contenido.objeto_2.textChanged.connect(self.datos_de_entrada_cambiados)
+		self.contenido.objeto_3.textChanged.connect(self.datos_de_entrada_cambiados)
+		self.contenido.objeto_4.stateChanged.connect(self.datos_de_entrada_cambiados)
 
 	def ediciones_de_espaciado(self):
 		pass
@@ -63,4 +63,4 @@ class Entradas(NodoBase):
 		self.Evaluacion_de_texto(self.contenido.objeto_2)
 		self.Evaluacion_de_texto(self.contenido.objeto_3)
 		self.EvaluacionBooleana(self.contenido.objeto_4)
-		self.evaluarHijos()
+		self.evaluar_hijos()

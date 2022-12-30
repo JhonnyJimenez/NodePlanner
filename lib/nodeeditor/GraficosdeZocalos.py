@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QGraphicsItem, QStyleOptionGraphicsItem
+from PyQt5.QtGui import QColor, QBrush, QPen
+from PyQt5.QtCore import Qt, QRectF
 
 COLORES_DE_ZOCALOS =[
 	QColor("#FFFF7700"),
@@ -11,7 +11,7 @@ COLORES_DE_ZOCALOS =[
 	QColor("#FFdbe220"),
 ]
 
-class GraficosDeZocalos(QGraphicsItem):
+class GraficosdeZocalos(QGraphicsItem):
 	def __init__(self, zocalo):
 		super().__init__(zocalo.nodo.Nodograficas)
 		
@@ -21,24 +21,24 @@ class GraficosDeZocalos(QGraphicsItem):
 		
 		self.radio = 6.0
 		self.grosor_contorno = 1.0
-		self.initAssets()
+		self.init_assets()
 	
 	@property
 	def tipo_zocalo(self):
 		return self.zocalo.tipo_zocalo
 		
-	def obtenerColorparaelZocalo(self, key):
+	def obtener_color_para_el_zocalo(self, key):
 		if type(key) == int: return COLORES_DE_ZOCALOS[key]
 		elif type(key) == str: return QColor(key)
 		return Qt.transparent
 	
-	def cambiarTipoZocalo(self):
-		self._color_de_fondo = self.obtenerColorparaelZocalo(self.tipo_zocalo)
+	def cambiar_tipo_de_zocalo(self):
+		self._color_de_fondo = self.obtener_color_para_el_zocalo(self.tipo_zocalo)
 		self._brush = QBrush(self._color_de_fondo)
 		self.update()
 		
-	def initAssets(self):
-		self._color_de_fondo = self.obtenerColorparaelZocalo(self.tipo_zocalo)
+	def init_assets(self):
+		self._color_de_fondo = self.obtener_color_para_el_zocalo(self.tipo_zocalo)
 		self._color_contorno = QColor("#FF000000")
 		self._color_highlight = QColor("#FF37A6FF")
 		
@@ -48,7 +48,7 @@ class GraficosDeZocalos(QGraphicsItem):
 		self._pen_highlight.setWidthF(2.0)
 		self._brush = QBrush(self._color_de_fondo)
 		
-	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
+	def paint(self, painter, estilo: QStyleOptionGraphicsItem, widget=None):
 		# Dibujando el círculo
 		painter.setBrush(self._brush)
 		painter.setPen(self._pen if not self.isHighlighted else self._pen_highlight)
@@ -62,6 +62,6 @@ class GraficosDeZocalos(QGraphicsItem):
 			2 * (self.radio + self.grosor_contorno),
 		)
 	
-	def mousePressEvent(self, QGraphicsSceneMouseEvent):
-		pass
-		# print('El zócalo ha sido presionado')
+	# def mousePressEvent(self, QGraphicsSceneMouseEvent):
+	# 	pass
+	# 	# print('El zócalo ha sido presionado')

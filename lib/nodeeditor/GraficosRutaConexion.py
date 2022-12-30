@@ -31,8 +31,8 @@ class EnrutadorBezier(GraficosdeLineaBasedeConexion):
 		cpy_d = 0
 		
 		if self.owner.linea.zocalo_origen is not None:
-			zoc_ini = self.owner.linea.zocalo_origen.esEntrada
-			zoc_fin = self.owner.linea.zocalo_origen.esSalida
+			zoc_ini = self.owner.linea.zocalo_origen.es_entrada
+			zoc_fin = self.owner.linea.zocalo_origen.es_salida
 			
 			if (o[0] > d[0] and zoc_fin) or (o[0] < d[0] and zoc_ini):
 				cpx_d *= -1

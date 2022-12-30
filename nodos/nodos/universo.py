@@ -1,22 +1,22 @@
-from np_nodo_base import *
+from nodos.nodo_base.np_nodo_base import *
 
 imagen = "C:/Users/Maste/Downloads/icons/star.svg"
 
 
-class Universo_Graficador(NodoBase_Graficador):
-	def initSizes(self):
-		super().initSizes()
+class Universo_Graficador(NodoBaseGraficador):
+	def init_sizes(self):
+		super().init_sizes()
 		self.anchoNodo = 120
 		self.altoNodo = 114
 		self.altoNodoparaCalculos = self.altoNodo
 		self.calculo_de_altura_disponible()
 
-	def initAssets(self):
-		super().initAssets()
+	def init_assets(self):
+		super().init_assets()
 		self._relleno_titulo_nodo = QBrush(QColor("#FF1D2546"))
 
 
-class Universo_Contenido(NodoBase_Contenido):
+class Universo_Contenido(NodoBaseContenido):
 	def contenidos(self):
 		self.objeto_1 = self.entrada_de_línea(1, "", "Nombre")
 		self.etiqueta_1 = self.etiqueta("", "Centro")
@@ -37,7 +37,7 @@ class Universo_Contenido(NodoBase_Contenido):
 		self.objeto_2.setText(data['Objeto_2'])
 
 
-@registrar_nodo(NODO_UNIVERSO)
+# @registrar_nodo(NODO_UNIVERSO)
 class Universo(NodoBase):
 	icono = imagen
 	codigo_op = NODO_UNIVERSO
@@ -50,9 +50,9 @@ class Universo(NodoBase):
 	def __init__(self, escena, titulo = titulo_op, entradas = [4, 2], salidas = [4, 2]):
 		super().__init__(escena, titulo, entradas, salidas)
 
-	def initConfiguraciones(self):
-		super().initConfiguraciones()
-		self.pos_det_entradas = Izquierda_arriba
+	def init_configuraciones(self):
+		super().init_configuraciones()
+		self.pos_det_entradas = IZQUIERDA_ARRIBA
 
 	def universo_real(self):
 		self.entradas[0].quitar_todas_las_conexiones(True)
@@ -62,19 +62,19 @@ class Universo(NodoBase):
 		self.contenido.etiqueta_1.show()
 
 	def actualizacion(self):
-		self.contenido.objeto_1.textChanged.connect(self.DatosdeEntradaCambiados)
-		self.contenido.objeto_2.textChanged.connect(self.DatosdeEntradaCambiados)
+		self.contenido.objeto_1.textChanged.connect(self.datos_de_entrada_cambiados)
+		self.contenido.objeto_2.textChanged.connect(self.datos_de_entrada_cambiados)
 
 	def ediciones_de_espaciado(self):
 		pass
 
-	def DatosdeEntradaCambiados(self, zocalo = None):
-		self.marcarIndefinido()
+	def datos_de_entrada_cambiados(self, zocalo = None):
+		self.marcar_indefinido()
 
 		if self.contenido.objeto_1.text() == "Universo real":
 			self.universo_real()
 
-		self.evaluar()
+		self.evaluación()
 
 	def ImplementarEvaluacion(self):
 		entrada_1 = self.obtenerContrazocalo(0)
@@ -106,7 +106,7 @@ class Universo(NodoBase):
 
 			self.valores = self.valores_entrantes
 
-		self.marcarIndefinido(False)
-		self.marcarInvalido(False)
+		self.marcar_indefinido(False)
+		self.marcar_inválido(False)
 		self.Nodograficas.setToolTip("")
-		self.evaluarHijos()
+		self.evaluar_hijos()

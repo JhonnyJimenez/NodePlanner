@@ -3,8 +3,8 @@ from np_enlistado_de_nodos import *
 
 
 class Número_Graficador(Entradas_Graficador):
-	def initSizes(self):
-		super().initSizes()
+	def init_sizes(self):
+		super().init_sizes()
 		self.altoNodo = 64
 		self.altoNodoparaCalculos = self.altoNodo
 		self.calculo_de_altura_disponible()
@@ -20,7 +20,7 @@ class Número_Contenido(Entradas_Contenido):
 	def lista_a_desearializar(self, data):
 		self.objeto_1.setText(data['Objeto_1'])
 
-@registrar_nodo(NODO_ENTRADA_NÚMERO)
+# @registrar_nodo(NODO_ENTRADA_NÚMERO)
 class Número(Entradas):
 	icono = imagen
 	codigo_op = NODO_ENTRADA_NÚMERO
@@ -34,8 +34,8 @@ class Número(Entradas):
 		super().__init__(escena, titulo, entradas, salidas)
 
 	def actualizacion(self):
-		self.contenido.objeto_1.textChanged.connect(self.DatosdeEntradaCambiados)
+		self.contenido.objeto_1.textChanged.connect(self.datos_de_entrada_cambiados)
 
 	def ImplementarEvaluacion(self):
 		self.evaluacion_númerica(self.contenido.objeto_1)
-		self.evaluarHijos()
+		self.evaluar_hijos()

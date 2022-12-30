@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsTextItem, QStyleOptionGraphicsItem, QGraphicsSceneHoverEvent
+from PyQt5.QtCore import QRectF, Qt
+from PyQt5.QtGui import QColorConstants, QFont, QColor, QPen, QBrush, QPainterPath
 
 
 class GraficosdelNodo(QGraphicsItem):
@@ -9,13 +9,13 @@ class GraficosdelNodo(QGraphicsItem):
 		self.nodo = nodo
 		
 		# init de señales
-		self.hovered = False
+		self.con_efecto_hover = False
 		self._elemento_movido = False
 		self._ultimo_estado_de_seleccion = False
 		
-		self.initSizes()
-		self.initAssets()
-		self.initUI()
+		self.init_sizes()
+		self.init_assets()
+		self.init_ui()
 	
 	@property
 	def contenido(self):
@@ -28,50 +28,50 @@ class GraficosdelNodo(QGraphicsItem):
 	@nombre.setter
 	def nombre(self, valor):
 		self._titulo = valor
-		self.titulo_del_objeto.setPlainText(self._titulo)
+		self.título_del_objeto.setPlainText(self._titulo)
 	
-	def initUI(self):
-		self.setFlag(QGraphicsItem.ItemIsSelectable)
+	def init_ui(self):
+		self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
 		self.setAcceptHoverEvents(True)
-		self.setFlag(QGraphicsItem.ItemIsMovable)
+		self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
 		
 		# init titulos
 		self.titulo_del_nodo()
 		self.nombre = self.nodo.titulo
 		
-		self.initContenido()
+		self.init_contenido()
 		
-	def initSizes(self):
-		self.redondezdelaOrilladelNodo = 10.0
-		self.sangria_de_la_orilla = 10.0
-		self.alturaTituloNodo = 24.0
-		self.sangria_del_titulo = 4.0
-		self.sangria_vertical_del_titulo = 4.0
-		self.anchoNodo = 180
-		self.altoNodo = 240
+	def init_sizes(self):
+		self.redondez_del_nodo = 10.0
+		self.márgen = 10.0
+		self.altura_del_título = 24.0
+		self.sangría_del_título = 4.0
+		self.sangría_vertical_del_título = 4.0
+		self.anchura_del_nodo = 180
+		self.altura_del_nodo = 240
 
-	def initAssets(self):
-		self._ColorDelTitulo = Qt.white
-		self._FuenteDelTitulo = QFont("Ubuntu", 9)
+	def init_assets(self):
+		self._color_del_título = QColorConstants.White
+		self._fuente_del_título = QFont("Ubuntu", 9)
 		
 		self._color = QColor("#7F000000")
 		self._color_seleccionado = QColor("#FFFFA637")
 		self._color_hovered = QColor("#FF37A6FF")
 		
-		self._pen_default = QPen(self._color)
-		self._pen_default.setWidthF(2.0)
-		self._pen_seleccionado = QPen(self._color_seleccionado)
-		self._pen_seleccionado.setWidthF(2.0)
-		self._pen_hovered = QPen(self._color_hovered)
-		self._pen_hovered.setWidthF(3.0)
+		self._lápiz_por_defecto = QPen(self._color)
+		self._lápiz_por_defecto.setWidthF(2.0)
+		self._lápiz_para_selección = QPen(self._color_seleccionado)
+		self._lápiz_para_selección.setWidthF(2.0)
+		self._efecto_hover = QPen(self._color_hovered)
+		self._efecto_hover.setWidthF(3.0)
 		
-		self._relleno_titulo_nodo = QBrush(QColor("#FF313131"))
-		self._relleno_fondo_nodo = QBrush(QColor("#E3212121"))
+		self._relleno_del_título = QBrush(QColor("#FF313131"))
+		self._relleno_del_fondo = QBrush(QColor("#E3212121"))
 	
 	def seleccionado(self):
-		self.nodo.escena.GraficosEsc.objetoSeleccionado.emit()
+		self.nodo.escena.graficador_de_la_escena.objeto_seleccionado.emit()
 		
-	def hacerSeleccion(self, nuevo_estado=True):
+	def hacer_selección(self, nuevo_estado=True):
 		self.setSelected(nuevo_estado)
 		self._ultimo_estado_de_seleccion = nuevo_estado
 		if nuevo_estado: self.seleccionado()
@@ -80,9 +80,9 @@ class GraficosdelNodo(QGraphicsItem):
 		super().mouseMoveEvent(evento)
 
 		# ¡Optimízame! ¡Solo actualizo los nodos seleccionados!
-		for nodo in self.scene().escena.Nodos:
+		for nodo in self.scene().escena.nodos:
 			if nodo.Nodograficas.isSelected():
-				nodo.actualizarconexiones()
+				nodo.actualizar_conexiones()
 		self._elemento_movido = True
 		
 	def mouseReleaseEvent(self, evento):
@@ -91,97 +91,107 @@ class GraficosdelNodo(QGraphicsItem):
 		# Control para cuando se mueve el nodo.
 		if self._elemento_movido:
 			self._elemento_movido = False
-			self.nodo.escena.historial.almacenarHistorial("Nodo movido", setModified=True)
+			self.nodo.escena.historial.almacenar_historial("Nodo movido", set_modified =True)
 			
-			self.nodo.escena.restaurarUltimoEstadodeSeleccion()
+			self.nodo.escena.restaurar_último_estado_de_selección()
 			# ToDo: Esta función ↓↓↓ hace que el historial almacene el cambio de seleccion que de hecho, se quiere evitar
 			#  al mover el nodo. Lo desactivé hasta hallar la solución en futuros tutoriales o para solucionarlo yo
-			#  mismo. El punto es que la señal que emite la variable en GraficosEscena activa el almacenamiento
+			#  mismo. El punto es que la señal que emite la variable en GraficadordelaEscena activa el almacenamiento
 			#  del historia por alguna razón.
-			# self.hacerSeleccion()
+			# self.hacer_selección()
 			
 			# Necesitamos almacenar el último estado de selección porque mover nodos también los selecciona.
-			self.nodo.escena._ultimos_objetos_seleccionados = self.nodo.escena.objetosSeleccionados()
+			self.nodo.escena._ultimos_objetos_seleccionados = self.nodo.escena.objetos_seleccionados()
 			
 			# Ahora queremos saltarnos el almacenamiento en el historial de la selección.
 			return
 			
 		# Control para cuando se selecciona el nodo.
-		if self._ultimo_estado_de_seleccion != self.isSelected() or self.nodo.escena._ultimos_objetos_seleccionados != self.nodo.escena.objetosSeleccionados():
-			self.nodo.escena.restaurarUltimoEstadodeSeleccion()
+		if self._ultimo_estado_de_seleccion != self.isSelected() or self.nodo.escena._ultimos_objetos_seleccionados != self.nodo.escena.objetos_seleccionados():
+			self.nodo.escena.restaurar_último_estado_de_selección()
 			self._ultimo_estado_de_seleccion = self.isSelected()
 			self.seleccionado()
 			
 	def mouseDoubleClickEvent(self, event):
-		self.nodo.DobleCliqueo(event)
+		self.nodo.doble_cliqueo(event)
 	
 	def hoverEnterEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
-		self.hovered = True
+		self.con_efecto_hover = True
 		self.update()
 	
 	def hoverLeaveEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
-		self.hovered = False
+		self.con_efecto_hover = False
 		self.update()
 
 	def boundingRect(self):
 		return QRectF(
 			0,
 			0,
-			self.anchoNodo,
-			self.altoNodo
+			self.anchura_del_nodo,
+			self.altura_del_nodo
 		).normalized()
 	
 	def titulo_del_nodo(self):
-		self.titulo_del_objeto = QGraphicsTextItem(self)
-		self.titulo_del_objeto.nodo = self.nodo
-		self.titulo_del_objeto.setDefaultTextColor(self._ColorDelTitulo)
-		self.titulo_del_objeto.setFont(self._FuenteDelTitulo)
-		self.titulo_del_objeto.setPos(self.sangria_del_titulo, 0)
-		self.titulo_del_objeto.setTextWidth(
-			self.anchoNodo
-			- 2 * self.sangria_del_titulo
+		self.título_del_objeto = QGraphicsTextItem(self)
+		self.título_del_objeto.nodo = self.nodo
+		self.título_del_objeto.setDefaultTextColor(self._color_del_título)
+		self.título_del_objeto.setFont(self._fuente_del_título)
+		self.título_del_objeto.setPos(self.sangría_del_título, 0)
+		self.título_del_objeto.setTextWidth(
+			self.anchura_del_nodo
+			- 2 * self.sangría_del_título
 		)
 	
-	def initContenido(self):
+	def init_contenido(self):
 		if self.contenido is not None:
-			self.contenido.setGeometry(int(self.sangria_de_la_orilla), int(self.alturaTituloNodo + self.sangria_de_la_orilla),
-									   self.anchoNodo - int((2 * self.sangria_de_la_orilla)), self.altoNodo - int((2 * self.sangria_de_la_orilla) + self.alturaTituloNodo))
+			self.contenido.setGeometry(int(self.márgen), int(self.altura_del_título + self.márgen),
+			                           self.anchura_del_nodo - int((2 * self.márgen)), self.altura_del_nodo - int((2 * self.márgen) + self.altura_del_título))
 			
 		# Obtener el QGraphicsProxy cuando está insertado en los gráficos de la escena.
-		self.GraficosContenidoNodo = self.nodo.escena.GraficosEsc.addWidget(self.contenido)
+		self.GraficosContenidoNodo = self.nodo.escena.graficador_de_la_escena.addWidget(self.contenido)
 		self.GraficosContenidoNodo.setParentItem(self)
 
-	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
-		
+	def paint(self, dibujante, estilo: QStyleOptionGraphicsItem, widget=None):
 		# Título
-		dibujado_del_titulo = QPainterPath()
-		dibujado_del_titulo.setFillRule(Qt.WindingFill)
-		dibujado_del_titulo.addRoundedRect(0, 0, self.anchoNodo, self.alturaTituloNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
-		dibujado_del_titulo.addRect(0, self.alturaTituloNodo - self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
-		dibujado_del_titulo.addRect(self.anchoNodo - self.redondezdelaOrilladelNodo, self.alturaTituloNodo - self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
-		painter.setPen(Qt.NoPen)
-		painter.setBrush(self._relleno_titulo_nodo)
-		painter.drawPath(dibujado_del_titulo.simplified())
+		etiqueta_del_título = QPainterPath()
+		etiqueta_del_título.setFillRule(Qt.FillRule.WindingFill)
+		etiqueta_del_título.addRoundedRect(
+				0, 0, self.anchura_del_nodo, self.altura_del_título,
+				self.redondez_del_nodo, self.redondez_del_nodo
+				)
+		etiqueta_del_título.addRect(
+				0, self.altura_del_título - self.redondez_del_nodo, self.anchura_del_nodo,
+				self.redondez_del_nodo
+				)
+		dibujante.setPen(Qt.PenStyle.NoPen)
+		dibujante.setBrush(self._relleno_del_título)
+		dibujante.drawPath(etiqueta_del_título.simplified())
 	
-		# Contenido
-		dibujado_del_contenido = QPainterPath()
-		dibujado_del_contenido.setFillRule(Qt.WindingFill)
-		dibujado_del_contenido.addRoundedRect(0, self.alturaTituloNodo, self.anchoNodo, self.altoNodo - self.alturaTituloNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
-		dibujado_del_contenido.addRect(0, self.alturaTituloNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
-		dibujado_del_contenido.addRect(self.anchoNodo - self.redondezdelaOrilladelNodo, self.alturaTituloNodo, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
-		painter.setPen(Qt.NoPen)
-		painter.setBrush(self._relleno_fondo_nodo)
-		painter.drawPath(dibujado_del_contenido.simplified())
+		# Relleno
+		relleno = QPainterPath()
+		relleno.setFillRule(Qt.FillRule.WindingFill)
+		relleno.addRoundedRect(
+				0, self.altura_del_título, self.anchura_del_nodo,
+				self.altura_del_nodo - self.altura_del_título, self.redondez_del_nodo,
+				self.redondez_del_nodo
+				)
+		relleno.addRect(0, self.altura_del_título, self.anchura_del_nodo, self.redondez_del_nodo)
+		dibujante.setPen(Qt.PenStyle.NoPen)
+		dibujante.setBrush(self._relleno_del_fondo)
+		dibujante.drawPath(relleno.simplified())
 		
 		# Contorno
-		dibujado_del_contorno = QPainterPath()
-		dibujado_del_contorno.addRoundedRect(-1, -1, self.anchoNodo + 2, self.altoNodo + 2, self.redondezdelaOrilladelNodo, self.redondezdelaOrilladelNodo)
-		painter.setBrush(Qt.NoBrush)
-		if self.hovered:
-			painter.setPen(self._pen_hovered)
-			painter.drawPath(dibujado_del_contorno.simplified())
-			painter.setPen(self._pen_default)
-			painter.drawPath(dibujado_del_contorno.simplified())
+		contorno = QPainterPath()
+		contorno.addRoundedRect(
+				-1, -1, self.anchura_del_nodo + 2, self.altura_del_nodo + 2, self.redondez_del_nodo,
+				self.redondez_del_nodo
+				)
+		dibujante.setBrush(Qt.BrushStyle.NoBrush)
+		if self.con_efecto_hover:
+			dibujante.setPen(self._efecto_hover)
+			dibujante.drawPath(contorno.simplified())
+			dibujante.setPen(self._lápiz_por_defecto)
+			dibujante.drawPath(contorno.simplified())
 		else:
-			painter.setPen(self._pen_default if not self.isSelected() else self._pen_seleccionado)
-			painter.drawPath(dibujado_del_contorno.simplified())
+			dibujante.setPen(self._lápiz_por_defecto if not self.isSelected() else self._lápiz_para_selección)
+			dibujante.drawPath(contorno.simplified())

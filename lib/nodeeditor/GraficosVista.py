@@ -3,7 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 
-from lib.nodeeditor.GraficosDeZocalos import GraficosDeZocalos
+from lib.nodeeditor.GraficosdeZocalos import GraficosdeZocalos
 from lib.nodeeditor.GraficosdeConexion import GraficosdeConexion
 from lib.nodeeditor.Dibujado_de_conexion import DibujadodeConexion
 from lib.nodeeditor.GraficosdeCortado import Recortado
@@ -22,14 +22,14 @@ DEBUG_CLIC_CENTRAL = True
 DEBUG_CLIC_CENTRAL_ULTIMAS_SELECCIONES = False
 
 
-class GraficosdelaVistaVP(QGraphicsView):
+class GraficadorVisual(QGraphicsView):
 	cambioPosEscena = pyqtSignal(int, int)
 	
 	def __init__(self, escena, parent=None):
 		super().__init__(parent)
 		self.escena = escena
 		
-		self.initui()
+		self.init_ui()
 		
 		self.setScene(self.escena)
 		
@@ -45,17 +45,17 @@ class GraficosdelaVistaVP(QGraphicsView):
 		self.escena.addItem(self.linea_de_recorte)
 		
 		self.ultima_posicion_del_mouse = QPoint(0, 0)
-		self.FactorAcercamiento = 1.25
-		self.ZoomClamp = True
-		self.Zoom = 6
-		self.NiveldeZoom = 1
-		self.RangodeZoom = [0, 10]
+		self.factor_de_acercamiento = 1.25
+		self.bloqueo_del_zoom = True
+		self.zoom = 6
+		self.nivel_de_zoom = 1
+		self.rango_de_zoom = [0, 10]
 		
 		# Listeners
 		self._drag_enter_listeners = []
 		self._drop_listeners = []
 		
-	def initui(self):
+	def init_ui(self):
 		self.setRenderHints(
 			QPainter.Antialiasing |
 			QPainter.HighQualityAntialiasing |
@@ -74,7 +74,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 		# Activado de arrastre y soltura de objetos.
 		self.setAcceptDrops(True)
 		
-	def reiniciarModo(self):
+	def reiniciar_modo(self):
 		self.modo = MODO_NORMAL
 		
 	def dragEnterEvent(self, event):
@@ -83,34 +83,34 @@ class GraficosdelaVistaVP(QGraphicsView):
 	def dropEvent(self, event):
 		for callback in self._drop_listeners: callback(event)
 		
-	def agregarDragEnterListener(self, callback):
+	def agregar_dragenter_listener(self, callback):
 		self._drag_enter_listeners.append(callback)
 	
-	def agregarDropListener(self, callback):
+	def agregar_drop_listener(self, callback):
 		self._drop_listeners.append(callback)
 
 	def mousePressEvent(self, event):
 		if event.button() == Qt.MiddleButton:
-			self.middleMouseButtonPress(event)
+			self.clic_central(event)
 		elif event.button() == Qt.LeftButton:
-			self.leftMouseButtonPress(event)
+			self.clic_izquierdo(event)
 		elif event.button() == Qt.RightButton:
-			self.rightMouseButtonPress(event)
+			self.clic_derecho(event)
 		else:
 			super().mousePressEvent(event)
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MiddleButton:
-			self.middleMouseButtonRelease(event)
+			self.clic_central_soltado(event)
 		elif event.button() == Qt.LeftButton:
-			self.leftMouseButtonRelease(event)
+			self.clic_izquierdo_soltado(event)
 		elif event.button() == Qt.RightButton:
-			self.rightMouseButtonRelease(event)
+			self.clic_derecho_soltado(event)
 		else:
 			super().mouseReleaseEvent(event)
 
-	def middleMouseButtonPress(self, event):
-		objeto = self.ConseguirObjetoAlCliquear(event)
+	def clic_central(self, event):
+		objeto = self.obtener_objeto_cliqueado(event)
 
 		# DEBUG print.
 		if DEBUG_CLIC_CENTRAL:
@@ -118,7 +118,7 @@ class GraficosdelaVistaVP(QGraphicsView):
 				print('MMB DEBUG: La', objeto.linea, "\n\t", objeto.linea.GraficosdeConexion if objeto.linea.GraficosdeConexion is not None else None)
 				return
 			
-			if isinstance(objeto, GraficosDeZocalos):
+			if isinstance(objeto, GraficosdeZocalos):
 				print("MMB DEBUG:", objeto.zocalo, "Tipo_de_zocalo:", objeto.zocalo.tipo_zocalo,
 					  "¿tiene conexiones?:", "No" if objeto.zocalo.Zocaloconexiones == [] else "")
 				if objeto.zocalo.Zocaloconexiones:
@@ -129,10 +129,10 @@ class GraficosdelaVistaVP(QGraphicsView):
 		if DEBUG_CLIC_CENTRAL and objeto is None:
 			print('Escena:')
 			print('   Nodo:')
-			for nodo in self.escena.escena.Nodos: print("\t", nodo)
+			for nodo in self.escena.escena.nodos: print("\t", nodo)
 			print('   Conexión:')
-			# for conexion in self.escena.escena.Conexiones: print("\t", conexion, "\n\t\tConexion:", conexion.GraficosDeConexion if conexion.GraficosDeConexion is not None else None)
-			for conexion in self.escena.escena.Conexiones: print("\t", conexion)
+			# for conexion in self.escena.escena.conexiones: print("\t", conexion, "\n\t\tConexion:", conexion.graficador_de_conexiones if conexion.graficador_de_conexiones is not None else None)
+			for conexion in self.escena.escena.conexiones: print("\t", conexion)
 			
 			if event.modifiers() & Qt.CTRL:
 				print("  Objetos graficos en la escena gráfica:")
@@ -150,14 +150,14 @@ class GraficosdelaVistaVP(QGraphicsView):
 		click_falso = QMouseEvent(event.type(), event.localPos(), event.screenPos(), Qt.LeftButton, event.buttons() | Qt.LeftButton, event.modifiers())
 		super().mousePressEvent(click_falso)
 
-	def middleMouseButtonRelease(self, event):
+	def clic_central_soltado(self, event):
 		click_falso = QMouseEvent(event.type(), event.localPos(), event.screenPos(), Qt.LeftButton, event.buttons() | Qt.LeftButton, event.modifiers())
 		super().mouseReleaseEvent(click_falso)
 		self.setDragMode(QGraphicsView.RubberBandDrag)
 
-	def leftMouseButtonPress(self, event):
+	def clic_izquierdo(self, event):
 		# Obtener el objeto donde se cliqueó.
-		objeto = self.ConseguirObjetoAlCliquear(event)
+		objeto = self.obtener_objeto_cliqueado(event)
 		
 		# Almacenamiento de la posición del último click izquierdo.
 		self.ultimo_clic = self.mapToScene(event.pos())
@@ -175,14 +175,14 @@ class GraficosdelaVistaVP(QGraphicsView):
 				return
 			
 				
-		if isinstance(objeto, GraficosDeZocalos):
+		if isinstance(objeto, GraficosdeZocalos):
 			if self.modo == MODO_NORMAL:
 				self.modo = MODO_DIBUJO
-				self.dibujado.ComenzarDibujadoConexion(objeto)
+				self.dibujado.comenzar_dibujado_de_conexión(objeto)
 				return
 
 		if self.modo == MODO_DIBUJO:
-			res = self.dibujado.FinalizarDibujadoConexion(objeto)
+			res = self.dibujado.finalizar_dibujado_de_conexión(objeto)
 			if res: return
 			
 		if objeto is None:
@@ -198,9 +198,9 @@ class GraficosdelaVistaVP(QGraphicsView):
 		
 		super().mousePressEvent(event)
 	
-	def leftMouseButtonRelease(self, event):
+	def clic_izquierdo_soltado(self, event):
 		# Obtener el objeto sobre el que se suelta el clic.
-		objeto = self.ConseguirObjetoAlCliquear(event)
+		objeto = self.obtener_objeto_cliqueado(event)
 		
 		try:
 			# Lógica.
@@ -214,12 +214,12 @@ class GraficosdelaVistaVP(QGraphicsView):
 					return
 				
 			if self.modo == MODO_DIBUJO:
-				if self.DistanciaEntreClicksEsCero(event):
-					res = self.dibujado.FinalizarDibujadoConexion(objeto)
+				if self.distancia_entre_clics_es_cero(event):
+					res = self.dibujado.finalizar_dibujado_de_conexión(objeto)
 					if res: return
 					
 			if self.modo == MODO_CORTE:
-				self.ConexionesCortadas()
+				self.conexiones_cortadas()
 				self.linea_de_recorte.linea_puntos = []
 				self.linea_de_recorte.update()
 				QApplication.setOverrideCursor(Qt.ArrowCursor)
@@ -232,31 +232,31 @@ class GraficosdelaVistaVP(QGraphicsView):
 				
 				if objetos_seleccionados_actualmente != self.escena.escena._ultimos_objetos_seleccionados:
 					if objetos_seleccionados_actualmente == []:
-						self.escena.objetosNoSeleccionados.emit()
+						self.escena.objetos_no_seleccionados.emit()
 					else:
-						self.escena.objetoSeleccionado.emit()
+						self.escena.objeto_seleccionado.emit()
 					self.escena.escena._ultimos_objetos_seleccionados = objetos_seleccionados_actualmente
 				
 				return
 			
 			# De otro modo deseleccionar todos los objetos.
 			if objeto is None:
-				self.escena.objetosNoSeleccionados.emit()
+				self.escena.objetos_no_seleccionados.emit()
 		except: dump_exception()
 			
 		super().mouseReleaseEvent(event)
 
-	def rightMouseButtonPress(self, event):
+	def clic_derecho(self, event):
 		super().mousePressEvent(event)
 
-	def rightMouseButtonRelease(self, event):
+	def clic_derecho_soltado(self, event):
 		super().mouseReleaseEvent(event)
 		
 	def mouseMoveEvent(self, event):
 		pos_esc = self.mapToScene(event.pos())
 		
 		if self.modo == MODO_DIBUJO:
-			self.dibujado.actualizarDestino(pos_esc.x(), pos_esc.y())
+			self.dibujado.actualizar_destino(pos_esc.x(), pos_esc.y())
 			
 		if self.modo == MODO_CORTE and self.linea_de_recorte is not None:
 			self.linea_de_recorte.linea_puntos.append(pos_esc)
@@ -272,15 +272,15 @@ class GraficosdelaVistaVP(QGraphicsView):
 	def keyPressEvent(self, event):
 		if event.key() == Qt.Key_Delete:
 			if not self.eventoedicion:
-				self.eliminarSeleccionado()
+				self.eliminar_seleccionado()
 			else:
 				super().keyPressEvent(event)
 		# elif event.key() == Qt.Key_S and event.modifiers() & Qt.ControlModifier:
-		#	self.escena.escena.guardarArchivo("graph.json")
+		#	self.escena.escena.guardar_archivo("graph.json")
 		# elif event.key() == Qt.Key_A and event.modifiers() & Qt.ControlModifier:
-		#	self.escena.escena.abrirArchivo("graph.json")
+		#	self.escena.escena.abrir_archivo("graph.json")
 		# elif event.key() == Qt.Key_1:
-		#	self.escena.escena.historial.almacenarHistorial("Item A")
+		#	self.escena.escena.historial.almacenar_historial("Item A")
 		# elif event.key() == Qt.Key_Z and event.modifiers() & Qt.ControlModifier and not event.modifiers() & Qt.ShiftModifier:
 		#	self.escena.escena.historial.deshacer()
 		# elif event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier and not event.modifiers() & Qt.ShiftModifier:
@@ -296,24 +296,24 @@ class GraficosdelaVistaVP(QGraphicsView):
 		super().keyPressEvent(event)
 
 
-	def ConexionesCortadas(self):
+	def conexiones_cortadas(self):
 		for ix in range(len(self.linea_de_recorte.linea_puntos) - 1):
 			p1 = self.linea_de_recorte.linea_puntos[ix]
 			p2 = self.linea_de_recorte.linea_puntos[ix + 1]
 		
-			for conexion in self.escena.escena.Conexiones.copy():
-				if conexion.GraficosDeConexion.cruzadocon(p1, p2):
+			for conexion in self.escena.escena.conexiones.copy():
+				if conexion.graficador_de_conexiones.cruzado_con(p1, p2):
 					conexion.quitar()
-		self.escena.escena.historial.almacenarHistorial("Conexión cortada borrada", setModified=True)
+		self.escena.escena.historial.almacenar_historial("Conexión cortada borrada", set_modified =True)
 			
-	def eliminarSeleccionado(self):
+	def eliminar_seleccionado(self):
 		for objeto in self.escena.selectedItems():
 			if isinstance(objeto, GraficosdeConexion):
 				objeto.linea.quitar()
 			elif hasattr(objeto, "nodo"):
 				objeto.nodo.quitar()
-		self.escena.escena.historial.almacenarHistorial("Objeto seleccionado borrado", setModified=True)
-		
+		self.escena.escena.historial.almacenar_historial("Objeto seleccionado borrado", set_modified =True)
+
 	def debug_modifiers(self, event):
 		out = ""
 		if event.modifiers() & Qt.ShiftModifier: out += "Shift"
@@ -321,13 +321,13 @@ class GraficosdelaVistaVP(QGraphicsView):
 		if event.modifiers() & Qt.AltModifier: out += "Alt"
 		return out
 		
-	def ConseguirObjetoAlCliquear(self, event):
+	def obtener_objeto_cliqueado(self, event):
 		# Devuelve el objeto sobre el que se ha clicado.
 		posicion = event.pos()
 		objeto = self.itemAt(posicion)
 		return objeto
 	
-	def DistanciaEntreClicksEsCero(self, event):
+	def distancia_entre_clics_es_cero(self, event):
 		# Medidas si nosotros estamos muy lejos de la posición del último clic dado.
 		nuevo_ultimo_clic = self.mapToScene(event.pos())
 		dist_de_clics = nuevo_ultimo_clic - self.ultimo_clic
@@ -336,22 +336,22 @@ class GraficosdelaVistaVP(QGraphicsView):
 
 	def wheelEvent(self, event):
 		# Cálculo del factor de zoom.
-		factoralejamiento = 1 / self.FactorAcercamiento
+		factor_de_alejamiento = 1 / self.factor_de_acercamiento
 		
 		# Cálculo del zoom
 		if event.angleDelta().y() > 0:
-			factor_de_zoom = self.FactorAcercamiento
-			self.Zoom += self.NiveldeZoom
+			factor_de_zoom = self.factor_de_acercamiento
+			self.zoom += self.nivel_de_zoom
 		else:
-			factor_de_zoom = factoralejamiento
-			self.Zoom -= self.NiveldeZoom
+			factor_de_zoom = factor_de_alejamiento
+			self.zoom -= self.nivel_de_zoom
 		
-		clamped = False
-		if self.Zoom < self.RangodeZoom[0]:
-			self.Zoom, clamped = self.RangodeZoom[0], True
-		if self.Zoom > self.RangodeZoom[1]:
-			self.Zoom, clamped = self.RangodeZoom[1], True
+		bloqueo_del_zoom = False
+		if self.zoom < self.rango_de_zoom[0]:
+			self.zoom, bloqueo_del_zoom = self.rango_de_zoom[0], True
+		if self.zoom > self.rango_de_zoom[1]:
+			self.zoom, bloqueo_del_zoom = self.rango_de_zoom[1], True
 		
 		# Configuración de la escala de la escena.
-		if not clamped or self.ZoomClamp is False:
+		if not bloqueo_del_zoom or self.bloqueo_del_zoom is False:
 			self.scale(factor_de_zoom, factor_de_zoom)

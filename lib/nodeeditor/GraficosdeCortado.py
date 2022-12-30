@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QGraphicsItem, QStyleOptionGraphicsItem
+from PyQt5.QtGui import QPen, QPolygonF, QPainterPath, QPainter
+from PyQt5.QtCore import Qt, QPointF
 
 
 class Recortado(QGraphicsItem):
@@ -31,7 +31,7 @@ class Recortado(QGraphicsItem):
 		
 		return ruta
 	
-	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
+	def paint(self, painter, estilo: QStyleOptionGraphicsItem, widget=None):
 		painter.setRenderHint(QPainter.Antialiasing)
 		painter.setBrush(Qt.NoBrush)
 		painter.setPen(self._pen)

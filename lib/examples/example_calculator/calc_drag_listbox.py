@@ -1,6 +1,6 @@
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QPixmap, QIcon, QDrag
+from PyQt5.QtCore import QSize, Qt, QByteArray, QDataStream, QIODevice, QMimeData, QPoint
+from PyQt5.QtWidgets import QListWidget, QAbstractItemView, QListWidgetItem
 
 from lib.examples.example_calculator.calc_config import *
 from lib.nodeeditor.Utilidades import dump_exception
@@ -9,25 +9,25 @@ from lib.nodeeditor.Utilidades import dump_exception
 class Listbox(QListWidget):
 	def __init__(self, parent=None):
 		super().__init__()
-		self.initUI()
+		self.init_ui()
 		
-	def initUI(self):
+	def init_ui(self):
 		# init
 		self.setIconSize(QSize(32, 32))
-		self.setSelectionMode(QAbstractItemView.SingleSelection)
+		self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 		self.setDragEnabled(True)
 		
 		
-		self.agregarMisObjetos()
+		self.agregar_mis_objetos()
 		
-	def agregarMisObjetos(self):
+	def agregar_mis_objetos(self):
 		keys = list(CALC_NODOS.keys())
 		keys.sort()
 		for key in keys:
 			nodo = obtener_clase_del_codigo_op(key)
-			self.agregarMiObjeto(nodo.titulo_op, nodo.icono, nodo.codigo_op)
+			self.agregar_mi_objeto(nodo.titulo_op, nodo.icono, nodo.codigo_op)
 		
-	def agregarMiObjeto(self, nombre, icono=None, codigo_operacion=0):
+	def agregar_mi_objeto(self, nombre, icono=None, codigo_operacion=0):
 		objeto = QListWidgetItem(nombre, self) # Puede ser (icono, texto, parent, <int>type)
 		pixmap = QPixmap(icono if icono is not None else ".")
 		objeto.setIcon(QIcon(pixmap))
@@ -49,17 +49,17 @@ class Listbox(QListWidget):
 			
 			pixmap = QPixmap(objeto.data(Qt.UserRole)).scaled(32, 32, 1, 1)
 			
-			itemData = QByteArray()
-			dataStream = QDataStream(itemData, QIODevice.WriteOnly)
-			dataStream << pixmap
-			dataStream.writeInt(codigo_operacion)
-			dataStream.writeQString(objeto.text())
+			item_data = QByteArray()
+			data_stream = QDataStream(item_data, QIODevice.WriteOnly)
+			data_stream << pixmap
+			data_stream.writeInt(codigo_operacion)
+			data_stream.writeQString(objeto.text())
 			
-			mimeData = QMimeData()
-			mimeData.setData(LISTBOX_MIMETYPE, itemData)
+			mime_data = QMimeData()
+			mime_data.setData(LISTBOX_MIMETYPE, item_data)
 			
 			drag = QDrag(self)
-			drag.setMimeData(mimeData)
+			drag.setMimeData(mime_data)
 			drag.setHotSpot(QPoint(int(pixmap.width() / 2), int(pixmap.height() / 2)))
 			drag.setPixmap(pixmap)
 			

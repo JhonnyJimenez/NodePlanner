@@ -1,10 +1,10 @@
-class Serializable():
+class Serializable:
 	def __init__(self):
 		self.id = id(self)
 	
-	def serializacion(self):
+	def serialización(self):
 		raise NotImplemented()
 	
-	def deserializacion(self, data, hashmap={}):
+	def deserialización(self, data, hashmap={}):
 		raise NotImplemented()
 	

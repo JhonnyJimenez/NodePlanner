@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from lib.nodeeditor.Seriabilizador import Serializable
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QTextEdit
 
 
 class ContenidoDelNodo(QWidget, Serializable):
@@ -8,33 +8,33 @@ class ContenidoDelNodo(QWidget, Serializable):
 		self.nodo = nodo
 		super().__init__(parent)
 		
-		self.initui()
+		self.init_ui()
 		
-	def initui(self):
+	def init_ui(self):
 		self.lienzo = QVBoxLayout()
 		self.lienzo.setContentsMargins(0, 0, 0, 0)
 		self.setLayout(self.lienzo)
 		
-		self.wdg_label = QLabel("Algún título")
-		self.lienzo.addWidget(self.wdg_label)
+		self.etiqueta = QLabel("Algún título")
+		self.lienzo.addWidget(self.etiqueta)
 		self.lienzo.addWidget(EditordeTexto("Mira, un texto"))
 		
-	def ConfigEdicion(self, value):
-		self.nodo.escena.obtenerVista().eventoedicion = value
+	def configurar_edición(self, value):
+		self.nodo.escena.obtener_vista().eventoedicion = value
 		
-	def serializacion(self):
+	def serialización(self):
 		return OrderedDict([
 		
 		])
 	
-	def deserializacion(self, data, hashmap={}):
+	def deserialización(self, data, hashmap={}):
 		return True
 		
 class EditordeTexto(QTextEdit):
 	def focusInEvent(self, event):
-		self.parentWidget().ConfigEdicion(True)
+		self.parentWidget().configurar_edición(True)
 		super().focusInEvent(event)
 	
 	def focusOutEvent(self, event):
-		self.parentWidget().ConfigEdicion(False)
+		self.parentWidget().configurar_edición(False)
 		super().focusOutEvent(event)

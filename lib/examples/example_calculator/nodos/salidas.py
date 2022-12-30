@@ -1,14 +1,14 @@
 import math
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QLabel
+from PyQt5.QtCore import Qt
 from lib.examples.example_calculator.calc_config import *
-from lib.examples.example_calculator.calc_nodo_base import *
-from lib.nodeeditor.Utilidades import dump_exception
+from lib.examples.example_calculator.calc_nodo_base import CalcNodo, GraphCalcNodo, ContenidoDelNodo
 
 imagen = "iconos/owoAwoo.png"
 
 
-class CalcNodoSalida_Contenido(ContenidoDelNodo):
-	def initui(self):
+class CalcNodoSalidaContenido(ContenidoDelNodo):
+	def init_ui(self):
 		self.lbl = QLabel("42", self)
 		self.lbl.setAlignment(Qt.AlignLeft)
 		self.lbl.setObjectName(self.nodo.content_label_objname)
@@ -24,22 +24,22 @@ class CalcNodoSalida(CalcNodo):
 	def __init__(self, escena):
 		super().__init__(escena, entradas=[1], salidas=[])
 	
-	def initClasesInternas(self):
-		self.contenido = CalcNodoSalida_Contenido(self)
+	def init_clases_internas(self):
+		self.contenido = CalcNodoSalidaContenido(self)
 		self.Nodograficas = GraphCalcNodo(self)
 		
-	def ImplementacionEvaluacion(self):
-		nodo_de_entrada = self.obtenerEntrada(0)
+	def implementar_evaluación(self):
+		nodo_de_entrada = self.obtener_entrada(0)
 		if not nodo_de_entrada:
 			self.Nodograficas.setToolTip("No hay un nodo conectado.")
-			self.marcarInvalido()
+			self.marcar_inválido()
 			return
 		
-		val = nodo_de_entrada.evaluar()
+		val = nodo_de_entrada.evaluación()
 		
 		if val is None:
 			self.Nodograficas.setToolTip("Los datos en la entrada no son un número.")
-			self.marcarInvalido()
+			self.marcar_inválido()
 			return
 		
 		if val == "ERROR":
@@ -48,8 +48,8 @@ class CalcNodoSalida(CalcNodo):
 		
 		decimal, entero = math.modf(val)
 		self.contenido.lbl.setText("%s" % (int(val) if decimal == 0.0 else round(val, 3)))
-		self.marcarInvalido(False)
-		self.marcarIndefinido(False)
+		self.marcar_inválido(False)
+		self.marcar_indefinido(False)
 		self.Nodograficas.setToolTip("")
 		
 		return val

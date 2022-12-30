@@ -6,19 +6,19 @@ def imprimir_error(*args):
 
 def debug_de_validacion_de_conexion(entrada, salida):
 	print("VALIDANDO:")
-	print(entrada, "entrada" if entrada.esEntrada else "salida",  "del nodo", entrada.nodo)
-	for zocalo in entrada.nodo.entradas + entrada.nodo.salidas: print("\t", zocalo, "entrada" if zocalo.esEntrada else "salida")
-	print(salida, "entrada" if salida.esEntrada else "salida", "del nodo", salida.nodo)
-	for zocalo in salida.nodo.entradas + salida.nodo.salidas: print("\t", zocalo, "entrada" if zocalo.esEntrada else "salida")
+	print(entrada, "entrada" if entrada.es_entrada else "salida", "del nodo", entrada.nodo)
+	for zocalo in entrada.nodo.entradas + entrada.nodo.salidas: print("\t", zocalo, "entrada" if zocalo.es_entrada else "salida")
+	print(salida, "entrada" if salida.es_entrada else "salida", "del nodo", salida.nodo)
+	for zocalo in salida.nodo.entradas + salida.nodo.salidas: print("\t", zocalo, "entrada" if zocalo.es_entrada else "salida")
 	
 	return True
 
 def invalidar_conexion_de_doble_entrada_o_salida(entrada, salida):
-	if entrada.esSalida and salida.esSalida:
+	if entrada.es_salida and salida.es_salida:
 		imprimir_error("Conectando dos salidas")
 		return False
 		
-	if entrada.esEntrada and salida.esEntrada:
+	if entrada.es_entrada and salida.es_entrada:
 		imprimir_error("Conectando dos entradas")
 		return False
 		

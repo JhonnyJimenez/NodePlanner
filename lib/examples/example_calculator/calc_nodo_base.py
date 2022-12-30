@@ -1,42 +1,42 @@
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QImage
+from PyQt5.QtCore import QRectF
+from PyQt5.QtWidgets import QStyleOptionGraphicsItem, QLabel
 from lib.nodeeditor.Nodo import Nodo
 from lib.nodeeditor.ContenidodelNodo import ContenidoDelNodo
 from lib.nodeeditor.GraficosdelNodo import GraficosdelNodo
-from lib.nodeeditor.Zocalos import Izquierda_centro, Derecha_centro
+from lib.nodeeditor.Zocalos import IZQUIERDA_CENTRO, DERECHA_CENTRO
 from lib.nodeeditor.Utilidades import dump_exception
 
 
 class GraphCalcNodo(GraficosdelNodo):
-	def initSizes(self):
-		super().initSizes()
-		self.anchoNodo = 160
-		self.altoNodo = 74
-		self.redondezdelaOrilladelNodo = 6
-		self.sangria_de_la_orilla = 0
-		self.sangria_del_titulo = 8
-		self.sangria_vertical_del_titulo = 10
+	def init_sizes(self):
+		super().init_sizes()
+		self.anchura_del_nodo = 160
+		self.altura_del_nodo = 74
+		self.redondez_del_nodo = 6
+		self.márgen = 0
+		self.sangría_del_título = 8
+		self.sangría_vertical_del_título = 10
 		
-	def initAssets(self):
-		super().initAssets()
+	def init_assets(self):
+		super().init_assets()
 		self.iconos = QImage("iconos/status_icons.png")
 		
-	def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
-		super().paint(painter, QStyleOptionGraphicsItem, widget)
+	def paint(self, dibujante, estilo: QStyleOptionGraphicsItem, widget=None):
+		super().paint(dibujante, estilo, widget)
 		
 		offset = 24.0
-		if self.nodo.esIndefinido(): offset = 0.0
-		if self.nodo.esInvalido(): offset = 48.0
+		if self.nodo.es_indefinido(): offset = 0.0
+		if self.nodo.es_inválido(): offset = 48.0
 		
-		painter.drawImage(
+		dibujante.drawImage(
 			QRectF(-10, -10, 24.0, 24.0),
 			self.iconos,
 			QRectF(offset, 0, 24.0, 24.0)
 		)
 
 class CalcContenido(ContenidoDelNodo):
-	def initui(self):
+	def init_ui(self):
 		lbl = QLabel(self.nodo.content_label, self)
 		lbl.setObjectName(self.nodo.content_label_objname)
 
@@ -56,68 +56,68 @@ class CalcNodo(Nodo):
 		self.valor = None
 		
 		# Es realmente importante marcar los nodos indefinidos por defecto.
-		self.marcarIndefinido()
+		self.marcar_indefinido()
 		
-	def initConfiguraciones(self):
-		super().initConfiguraciones()
-		self.pos_det_entradas = Izquierda_centro
-		self.pos_det_salidas = Derecha_centro
+	def init_configuraciones(self):
+		super().init_configuraciones()
+		self.pos_det_entradas = IZQUIERDA_CENTRO
+		self.pos_det_salidas = DERECHA_CENTRO
 		
-	def realizarOperacion(self, entrada1, entrada2):
+	def realizar_operación(self, entrada1, entrada2):
 		return 123
 	
-	def ImplementacionEvaluacion(self):
-		e1 = self.obtenerEntrada(0)
-		e2 = self.obtenerEntrada(1)
+	def implementar_evaluación(self):
+		e1 = self.obtener_entrada(0)
+		e2 = self.obtener_entrada(1)
 		
 		if e1 is None or e2 is None:
-			self.marcarInvalido()
-			self.marcarDescendenciaIndefinido()
+			self.marcar_inválido()
+			self.marcar_descendencia_indefinido()
 			self.Nodograficas.setToolTip("Conecte todas las entradas, por favor")
 			return None
 		
 		else:
-			val = self.realizarOperacion(e1.evaluar(), e2.evaluar())
+			val = self.realizar_operación(e1.evaluación(), e2.evaluación())
 			self.valor = val
-			self.marcarIndefinido(False)
-			self.marcarInvalido(False)
+			self.marcar_indefinido(False)
+			self.marcar_inválido(False)
 			self.Nodograficas.setToolTip("")
 			
-			self.marcarDescendenciaIndefinido()
-			self.evaluarHijos()
+			self.marcar_descendencia_indefinido()
+			self.evaluar_hijos()
 			
 			return val
 	
-	def evaluar(self):
-		if not self.esIndefinido() and not self.esInvalido():
+	def evaluación(self):
+		if not self.es_indefinido() and not self.es_inválido():
 			# print(" _> devolver valor %s en cache:" % self.__class__.__name__, self.valor)
 			return self.valor
 		
 		try:
 			
-			val = self.ImplementacionEvaluacion()
+			val = self.implementar_evaluación()
 			return val
 		except ValueError as e:
-			self.marcarInvalido()
+			self.marcar_inválido()
 			self.Nodograficas.setToolTip(str(e))
-			self.marcarDescendenciaIndefinido()
+			self.marcar_descendencia_indefinido()
 		except Exception as e:
-			self.marcarInvalido()
+			self.marcar_inválido()
 			self.Nodograficas.setToolTip(str(e))
 			dump_exception(e)
 		
-	def DatosdeEntradaCambiados(self, zocalo=None):
+	def datos_de_entrada_cambiados(self, zocalo=None):
 		# print("%s::__DatosdeEntradaCambiados (Nodo base)" % self.__class__.__name__)
-		self.marcarIndefinido()
-		self.evaluar()
+		self.marcar_indefinido()
+		self.evaluación()
 		
-	def serializacion(self):
-		res = super().serializacion()
-		res['Codigo_op'] = self.__class__.codigo_op
+	def serialización(self):
+		res = super().serialización()
+		res['Código op'] = self.__class__.codigo_op
 		return res
 	
-	def deserializacion(self, data, hashmap={}, restaure_id=True):
-		res = super().deserializacion(data, hashmap, restaure_id)
+	def deserialización(self, data, hashmap={}, restaure_id=True):
+		res = super().deserialización(data, hashmap, restaure_id)
 		# print("Deserializando CalcNodo '%s'" % self.__class__.__name__, "res:", res)
 		return res
 		

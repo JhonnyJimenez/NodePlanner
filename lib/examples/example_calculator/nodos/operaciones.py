@@ -1,7 +1,5 @@
-from PyQt5.QtCore import *
 from lib.examples.example_calculator.calc_config import *
-from lib.examples.example_calculator.calc_nodo_base import *
-from lib.nodeeditor.Utilidades import dump_exception
+from lib.examples.example_calculator.calc_nodo_base import CalcNodo
 
 imagen = "iconos/owoAwoo.png"
 
@@ -14,7 +12,7 @@ class CalcNodoSuma(CalcNodo):
 	content_label = "+"
 	content_label_objname = "calc_nodo_bg"
 	
-	def realizarOperacion(self, entrada1, entrada2):
+	def realizar_operación(self, entrada1, entrada2):
 		return entrada1 + entrada2
 
 
@@ -26,7 +24,7 @@ class CalcNodoResta(CalcNodo):
 	content_label = "-"
 	content_label_objname = "calc_nodo_bg"
 	
-	def realizarOperacion(self, entrada1, entrada2):
+	def realizar_operación(self, entrada1, entrada2):
 		return entrada1 - entrada2
 
 
@@ -38,7 +36,7 @@ class CalcNodoMulplicacion(CalcNodo):
 	content_label = "*"
 	content_label_objname = "calc_nodo_mul"
 	
-	def realizarOperacion(self, entrada1, entrada2):
+	def realizar_operación(self, entrada1, entrada2):
 		return entrada1 * entrada2
 
 
@@ -50,7 +48,7 @@ class CalcNodoDivision(CalcNodo):
 	content_label = "/"
 	content_label_objname = "calc_nodo_div"
 	
-	def realizarOperacion(self, entrada1, entrada2):
+	def realizar_operación(self, entrada1, entrada2):
 		if 0 in (entrada1, entrada2):
 			if entrada1 == 0 and entrada2 == 0:
 				return "ERROR"

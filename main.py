@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication
 from np_ventana import NodePlannerVentana
 
 if __name__ == '__main__':

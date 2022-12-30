@@ -1,22 +1,22 @@
-from np_nodo_base import *
+from nodos.nodo_base.np_nodo_base import *
 
 imagen = "C:/Users/Maste/Downloads/icons/time.svg"
 
 
-class Cronista_Graficador(NodoBase_Graficador):
-	def initSizes(self):
-		super().initSizes()
+class Cronista_Graficador(NodoBaseGraficador):
+	def init_sizes(self):
+		super().init_sizes()
 		self.anchoNodo = 120
 		self.altoNodo = 64
 		self.altoNodoparaCalculos = self.altoNodo
 		self.calculo_de_altura_disponible()
 
-	def initAssets(self):
-		super().initAssets()
+	def init_assets(self):
+		super().init_assets()
 		self._relleno_titulo_nodo = QBrush(QColor("#FF246283"))
 
 
-class Cronista_Contenido(NodoBase_Contenido):
+class Cronista_Contenido(NodoBaseContenido):
 	def contenidos(self):
 		self.etiqueta_1 = self.etiqueta("Segundo inicial", "Derecha")
 
@@ -27,7 +27,7 @@ class Cronista_Contenido(NodoBase_Contenido):
 		pass
 
 
-@registrar_nodo(NODO_CRONISTA)
+# @registrar_nodo(NODO_CRONISTA)
 class Cronista(NodoBase):
 	icono = imagen
 	codigo_op = NODO_CRONISTA
@@ -48,4 +48,4 @@ class Cronista(NodoBase):
 
 	def ImplementarEvaluacion(self):
 		self.valores[0] = 0
-		self.evaluarHijos()
+		self.evaluar_hijos()

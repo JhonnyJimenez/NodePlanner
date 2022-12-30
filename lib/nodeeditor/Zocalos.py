@@ -1,26 +1,26 @@
 from collections import OrderedDict
 from lib.nodeeditor.Seriabilizador import Serializable
-from lib.nodeeditor.GraficosDeZocalos import GraficosDeZocalos
+from lib.nodeeditor.GraficosdeZocalos import GraficosdeZocalos
 from lib.nodeeditor.Utilidades import debugnames
 
 
-Izquierda_arriba = 1
-Izquierda_centro = 2
-Izquierda_abajo = 3
-Derecha_arriba = 4
-Derecha_centro = 5
-Derecha_abajo = 6
+IZQUIERDA_ARRIBA = 1
+IZQUIERDA_CENTRO = 2
+IZQUIERDA_ABAJO = 3
+DERECHA_ARRIBA = 4
+DERECHA_CENTRO = 5
+DERECHA_ABAJO = 6
 
 DEBUG = False
 DEBUG_REMOVE_WARNINGS = False
 
 
 class Zocalo(Serializable):
-	ClaseGraficadeZocalos = GraficosDeZocalos
+	ClaseGraficadeZocalos = GraficosdeZocalos
 	
 	def __init__(
 			self, nodo, indice, posicion, tipo_zocalo=1, multiconexion=True, cantidad_en_el_lado_actual=1,
-			esEntrada=False
+			es_entrada=False
 			):
 		super().__init__()
 		
@@ -29,9 +29,9 @@ class Zocalo(Serializable):
 		self.indice = indice
 		self.tipo_zocalo = tipo_zocalo
 		self.cantidad_en_el_lado_actual = cantidad_en_el_lado_actual
-		self.esmulticonexion = multiconexion
-		self.esEntrada = esEntrada
-		self.esSalida = not self.esEntrada
+		self.es_multiconexion = multiconexion
+		self.es_entrada = es_entrada
+		self.es_salida = not self.es_entrada
 		
 		if DEBUG:
 			print("Zócalo", self.indice, "ubicado", debugnames(posicion), "del", self.nodo.titulo, self.nodo)
@@ -44,19 +44,19 @@ class Zocalo(Serializable):
 	
 	def __str__(self):
 		return "<Zócalo #%d %s %s..%s>" % (
-			self.indice, "multiconexion" if self.esmulticonexion else "de conexion única",
+			self.indice, "multiconexion" if self.es_multiconexion else "de conexion única",
 			hex(id(self))[2:5], hex(id(self))[-3:]
 		)
 	
-	def eliminarzocalo(self):
+	def eliminar_zocalo(self):
 		self.GraficosZocalos.setParentItem(None)
-		self.nodo.escena.GraficosEsc.removeItem(self.GraficosZocalos)
+		self.nodo.escena.graficador_de_la_escena.removeItem(self.GraficosZocalos)
 		del self.GraficosZocalos
 		
-	def cambiarTipoZocalo(self, nuevo_tipo_zocalo):
+	def cambiar_tipo_de_zocalo(self, nuevo_tipo_zocalo):
 		if self.tipo_zocalo != nuevo_tipo_zocalo:
 			self.tipo_zocalo = nuevo_tipo_zocalo
-			self.GraficosZocalos.cambiarTipoZocalo()
+			self.GraficosZocalos.cambiar_tipo_de_zocalo()
 			return True
 		return False
 	
@@ -72,7 +72,7 @@ class Zocalo(Serializable):
 	def tiene_alguna_conexion(self):
 		return len(self.Zocaloconexiones) > 0
 	
-	def estaConectado(self, conexion):
+	def está_conectado(self, conexion):
 		return conexion in self.Zocaloconexiones
 		
 	def agregar_conexion(self, conexion):
@@ -93,25 +93,25 @@ class Zocalo(Serializable):
 			else:
 				conexion.quitar()
 				
-	def determinarmulticonexion(self, data):
-		if 'Multiconexion' in data:
-			return data['Multiconexion']
+	def determinar_multiconexión(self, data):
+		if 'Multiconexión' in data:
+			return data['Multiconexión']
 		else:
 			# Probablemente una versión antigua del archivo, por lo tanto, hacer los zócalos derechos como multiconexión por defecto.
-			return data['Posicion'] in (Derecha_abajo, Derecha_arriba)
+			return data['Posición'] in (DERECHA_ABAJO, DERECHA_ARRIBA)
 	
-	def serializacion(self):
+	def serialización(self):
 		return OrderedDict([
-			('id', self.id),
-			('Indice', self.indice),
-			('Multiconexion', self.esmulticonexion),
-			('Posicion', self.posicion),
-			('Tipo_de_zocalo', self.tipo_zocalo),
+			('ID', self.id),
+			('Índice', self.indice),
+			('Multiconexión', self.es_multiconexion),
+			('Posición', self.posicion),
+			('Tipo de zócalo', self.tipo_zocalo),
 		])
 	
-	def deserializacion(self, data, hashmap={}, restaure_id=True):
-		if restaure_id: self.id = data['id']
-		self.esmulticonexion = self.determinarmulticonexion(data)
-		self.cambiarTipoZocalo(data['Tipo_de_zocalo'])
-		hashmap[data['id']] = self
+	def deserialización(self, data, hashmap={}, restaure_id=True):
+		if restaure_id: self.id = data['ID']
+		self.es_multiconexion = self.determinar_multiconexión(data)
+		self.cambiar_tipo_de_zocalo(data['Tipo de zócalo'])
+		hashmap[data['ID']] = self
 		return True
