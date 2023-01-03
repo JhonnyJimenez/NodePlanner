@@ -229,7 +229,7 @@ class Escena(Serializable):
 					dump_exception()
 			else:
 				try:
-					encontrado.deserializacion(datos_nodo, hashmap, restaure_id, *args, **kwargs)
+					encontrado.deserialización(datos_nodo, hashmap, restaure_id, *args, **kwargs)
 					encontrado.al_deserializar(datos_nodo)
 					todos_los_nodos.remove(encontrado)
 				except: dump_exception()
@@ -251,7 +251,7 @@ class Escena(Serializable):
 			if not encontrado:
 				nueva_conexion = Conexion(self).deserialización(datos_conexion, hashmap, restaure_id, *args, **kwargs)
 			else:
-				encontrado.deserializacion(datos_conexion, hashmap, restaure_id, *args, **kwargs)
+				encontrado.deserialización(datos_conexion, hashmap, restaure_id, *args, **kwargs)
 				todas_las_conexiones.remove(encontrado)
 				
 		while todas_las_conexiones != []:

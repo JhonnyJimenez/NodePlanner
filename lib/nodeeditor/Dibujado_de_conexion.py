@@ -63,7 +63,7 @@ class DibujadodeConexion:
 				
 					# Primero quitamos las conexiones viejas y enviamos notificacion.
 					for zocalo in (objeto.zocalo, self.zocalo_inicial_de_dibujado):
-						if not zocalo.es_multiconexion:
+						if not zocalo.es_multiconexión:
 							if zocalo.es_entrada:
 								# print("Quitando SILENCIOSAMENTE conexiones de los zocalos de entrada (esEntrada y !esmulticonexion) [Comienza dibujado]:", objeto.zocalo.Zocaloconexiones)
 								zocalo.quitar_todas_las_conexiones(silencioso=True)
@@ -80,7 +80,15 @@ class DibujadodeConexion:
 					# Manda notificaciones para la nueva conexion.
 					for zocalo in [self.zocalo_inicial_de_dibujado, objeto.zocalo]:
 						zocalo.nodo.datos_de_conexion_cambiados(nueva_conexion)
+						# Adición mía para que el zócalo de salida también fuerce una evaluación.
+						try:
+							if zocalo.es_salida: zocalo.nodo.datos_de_salida_cambiados()
+							# if zocalo.es_salida: zocalo.nodo.datos_de_salida_cambiados(zocalo)
+						except AttributeError:
+							print('Error porque el método datos de salida cambiados es una adición mía fuera del nodo'
+							      ' base.')
 						if zocalo.es_entrada: zocalo.nodo.datos_de_entrada_cambiados(zocalo)
+
 					
 					self.graficos_vista.escena.escena.historial.almacenar_historial("Conexion creada mediante dibujado",
 					                                                                set_modified =True)

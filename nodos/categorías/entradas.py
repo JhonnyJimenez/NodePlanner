@@ -1,66 +1,53 @@
-from nodos.nodo_base.np_nodo_base import *
+from PyQt5.QtGui import QBrush, QColor
+
+from np_enlistado_de_nodos import *
+from nodos.nodo_base.np_nodo_base import NodoBase
+from nodos.nodo_base.np_nodo_contenido import ContenidodelNodoBase
+from nodos.nodo_base.np_nodo_graficador import GraficadordelNodoBase
+from nodos.objetos.np_entrada import Entrada, VALIDANTE_NUMÉRICO
+from nodos.objetos.np_booleana import Booleana
 
 imagen = "C:/Users/Maste/Downloads/icons/edit.svg"
 
 
-class Entradas_Graficador(NodoBaseGraficador):
-	def init_sizes(self):
-		super().init_sizes()
-		self.anchoNodo = 120
-		self.altoNodo = 139
-		self.altoNodoparaCalculos = self.altoNodo
-		self.calculo_de_altura_disponible()
-
+class GraficadordelosNodosdeEntrada(GraficadordelNodoBase):
 	def init_assets(self):
 		super().init_assets()
-		self._relleno_titulo_nodo = QBrush(QColor("#FF83314A"))
+		self._relleno_del_título = QBrush(QColor("#FF83314A"))
 
 
-class Entradas_Contenido(NodoBaseContenido):
-	def contenidos(self):
-		self.objeto_1 = self.entrada_de_línea(1, "")
-		self.objeto_2 = self.entrada_de_línea(2, "0", validante = QIntValidator())
-		self.objeto_3 = self.entrada_de_línea(3, "0.000", validante = QDoubleValidator())
-		self.objeto_4 = self.entrada_booleana(4, 0, "Valor")
+class ContenidodelosNodosdeEntrada(ContenidodelNodoBase):
+	def controles(self):
+		super().controles()
+		self.placeholder(3)
 
-	def lista_a_serializar(self, res):
-		res['Objeto_1'] = self.objeto_1.text()
-		res['Objeto_2'] = self.objeto_2.text()
-		res['Objeto_3'] = self.objeto_3.text()
-		res['Objeto_4'] = self.objeto_4.checkState()
+	def configuraciones(self):
+		super().configuraciones()
+		self.anchura = 100
 
-	def lista_a_desearializar(self, data):
-		self.objeto_1.setText(data['Objeto_1'])
-		self.objeto_2.setText(data['Objeto_2'])
-		self.objeto_3.setText(data['Objeto_3'])
-		self.objeto_4.setCheckState(data['Objeto_4'])
-
+	def contenido(self):
+		self.objeto_0 = Entrada(
+				self, índice = 0, zócalo_de_salida = 0, texto_inicial = '0', validante = VALIDANTE_NUMÉRICO
+				)
+		self.objeto_1 = Entrada(
+				self, índice = 1, zócalo_de_salida = 1, texto_inicial = ''
+				)
+		self.objeto_2 = Booleana(
+				self, índice = 2, zócalo_de_salida = 2, texto_inicial = 'Valor',
+				indeterminado = True, valor_inicial = 1
+				)
 
 # @registrar_nodo(CATEGORIA_ENTRADAS)
-class Entradas(NodoBase):
+class NodosdeEntrada(NodoBase):
 	icono = imagen
 	codigo_op = CATEGORIA_ENTRADAS
-	titulo_op = "Entrada"
-	content_label_objname = "Entradas"
+	titulo_op = "Entradas"
 
-	ClaseGraficadeNodo = Entradas_Graficador
-	ClasedelContenidodeNodo = Entradas_Contenido
+	ClaseGraficadeNodo = GraficadordelosNodosdeEntrada
+	ClasedelContenidodeNodo = ContenidodelosNodosdeEntrada
 
-	def __init__(self, escena, titulo = titulo_op, entradas = [], salidas = [4, 1, 2, 3]):
+	Entradas = []
+	Salidas = [1, 4, 3]
+
+	def __init__(self, escena, titulo = titulo_op, entradas = Entradas, salidas = Salidas):
 		super().__init__(escena, titulo, entradas, salidas)
-
-	def actualizacion(self):
-		self.contenido.objeto_1.textChanged.connect(self.datos_de_entrada_cambiados)
-		self.contenido.objeto_2.textChanged.connect(self.datos_de_entrada_cambiados)
-		self.contenido.objeto_3.textChanged.connect(self.datos_de_entrada_cambiados)
-		self.contenido.objeto_4.stateChanged.connect(self.datos_de_entrada_cambiados)
-
-	def ediciones_de_espaciado(self):
-		pass
-
-	def ImplementarEvaluacion(self):
-		self.Evaluacion_de_texto(self.contenido.objeto_1)
-		self.Evaluacion_de_texto(self.contenido.objeto_2)
-		self.Evaluacion_de_texto(self.contenido.objeto_3)
-		self.EvaluacionBooleana(self.contenido.objeto_4)
-		self.evaluar_hijos()

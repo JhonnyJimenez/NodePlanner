@@ -33,9 +33,9 @@ class NodePlannerSubVentana(EditordeNodos):
 		self._close_event_listeners = []
 
 	def obtener_clase_del_nodo_de_datos(self, data):
-		if 'Codigo_op' not in data:
+		if 'Código' not in data:
 			return None
-		return obtener_clase_del_codigo_op(data['Codigo_op'])
+		return obtener_clase_del_codigo_op(data['Código'])
 
 	def hacer_evaluación_de_salidas(self):
 		# Evaluar todos los nodos de salida.

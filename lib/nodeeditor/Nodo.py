@@ -30,7 +30,7 @@ class Nodo(Serializable):
 		
 		self.escena.agregar_nodo(self)
 		self.escena.graficador_de_la_escena.addItem(self.Nodograficas)
-		
+
 		# Creación de conectores para entradas y salidas de nodos.
 		self.entradas = []
 		self.salidas = []
@@ -103,7 +103,7 @@ class Nodo(Serializable):
 		contador = 0
 		for objeto in entradas:
 			zocalo = self.__class__.ClasedeZocalo(nodo=self, indice=contador, posicion=self.pos_det_entradas,
-												  tipo_zocalo=objeto, multiconexion=self.entradas_multiconexion,
+												  tipo_zocalo=objeto, multiconexión=self.entradas_multiconexion,
 												  cantidad_en_el_lado_actual=len(entradas), es_entrada=True
 												  )
 			contador += 1
@@ -112,7 +112,7 @@ class Nodo(Serializable):
 		contador = 0
 		for objeto in salidas:
 			zocalo = self.__class__.ClasedeZocalo(nodo=self, indice=contador, posicion=self.pos_det_salidas,
-												  tipo_zocalo=objeto, multiconexion=self.salidas_multiconexion,
+												  tipo_zocalo=objeto, multiconexión=self.salidas_multiconexion,
 												  cantidad_en_el_lado_actual=len(salidas), es_entrada=False
 												  )
 			contador += 1

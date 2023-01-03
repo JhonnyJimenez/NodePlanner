@@ -165,7 +165,7 @@ class Ventana(QMainWindow):
 		
 	def nuevo_archivo(self):
 		if self.confirmar_cierre():
-			self.obtener_actual_editor_de_nodos().nuevoarchivo()
+			self.obtener_actual_editor_de_nodos().nuevo_archivo()
 			self.definir_título()
 			
 		
@@ -173,15 +173,15 @@ class Ventana(QMainWindow):
 		if self.confirmar_cierre():
 			fname, filter = QFileDialog.getOpenFileName(self, TÍTULO_DIÁLOGO_ABRIR)
 			if fname != '' and os.path.isfile(fname):
-				self.obtener_actual_editor_de_nodos().leerarchivo(fname)
+				self.obtener_actual_editor_de_nodos().leer_archivo(fname)
 				self.definir_título()
 	
 	def guardar_archivo(self):
 		actual_editor_de_nodos = self.obtener_actual_editor_de_nodos()
 		if actual_editor_de_nodos is not None:
-			if not actual_editor_de_nodos.hayNombredeArchivo(): return self.guardar_archivo_como()
+			if not actual_editor_de_nodos.hay_nombre_de_archivo(): return self.guardar_archivo_como()
 	
-			actual_editor_de_nodos.guardararchivo()
+			actual_editor_de_nodos.guardar_archivo()
 			self.statusBar().showMessage("%s %s" % (MENSAJE_5, actual_editor_de_nodos.filename), 5000)
 			
 			# Soporte para aplicaciones MDI.
@@ -197,8 +197,8 @@ class Ventana(QMainWindow):
 			if fname == '': return False
 			
 			self.antes_de_guardar_como(actual_editor_de_nodos, fname)
-			actual_editor_de_nodos.guardararchivo(fname)
-			self.statusBar().showMessage("%s %s" % (MENSAJE_5, actual_editor_de_nodos).filename, 5000)
+			actual_editor_de_nodos.guardar_archivo(fname)
+			self.statusBar().showMessage("%s %s" % (MENSAJE_5, actual_editor_de_nodos.filename), 5000)
 
 			# Soporte para aplicaciones MDI.
 			if hasattr(actual_editor_de_nodos, "definir_título"): actual_editor_de_nodos.definir_título()

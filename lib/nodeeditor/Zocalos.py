@@ -19,7 +19,7 @@ class Zocalo(Serializable):
 	ClaseGraficadeZocalos = GraficosdeZocalos
 	
 	def __init__(
-			self, nodo, indice, posicion, tipo_zocalo=1, multiconexion=True, cantidad_en_el_lado_actual=1,
+			self, nodo, indice, posicion, tipo_zocalo=1, multiconexión=True, cantidad_en_el_lado_actual=1,
 			es_entrada=False
 			):
 		super().__init__()
@@ -29,7 +29,7 @@ class Zocalo(Serializable):
 		self.indice = indice
 		self.tipo_zocalo = tipo_zocalo
 		self.cantidad_en_el_lado_actual = cantidad_en_el_lado_actual
-		self.es_multiconexion = multiconexion
+		self.es_multiconexión = multiconexión
 		self.es_entrada = es_entrada
 		self.es_salida = not self.es_entrada
 		
@@ -44,7 +44,7 @@ class Zocalo(Serializable):
 	
 	def __str__(self):
 		return "<Zócalo #%d %s %s..%s>" % (
-			self.indice, "multiconexion" if self.es_multiconexion else "de conexion única",
+			self.indice, "multiconexion" if self.es_multiconexión else "de conexion única",
 			hex(id(self))[2:5], hex(id(self))[-3:]
 		)
 	
@@ -104,14 +104,14 @@ class Zocalo(Serializable):
 		return OrderedDict([
 			('ID', self.id),
 			('Índice', self.indice),
-			('Multiconexión', self.es_multiconexion),
+			('Multiconexión', self.es_multiconexión),
 			('Posición', self.posicion),
 			('Tipo de zócalo', self.tipo_zocalo),
 		])
 	
 	def deserialización(self, data, hashmap={}, restaure_id=True):
 		if restaure_id: self.id = data['ID']
-		self.es_multiconexion = self.determinar_multiconexión(data)
+		self.es_multiconexión = self.determinar_multiconexión(data)
 		self.cambiar_tipo_de_zocalo(data['Tipo de zócalo'])
 		hashmap[data['ID']] = self
 		return True

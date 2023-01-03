@@ -76,7 +76,7 @@ MENU_AYUDA = '&Ayuda'
 BARRA_DE_NODOS = 'Dock de nodos'
 
 # Método crear_dock_de_nodos en np_ventana.py
-DOCK_DE_NODOS = 'nodos'
+DOCK_DE_NODOS = 'Nodos'
 
 # Método crear_barra_de_estado en np_ventana.py
 MENSAJE_4 = 'Listo.'

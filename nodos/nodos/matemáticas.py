@@ -1,23 +1,21 @@
+import math
+import numpy
 from nodos.categorías.entradas import *
-from np_enlistado_de_nodos import *
+from nodos.objetos.np_etiqueta import Etiqueta
+from nodos.objetos.np_desplegable import Desplegable
 
 imagen = "C:/Users/Maste/Downloads/icons/square foot.svg"
 
 
-class Matemáticas_Graficador(Entradas_Graficador):
-	def init_sizes(self):
-		super().init_sizes()
-		self.anchoNodo = 120
-		self.altoNodo = 164
-		self.altoNodoparaCalculos = self.altoNodo
+class ContenidodelNodoMatemático(ContenidodelosNodosdeEntrada):
+	def controles(self):
+		super().controles()
+		self.placeholder(5)
 
-		self.calculo_de_altura_disponible()
-
-
-class Matemáticas_Contenido(Entradas_Contenido):
-	def contenidos(self):
-
-		self.etiqueta_1 = self.etiqueta("Resultado", "Derecha")
+	def contenido(self):
+		self.objeto_0 = Etiqueta(
+				self, índice = 0, zócalo_de_salida = 0, texto_inicial = 'Resultado', alineado = 'Derecha'
+				)
 		operaciones = [
 				"Adicionar", "Sustraer", "Multiplicar", "Dividir", "Multiplicar y adicionar",
 				"Potencia", "Logaritmo", "Raíz cuadrada", "Inverso de raíz cuadrada", "Absoluto",
@@ -27,357 +25,242 @@ class Matemáticas_Contenido(Entradas_Contenido):
 				"Arco coseno", "Arco tangente", "Arco tangente 2", "Seno hiperbólico",
 				"Coseno, hiperbólico", "Tangente hiperbólica", "A radianes", "A grados"
 				]
-		self.objeto_1 = self.lista_desplegable(elementos_visibles = 8, listado = operaciones)
-		self.objeto_2 = self.entrada_de_línea(1, "0.500", validante = VALIDANTE_NUMÉRICO)
-		self.objeto_3 = self.entrada_de_línea(2, "0.500", validante = VALIDANTE_NUMÉRICO)
-		self.objeto_4 = self.entrada_de_línea(3, "0.500", validante = VALIDANTE_NUMÉRICO)
+		self.objeto_1 = Desplegable(self, índice = 1, lista = operaciones, valor_inicial = 8)
+		self.objeto_2 = Entrada(
+				self, índice = 2, zócalo_de_entrada = 0, texto_inicial = '0.5', validante = VALIDANTE_NUMÉRICO
+				)
+		self.objeto_3 = Entrada(
+				self, índice = 3, zócalo_de_entrada = 1, texto_inicial = '0.5', validante = VALIDANTE_NUMÉRICO
+				)
+		self.objeto_4 = Entrada(
+				self, índice = 4, zócalo_de_entrada = 2, texto_inicial = '0.5', validante = VALIDANTE_NUMÉRICO
+				)
 
-	def lista_a_serializar(self, res):
-		res['Objeto_1'] = self.objeto_1.currentText()
-		res['Objeto_2'] = self.objeto_2.text()
-		res['Objeto_3'] = self.objeto_3.text()
-		res['Objeto_4'] = self.objeto_4.text()
 
-	def lista_a_desearializar(self, data):
-		self.objeto_1.setCurrentText(data['Objeto_1'])
-		self.objeto_2.setText(data['Objeto_2'])
-		self.objeto_3.setText(data['Objeto_3'])
-		self.objeto_4.setText(data['Objeto_4'])
-
-# @registrar_nodo(NODO_MATEMÁTICO)
-class Matemáticas(Entradas):
+@registrar_nodo(NODO_MATEMÁTICO)
+class NodoMatemático(NodosdeEntrada):
 	icono = imagen
 	codigo_op = NODO_MATEMÁTICO
 	titulo_op = "Matemáticas"
-	content_label_objname = "Matemáticas"
 
-	ClaseGraficadeNodo = Matemáticas_Graficador
-	ClasedelContenidodeNodo = Matemáticas_Contenido
+	ClasedelContenidodeNodo = ContenidodelNodoMatemático
 
-	def __init__(self, escena, titulo = titulo_op, entradas = [2, 2, 2], salidas = [2]):
+	Entradas = [1, 1, 1]
+	Salidas = [1]
+
+	def __init__(self, escena, titulo = titulo_op, entradas = Entradas, salidas = Salidas):
+		self.control1 = True
+		self.control2 = True
+		self.control3 = False
 		super().__init__(escena, titulo, entradas, salidas)
 
-	def actualizacion(self):
-		self.contenido.objeto_1.currentTextChanged.connect(self.datos_de_entrada_cambiados)
-		self.contenido.objeto_2.textChanged.connect(self.datos_de_entrada_cambiados)
-		self.contenido.objeto_3.textChanged.connect(self.datos_de_entrada_cambiados)
-		self.contenido.objeto_4.textChanged.connect(self.datos_de_entrada_cambiados)
+	def métodos_de_evaluación(self):
+		operación = self.valores_internos[1]
 
-	def ImplementarEvaluacion(self):
-		operacion = self.contenido.objeto_1.currentText()
+		if operación in (
+							"Raíz cuadrada", "Inverso de raíz cuadrada", "Absoluto", "Exponencial", "Signo",
+							"Redondear", "Piso", "Techo", "Truncar", "Fracción", "Seno", "Coseno", "Tangente",
+							"Arco seno", "Arco coseno", "Arco tangente", "Seno hiperbólico",
+							"Coseno, hiperbólico", "Tangente hiperbólica", "A radianes", "A grados"
+							):
+			self.contenido.objeto_3.autoocultarse()
+			self.contenido.objeto_4.autoocultarse()
+			self.Nodograficas.altura_del_nodo = (
+					self.Nodograficas.altura_del_título + (2 * self.Nodograficas.márgen) + self.contenido.objeto_2.alto
+					+ self.contenido.objeto_2.posición_y
+			)
 
-		self.oculto_por_metodo_2 = False
-		self.oculto_por_metodo_3 = False
+		elif operación in ("Multiplicar y adicionar", "Comparar", "Mínimo suave", "Máximo suave", "Ciclo"):
+			for elemento in (self.contenido.objeto_3, self.contenido.objeto_4):
+				if not self.entradas[elemento.zócalo_de_entrada].Zocaloconexiones:
+					elemento.automostrarse()
+			self.Nodograficas.altura_del_nodo = (
+					self.Nodograficas.altura_del_título + (2 * self.Nodograficas.márgen) + self.contenido.objeto_4.alto
+					+ self.contenido.objeto_4.posición_y
+			)
 
-		if operacion in (
-				"Raíz cuadrada", "Inverso de raíz cuadrada", "Absoluto", "Exponencial", "Signo",
-				"Redondear", "Piso", "Techo", "Truncar", "Fracción", "Seno", "Coseno", "Tangente",
-				"Arco seno", "Arco coseno", "Arco tangente", "Seno hiperbólico",
-				"Coseno, hiperbólico", "Tangente hiperbólica", "A radianes", "A grados"
-				):
-			self.ocultar_entrada_3()
-			self.ocultar_entrada_2()
-		elif operacion in ("Multiplicar y adicionar", "Comparar", "Mínimo suave", "Máximo suave", "Ciclo"):
-			self.mostrar_entrada_2()
-			self.mostrar_entrada_3()
 		else:
-			self.ocultar_entrada_3()
-			self.mostrar_entrada_2()
+			self.contenido.objeto_4.autoocultarse()
+			if not self.entradas[self.contenido.objeto_3.zócalo_de_entrada].Zocaloconexiones:
+				self.contenido.objeto_3.automostrarse()
+			self.Nodograficas.altura_del_nodo = (
+					self.Nodograficas.altura_del_título + (2 * self.Nodograficas.márgen) + self.contenido.objeto_3.alto
+					+ self.contenido.objeto_3.posición_y
+			)
+			
+		self.valores_a_evaluar = [0.5, 0.5, 0.5]
 
-		entrada_1 = self.obtenerContrazocalo(0)
-		entrada_2 = self.obtenerContrazocalo(1)
-		entrada_3 = self.obtenerContrazocalo(2)
-
-		if entrada_1 is not None:
-			self.contenido.objeto_2.setVisible(False)
-			valor_1 = entrada_1.nodo.valores[entrada_1.indice]
+		if self.valores_de_entrada[0] is None:
+			self.valores_a_evaluar[0] = self.valores_internos[2]
 		else:
-			self.contenido.objeto_2.setVisible(True)
-			valor_1 = self.contenido.objeto_2.text()
+			self.valores_a_evaluar[0] = self.valores_de_entrada[0]
 
-		if not self.oculto_por_metodo_2:
-			if entrada_2 is not None:
-				self.contenido.objeto_3.setVisible(False)
-				valor_2 = entrada_2.nodo.valores[entrada_2.indice]
-			else:
-				self.contenido.objeto_3.setVisible(True)
-				valor_2 = self.contenido.objeto_3.text()
+		if self.valores_de_entrada[1] is None:
+			self.valores_a_evaluar[1] = self.valores_internos[3]
 		else:
-			valor_2 = 0.5
+			self.valores_a_evaluar[1] = self.valores_de_entrada[1]
 
-		if not self.oculto_por_metodo_3:
-			if entrada_3 is not None:
-				self.contenido.objeto_4.setVisible(False)
-				valor_3 = entrada_3.nodo.valores[entrada_3.indice]
-			else:
-				self.contenido.objeto_4.setVisible(True)
-				valor_3 = self.contenido.objeto_4.text()
+		if self.valores_de_entrada[2] is None:
+			self.valores_a_evaluar[2] = self.valores_internos[4]
 		else:
-			valor_3 = 0.5
+			self.valores_a_evaluar[2] = self.valores_de_entrada[2]
 
-		if self.oculto_por_metodo_2 and self.oculto_por_metodo_3:
-			self.Nodograficas.altura_del_nodo = 114
-		elif self.oculto_por_metodo_3:
-			self.Nodograficas.altura_del_nodo = 139
-		else:
-			self.Nodograficas.altura_del_nodo = 164
+		self.valores_de_salida[0] = self.operaciones_matemáticas(operación, *self.valores_a_evaluar)
 
-		self.definir_entradas(operacion, valor_1, valor_2, valor_3)
+		return self.valores_de_salida
 
-		valor_1 = self.valores_entrantes[0]
-		valor_2 = self.valores_entrantes[1]
-		valor_3 = self.valores_entrantes[2]
+	def operaciones_matemáticas(self, operación, x, y, z):
+		if operación == "Adicionar":
+			resultado = x + y
 
-		if (type(valor_1) is str and type(valor_2) is not str) or (type(valor_1) is not str and type(valor_2) is str):
-			resultado = 0
-		else:
-			resultado = self.operaciones_matemáticas(operacion, valor_1, valor_2, valor_3)
+		elif operación == "Sustraer":
+			resultado = x - y
 
-		self.valores[0] = resultado
+		elif operación == "Multiplicar":
+			resultado = x * y
 
-		self.marcar_indefinido(False)
-		self.marcar_inválido(False)
-		self.Nodograficas.setToolTip("")
-		self.evaluar_hijos()
-
-		return self.valores[0]
-
-	def operaciones_matemáticas(self, seleccionador, valor_1, valor_2, valor_3 = 0.5):
-		if seleccionador == "Adicionar":
-			resultado = valor_1 + valor_2
-			if type(resultado) is not str:
-				resultado = self.limpieza(resultado)
-
-		elif seleccionador == "Sustraer":
-			resultado = valor_1 - valor_2
-			resultado = self.limpieza(resultado)
-
-		elif seleccionador == "Multiplicar":
-			resultado = valor_1 * valor_2
-			resultado = self.limpieza(resultado)
-
-		elif seleccionador == "Dividir":
+		elif operación == "Dividir":
 			try:
-				resultado_base = valor_1 / valor_2
+				resultado = x / y
 			except ZeroDivisionError:
-				resultado_base = valor_1
-			resultado = self.limpieza(resultado_base)
+				resultado = x
 
-		elif seleccionador == "Multiplicar y adicionar":
-			resultado = (valor_1 * valor_2) + valor_3
-			resultado = self.limpieza(resultado)
+		elif operación == "Multiplicar y adicionar":
+			resultado = (x * y) + z
 
-		elif seleccionador == "Potencia":
-			resultado = pow(valor_1, valor_2)
-			resultado = self.limpieza(resultado)
+		elif operación == "Potencia":
+			resultado = pow(x, y)
 
-		elif seleccionador == "Logaritmo":
-			resultado = math.log(valor_1, valor_2)
-			resultado = self.limpieza(resultado)
+		elif operación == "Logaritmo":
+			resultado = math.log(x, y)
 
-		elif seleccionador == "Raíz cuadrada":
-			resultado = math.sqrt(valor_1)
-			resultado = self.limpieza(resultado)
+		elif operación == "Raíz cuadrada":
+			resultado = math.sqrt(x)
 
-		elif seleccionador == "Inverso de raíz cuadrada":
-			resultado = 1 / math.sqrt(valor_1)
-			resultado = self.limpieza(resultado)
+		elif operación == "Inverso de raíz cuadrada":
+			resultado = 1 / math.sqrt(x)
 
-		elif seleccionador == "Absoluto":
-			resultado = abs(valor_1)
-			resultado = self.limpieza(resultado)
+		elif operación == "Absoluto":
+			resultado = abs(x)
 
-		elif seleccionador == "Exponencial":
-			resultado = math.exp(valor_1)
-			resultado = self.limpieza(resultado)
+		elif operación == "Exponencial":
+			resultado = math.exp(x)
 
-		elif seleccionador == "Mínimo":
-			resultado = min(valor_1, valor_2)
-			resultado = self.limpieza(resultado)
+		elif operación == "Mínimo":
+			resultado = min(x, y)
 
-		elif seleccionador == "Máximo":
-			resultado = max(valor_1, valor_2)
-			resultado = self.limpieza(resultado)
+		elif operación == "Máximo":
+			resultado = max(x, y)
 
-		elif seleccionador == "Menor que":
-			if valor_1 < valor_2:
+		elif operación == "Menor que":
+			if x < y:
 				resultado = 1
 			else:
 				resultado = 0
-			resultado = self.limpieza(resultado)
 
-		elif seleccionador == "Mayor que":
-			if valor_1 > valor_2:
+		elif operación == "Mayor que":
+			if x > y:
 				resultado = 1
 			else:
 				resultado = 0
-			resultado = self.limpieza(resultado)
 
-		elif seleccionador == "Signo":
-			if valor_1 > 0:
+		elif operación == "Signo":
+			if x > 0:
 				resultado = 1
-			elif valor_1 == 0:
+			elif x == 0:
 				resultado = 0
 			else:
 				resultado = -1
-			resultado = self.limpieza(resultado)
 
-		elif seleccionador == "Comparar":
-			min = (valor_2 - valor_3)
-			max = (valor_2 + valor_3)
-			if valor_1 >= min and valor_1 <= max:
+		elif operación == "Comparar":
+			mínimo = (y - z)
+			máximo = (y + z)
+			if mínimo <= x <= máximo:
 				resultado = 1
 			else:
 				resultado = 0
-			resultado = self.limpieza(resultado)
 
-		elif seleccionador == "Mínimo suave":
+		elif operación == "Mínimo suave":
 			resultado = "Aún no implementado."
 
-		elif seleccionador == "Máximo suave":
+		elif operación == "Máximo suave":
 			resultado = "Aún no implementado."
 
-		elif seleccionador == "Redondear":
-			decimales, entero = math.modf(valor_1)
+		elif operación == "Redondear":
+			decimales, entero = math.modf(x)
 			if decimales >= 0.5:
-				resultado = int(valor_1) + 1
+				resultado = int(x) + 1
 			else:
-				resultado = int(valor_1)
-			resultado = self.limpieza(resultado)
+				resultado = int(x)
 
-		elif seleccionador == "Piso":
-			resultado = int(valor_1) + 1
-			resultado = self.limpieza(resultado)
+		elif operación == "Piso":
+			resultado = int(x) + 1
 
-		elif seleccionador == "Techo":
-			resultado = int(valor_1)
-			resultado = self.limpieza(resultado)
+		elif operación == "Techo":
+			resultado = int(x)
 
-		elif seleccionador == "Truncar":
-			decimales, resultado = math.modf(valor_1)
-			resultado = self.limpieza(resultado)
+		elif operación == "Truncar":
+			decimales, resultado = math.modf(x)
 
-		elif seleccionador == "Fracción":
-			resultado, entero = math.modf(valor_1)
-			resultado = self.limpieza(resultado)
+		elif operación == "Fracción":
+			resultado, entero = math.modf(x)
 
-		elif seleccionador == "Resto":
-			resultado = valor_1 % valor_2
-			resultado = self.limpieza(resultado)
+		elif operación == "Resto":
+			resultado = x % y
 
-		elif seleccionador == "Ciclo":
+		elif operación == "Ciclo":
 			resultado = "Aún no implementado."
 
-		elif seleccionador == "Adherir":
+		elif operación == "Adherir":
 			resultado = "Aún no implementado."
 
-		elif seleccionador == "Ping pong":
+		elif operación == "Ping pong":
 			resultado = "Aún no implementado."
 
-		elif seleccionador == "Seno":
-			resultado = math.sin(valor_1)
-			resultado = self.limpieza(resultado)
+		elif operación == "Seno":
+			resultado = math.sin(x)
 
-		elif seleccionador == "Coseno":
-			resultado = math.cos(valor_1)
-			resultado = self.limpieza(resultado)
+		elif operación == "Coseno":
+			resultado = math.cos(x)
 
-		elif seleccionador == "Tangente":
-			resultado = math.tan(valor_1)
-			resultado = self.limpieza(resultado)
+		elif operación == "Tangente":
+			resultado = math.tan(x)
 
-		elif seleccionador == "Arco seno":
-			resultado = numpy.arcsin(valor_1)
+		elif operación == "Arco seno":
+			resultado = numpy.arcsin(x)
 
-		elif seleccionador == "Arco coseno":
-			resultado = numpy.arccos(valor_1)
+		elif operación == "Arco coseno":
+			resultado = numpy.arccos(x)
 
-		elif seleccionador == "Arco tangente":
-			resultado = numpy.arctan(valor_1)
+		elif operación == "Arco tangente":
+			resultado = numpy.arctan(x)
 
-		elif seleccionador == "Arco tangente 2":
-			resultado = numpy.arctan2(valor_1, valor_2)
+		elif operación == "Arco tangente 2":
+			resultado = numpy.arctan2(x, y)
 
-		elif seleccionador == "Seno hiperbólico":
-			resultado = numpy.sinh(valor_1)
+		elif operación == "Seno hiperbólico":
+			resultado = numpy.sinh(x)
 
-		elif seleccionador == "Coseno hiperbólico":
-			resultado = numpy.cosh(valor_1)
+		elif operación == "Coseno hiperbólico":
+			resultado = numpy.cosh(x)
 
-		elif seleccionador == "Tangente hiperbólica":
-			resultado = numpy.tanh(valor_1)
+		elif operación == "Tangente hiperbólica":
+			resultado = numpy.tanh(x)
 
-		elif seleccionador == "A radianes":
-			resultado = math.radians(valor_1)
+		elif operación == "A radianes":
+			resultado = math.radians(x)
 
-		elif seleccionador == "A grados":
-			resultado = math.degrees(valor_1)
+		elif operación == "A grados":
+			resultado = math.degrees(x)
 
 		else:
 			resultado = "¿Cómo sacaste esta opción?"
 
+
+		if type(resultado) is float:
+			decimales, entero = math.modf(resultado)
+
+			if decimales == 0.0:
+				resultado = int(entero)
+
 		return resultado
-
-	def definir_entradas(self, operacion, *args):
-		valor_por_defecto = 0.5
-		nuevos_valores = []
-		contador = -1
-		for valor in args:
-			contador += 1
-			if valor is None:
-				valor = valor_por_defecto
-				print("Indice %s: Valor por defecto" % contador)
-			else:
-				try:
-					if valor in ('-', '.', '', '+'):
-						valor = 0
-					else:
-						if type(valor) is str:
-							valor = "".join(valor.split())
-							valor = float(valor)
-						else:
-							pass
-				except:
-					if operacion == 'Adicionar' and type(valor) == str:
-						pass
-					else:
-						valor = valor_por_defecto
-						print("Indice %s: Error" % contador)
-			nuevos_valores.append(valor)
-		self.valores_entrantes = nuevos_valores
-		return self.valores_entrantes
-
-	def limpieza(self, resultado: float):
-		decimales, entero = math.modf(resultado)
-		if decimales == 0.0:
-			resultado = int(resultado)
-			return resultado
-
-		cantidad_digitos = len(str(resultado))
-		punto = str(resultado).find(".") + 1
-		decimales = cantidad_digitos - punto
-
-		resultado = (round(resultado, decimales))
-		return resultado
-
-	def ocultar_entrada_3(self):
-		self.entradas[2].quitar_todas_las_conexiones(True)
-		self.contenido.objeto_4.setVisible(False)
-		self.entradas[2].GraficosZocalos.setVisible(False)
-		self.oculto_por_metodo_3 = True
-
-	def mostrar_entrada_3(self):
-		self.entradas[2].GraficosZocalos.setVisible(True)
-		self.contenido.objeto_4.setVisible(True)
-		self.oculto_por_metodo_3 = False
-
-	def ocultar_entrada_2(self):
-		self.entradas[1].quitar_todas_las_conexiones(True)
-		self.entradas[1].GraficosZocalos.setVisible(False)
-		self.contenido.objeto_3.setVisible(False)
-		self.oculto_por_metodo_2 = True
-
-	def mostrar_entrada_2(self):
-		self.entradas[1].GraficosZocalos.setVisible(True)
-		self.contenido.objeto_3.setVisible(True)
-		self.oculto_por_metodo_2 = False

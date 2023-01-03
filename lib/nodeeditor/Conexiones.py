@@ -177,6 +177,16 @@ class Conexion(Serializable):
 					# Notificar a los nodos de los zócalos.
 					zocalo.nodo.datos_de_conexion_cambiados(self)  # (Comenté está línea porque el método está vacío y me
 					# daba error al tratar de implementar algo en ese método vacío).
+
+					# La línea siguiente es una adicion mía para forzar una evaluación del nodo con la salida al
+					# quitar la conexión.
+					try:
+						if zocalo.es_salida: zocalo.nodo.datos_de_salida_cambiados()
+						# if zocalo.es_salida: zocalo.nodo.datos_de_salida_cambiados(zocalo)
+					except AttributeError:
+						print('Error porque el nodo no tiene un método llamado datos de sálidas. Es una adición mía '
+						      'posterior en los nodos que uso.')
+
 					if zocalo.es_entrada: zocalo.nodo.datos_de_entrada_cambiados(zocalo)
 		except Exception as e: dump_exception(e)
 		

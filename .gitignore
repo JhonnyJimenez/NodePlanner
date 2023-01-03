@@ -2,3 +2,4 @@
 *.pyc
 .vscode
 .fleet
+pruebas_precision_numerica.py

@@ -89,15 +89,19 @@ class GraficosdeConexion(QGraphicsPathItem):
 
 	
 	def definir_color_desde_el_zocalo(self):
-		tipo_zocalo_origen = self.linea.zocalo_origen.tipo_zocalo
-		# Esta es la línea original: tipo_zocalo_origen = self.linea.zocalo_inicial_de_dibujado.tipo_zocalo
-		tipo_zocalo_final = self.linea.zocalo_final.tipo_zocalo
-		if tipo_zocalo_origen != tipo_zocalo_final:
-			return self.cambiar_color_gradiente(
-					self.linea.zocalo_origen.GraficosZocalos.obtener_color_para_el_zocalo(tipo_zocalo_origen),
-					self.linea.zocalo_origen.GraficosZocalos.obtener_color_para_el_zocalo(tipo_zocalo_final)
-					)
-		self.cambiar_color(self.linea.zocalo_origen.GraficosZocalos.obtener_color_para_el_zocalo(tipo_zocalo_origen))
+		try:
+			tipo_zocalo_origen = self.linea.zocalo_origen.tipo_zocalo
+			# Esta es la línea original: tipo_zocalo_origen = self.linea.zocalo_inicial_de_dibujado.tipo_zocalo
+			tipo_zocalo_final = self.linea.zocalo_final.tipo_zocalo
+			if tipo_zocalo_origen != tipo_zocalo_final:
+				return self.cambiar_color_gradiente(
+						self.linea.zocalo_origen.GraficosZocalos.obtener_color_para_el_zocalo(tipo_zocalo_origen),
+						self.linea.zocalo_origen.GraficosZocalos.obtener_color_para_el_zocalo(tipo_zocalo_final)
+						)
+			self.cambiar_color(self.linea.zocalo_origen.GraficosZocalos.obtener_color_para_el_zocalo(tipo_zocalo_origen))
+		except AttributeError:
+			# ¿Por qué sale un Nonetype como error aquí? Ni idea...
+			pass
 		
 	def seleccionado(self):
 		self.linea.escena.graficador_de_la_escena.objeto_seleccionado.emit()

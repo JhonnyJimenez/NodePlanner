@@ -2,7 +2,7 @@ ContenidoDelNodo { background: transparent; }
 ContenidoDelNodo QLabel { color: #e0e0e0; }
 QGraphicsView { selection-background-color: rgb(255, 255, 255); }
 
-Entradas_Contenido QCheckBox {
+Entradas_Contenidodel QCheckBox {
   color: #fff;
   background: transparent;
 }

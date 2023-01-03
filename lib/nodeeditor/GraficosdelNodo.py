@@ -145,7 +145,7 @@ class GraficosdelNodo(QGraphicsItem):
 	def init_contenido(self):
 		if self.contenido is not None:
 			self.contenido.setGeometry(int(self.márgen), int(self.altura_del_título + self.márgen),
-			                           self.anchura_del_nodo - int((2 * self.márgen)), self.altura_del_nodo - int((2 * self.márgen) + self.altura_del_título))
+			                           self.anchura_del_nodo - int(2 * self.márgen), self.altura_del_nodo - int((2 * self.márgen) + self.altura_del_título))
 			
 		# Obtener el QGraphicsProxy cuando está insertado en los gráficos de la escena.
 		self.GraficosContenidoNodo = self.nodo.escena.graficador_de_la_escena.addWidget(self.contenido)

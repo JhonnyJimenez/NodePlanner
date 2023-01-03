@@ -1,41 +1,24 @@
 from nodos.categorías.entradas import *
-from np_enlistado_de_nodos import *
 
+class ContenidodelNodoNúmero(ContenidodelosNodosdeEntrada):
+	def controles(self):
+		super().controles()
+		self.placeholder(1)
 
-class Número_Graficador(Entradas_Graficador):
-	def init_sizes(self):
-		super().init_sizes()
-		self.altoNodo = 64
-		self.altoNodoparaCalculos = self.altoNodo
-		self.calculo_de_altura_disponible()
+	def contenido(self):
+		self.objeto_0 = Entrada(
+				self, índice = 0, zócalo_de_salida = 0, texto_inicial = '0', validante = VALIDANTE_NUMÉRICO
+				)
 
-
-class Número_Contenido(Entradas_Contenido):
-	def contenidos(self):
-		self.objeto_1 = self.entrada_de_línea(1, "0", validante = VALIDANTE_NUMÉRICO)
-
-	def lista_a_serializar(self, res):
-		res['Objeto_1'] = self.objeto_1.text()
-
-	def lista_a_desearializar(self, data):
-		self.objeto_1.setText(data['Objeto_1'])
-
-# @registrar_nodo(NODO_ENTRADA_NÚMERO)
-class Número(Entradas):
-	icono = imagen
+@registrar_nodo(NODO_ENTRADA_NÚMERO)
+class NodoNúmero(NodosdeEntrada):
 	codigo_op = NODO_ENTRADA_NÚMERO
 	titulo_op = "Número"
-	content_label_objname = "Número"
 
-	ClaseGraficadeNodo = Número_Graficador
-	ClasedelContenidodeNodo = Número_Contenido
+	ClasedelContenidodeNodo = ContenidodelNodoNúmero
 
-	def __init__(self, escena, titulo = titulo_op, entradas = [], salidas = [1]):
+	Entradas = []
+	Salidas = [1]
+
+	def __init__(self, escena, titulo = titulo_op, entradas = Entradas, salidas = Salidas):
 		super().__init__(escena, titulo, entradas, salidas)
-
-	def actualizacion(self):
-		self.contenido.objeto_1.textChanged.connect(self.datos_de_entrada_cambiados)
-
-	def ImplementarEvaluacion(self):
-		self.evaluacion_númerica(self.contenido.objeto_1)
-		self.evaluar_hijos()

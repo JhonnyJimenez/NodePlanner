@@ -1,40 +1,26 @@
 from nodos.categorías.entradas import *
-from np_enlistado_de_nodos import *
 
 
-class NodoBooleana_Graficador(Entradas_Graficador):
-	def init_sizes(self):
-		super().init_sizes()
-		self.altoNodo = 64
-		self.altoNodoparaCalculos = self.altoNodo
-		self.calculo_de_altura_disponible()
+class ContenidodelNodoBooleano(ContenidodelosNodosdeEntrada):
+	def controles(self):
+		super().controles()
+		self.placeholder(1)
 
-class NodoBooleana_Contenido(Entradas_Contenido):
-	def contenidos(self):
-		self.objeto_1 = self.entrada_booleana(1)
+	def contenido(self):
+		self.objeto_0 = Booleana(
+				self, índice = 0, zócalo_de_salida = 0, texto_inicial = 'Valor',
+				valor_inicial = 2
+				)
 
-	def lista_a_serializar(self, res):
-		res['Objeto_1'] = self.objeto_1.checkState()
-
-	def lista_a_desearializar(self, data):
-		self.objeto_1.setCheckState(data['Objeto_1'])
-
-# @registrar_nodo(NODO_ENTRADA_BOOLEANA)
-class NodoBooleana(Entradas):
-	icono = imagen
+@registrar_nodo(NODO_ENTRADA_BOOLEANA)
+class NodoBooleano(NodosdeEntrada):
 	codigo_op = NODO_ENTRADA_BOOLEANA
 	titulo_op = "Booleana"
-	content_label_objname = "Booleana"
 
-	ClaseGraficadeNodo = NodoBooleana_Graficador
-	ClasedelContenidodeNodo = NodoBooleana_Contenido
+	ClasedelContenidodeNodo = ContenidodelNodoBooleano
 
-	def __init__(self, escena, titulo = titulo_op, entradas = [], salidas = [3]):
+	Entradas = []
+	Salidas = [3]
+
+	def __init__(self, escena, titulo = titulo_op, entradas = Entradas, salidas = Salidas):
 		super().__init__(escena, titulo, entradas, salidas)
-
-	def actualizacion(self):
-		self.contenido.objeto_1.stateChanged.connect(self.datos_de_entrada_cambiados)
-
-	def ImplementarEvaluacion(self):
-		self.EvaluacionBooleana(self.contenido.objeto_1)
-		self.evaluar_hijos()

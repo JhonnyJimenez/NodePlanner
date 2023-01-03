@@ -1,7 +1,8 @@
-from PyQt5.QtGui import QColor, QPainter, QBrush
-from PyQt5.QtCore import Qt, QPointF, QRectF
+from PyQt5.QtWidgets import QStyleOptionGraphicsItem
+from PyQt5.QtGui import QColor, QBrush
+from PyQt5.QtCore import Qt, QRectF, QPointF
 
-from lib.nodeeditor.GraficosdeZocalos import *
+from lib.nodeeditor.GraficosdeZocalos import GraficosdeZocalos
 
 COLORES_DE_ZOCALOS = [
 		QColor("#FFcca6d6"),  # 0. Zócalo de entrada y salida todoterreno
@@ -23,41 +24,64 @@ ZOCALOS_ROMBOS = [1, 2, 3, 6, 7]
 
 
 class NodoBaseGraficadordeZocalos(GraficosdeZocalos):
-	pass
-	# def init_assets(self):
-	# 	super().init_assets()
-	#
-	# def obtener_color_para_el_zocalo(self, key):
-	# 	if type(key) == int:
-	# 		if len(COLORES_DE_ZOCALOS) - 1 < key:
-	# 			return Qt.transparent
-	# 		return COLORES_DE_ZOCALOS[key]
-	# 	elif type(key) == str:
-	# 		return QColor(key)
-	# 	return Qt.transparent
-	#
-	# def paint(self, painter: QPainter, QStyleOptionGraphicsItem, widget=None):
-	# 	painter.setBrush(self._brush)
-	# 	painter.setPen(self._lápiz if not self.isHighlighted else self._pen_highlight)
-	#
-	# 	if self.tipo_zocalo in ZOCALOS_ROMBOS:
-	# 		self.nuevo_radio_1 = self.radio * 1.20
-	#
-	# 		rombo = (
-	# 					QPointF(0.0, -self.nuevo_radio_1), QPointF(self.nuevo_radio_1, 0.0),
-	# 					QPointF(0.0, self.nuevo_radio_1), QPointF(-self.nuevo_radio_1, 0.0)
-	# 				)
-	# 		painter.drawPolygon(rombo)
-	#
-	# 		self.nuevo_radio = self.radio * 0.30
-	# 		rombo_pequeño = (
-	# 							QPointF(0.0, -self.nuevo_radio), QPointF(self.nuevo_radio, 0.0),
-	# 							QPointF(0.0, self.nuevo_radio), QPointF(-self.nuevo_radio, 0.0)
-	# 							)
-	#
-	# 		self._brush_nuevo = QBrush(self._color_contorno)
-	# 		painter.setBrush(self._brush_nuevo)
-	# 		painter.drawPolygon(rombo_pequeño)
-	#
-	# 	else:
-	# 		painter.drawEllipse(QRectF(-self.radio, -self.radio, 2 * self.radio, 2 * self.radio))
+	def __init__(self, zocalo):
+		super().__init__(zocalo)
+
+		self.zocalo = zocalo
+
+		self.isHighlighted = False
+
+		self.radio = 6.0
+		self.tamaño_rombo = self.radio
+		self.tamaño_rombo_interno = self.tamaño_rombo * 0.30
+		self.grosor_contorno = 1.0
+
+		if self.tipo_zocalo in ZOCALOS_ROMBOS:
+			self.tamaño = self.tamaño_rombo
+		else:
+			self.tamaño = self.radio
+
+		self.init_assets()
+
+	def obtener_color_para_el_zocalo(self, key):
+		if type(key) == int:
+			if len(COLORES_DE_ZOCALOS) - 1 < key:
+				return Qt.transparent
+			return COLORES_DE_ZOCALOS[key]
+		elif type(key) == str:
+			return QColor(key)
+		return Qt.transparent
+
+	def boundingRect(self):
+		return QRectF(
+				-self.tamaño - self.grosor_contorno,
+				-self.tamaño - self.grosor_contorno,
+				2 * (self.tamaño + self.grosor_contorno),
+				2 * (self.tamaño + self.grosor_contorno),
+				)
+
+	def rombo(self):
+		rombo = (
+				QPointF(0.0, -self.tamaño_rombo), QPointF(self.tamaño_rombo, 0.0),
+				QPointF(0.0, self.tamaño_rombo), QPointF(-self.tamaño_rombo, 0.0)
+				)
+		return rombo
+
+	def paint(self, painter, estilo: QStyleOptionGraphicsItem, widget=None):
+		painter.setBrush(self._brush)
+		painter.setPen(self._lápiz if not self.isHighlighted else self._lápiz_highlight)
+
+		if self.tipo_zocalo in ZOCALOS_ROMBOS:
+			painter.drawPolygon(self.rombo())
+
+			if self.zocalo.rombito:
+				rombo_pequeño = (
+									QPointF(0.0, -self.tamaño_rombo_interno), QPointF(self.tamaño_rombo_interno, 0.0),
+									QPointF(0.0, self.tamaño_rombo_interno), QPointF(-self.tamaño_rombo_interno, 0.0)
+									)
+				self._brush_nuevo = QBrush(self._color_contorno)
+				painter.setBrush(self._brush_nuevo)
+				painter.drawPolygon(rombo_pequeño)
+
+		else:
+			painter.drawEllipse(QRectF(-self.radio, -self.radio, 2 * self.radio, 2 * self.radio))
