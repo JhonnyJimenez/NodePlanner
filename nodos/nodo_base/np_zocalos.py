@@ -7,12 +7,12 @@ class ZócalosdelNodoBase(Zocalo):
 
 	def __init__(
 			self, nodo, indice, posicion, tipo_zocalo = 1, multiconexión = True, cantidad_en_el_lado_actual = 1,
-			es_entrada = False, rombito = True
+			es_entrada = False, forma: str = 'Círculo'
 			):
+		self.forma = forma
 		super().__init__(
 				nodo, indice, posicion, tipo_zocalo, multiconexión, cantidad_en_el_lado_actual, es_entrada
 				)
-		self.rombito = rombito
 
 	def definir_posicion_del_zocalo(self):
 		self.GraficosZocalos.setPos(
@@ -25,4 +25,9 @@ class ZócalosdelNodoBase(Zocalo):
 		res = self.nodo.obtener_posicion_zocalo(
 				self.indice, self.posicion, self.cantidad_en_el_lado_actual, self.es_entrada
 				)
+		return res
+
+	def serialización(self):
+		res = super().serialización()
+		res["Forma"] = self.forma
 		return res

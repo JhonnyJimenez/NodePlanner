@@ -8,71 +8,83 @@ from nodos.objetos.np_desplegable import Desplegable
 
 class ContenidodelNodoBase(ContenidoDelNodo):
 	def init_ui(self):
-		self.controles()
 		self.configuraciones()
+		self.controles()
 		self.contenido()
 
+	def configuraciones(self):
+		self.anchura = 160
+		self.altura = 20
+		self.espaciado = 4
+
+		self.nombre_de_la_fuente = "Rounded Mgen+ 1c"
+		self.fuente = QFont(self.nombre_de_la_fuente, 8)
+
 	def controles(self):
-		self.última_altura_usada = [0]              # Para la ubicación automática de cada objeto y para determinar
-														# la altura del nodo automáticamente.
-		self.lista_de_anchuras = []                 # Para determinar la anchura del nodo automáticamente.
-		self.lista_de_posiciones_de_entradas = []   # Para ubicar las entradas según el objeto que las use.
-		self.lista_de_posiciones_de_salidas = []    # Para ubicar las salidas según el objeto que las use.
+		self.lista_de_alturas = [0]             # Para la ubicación automática de cada objeto y para determinar
+												# la altura del nodo automáticamente.
+		self.lista_de_anchuras = []             # Para determinar la anchura del nodo automáticamente.
+		self.posicionador_de_entradas = []      # Para ubicar las entradas según el objeto que las use.
+		self.posicionador_de_salidas = []       # Para ubicar las salidas según el objeto que las use.
+		self.valores = {}
+		self.diccionarios = {'Salidas': {}, 'Entradas': {}}
 
 		for entradas in self.nodo.Entradas:
-			self.lista_de_posiciones_de_entradas.append(None)
+			self.posicionador_de_entradas.append(None)
 
 		for salidas in self.nodo.Salidas:
-			self.lista_de_posiciones_de_salidas.append(None)
-
-		self.lista_de_contenidos = []
-
-		self.placeholder(5)
-
-	def configuraciones(self):
-		self.espaciado_entre_contenidos = 5.0
-		self.anchura = 220
-		self.altura = 20
-
-		self.fuente = QFont("Ubuntu", 9)
-
-	def placeholder(self, cantidad_de_objetos: int):
-		self.lista_de_información = []
-		self.lista_de_deserializamiento = []
-
-		for num in range(0, cantidad_de_objetos):
-			self.lista_de_información.append(None)
-			self.lista_de_deserializamiento.append(None)
+			self.posicionador_de_salidas.append(None)
 
 	def contenido(self):
-		self.ejemplo_0 = Etiqueta(
-				self, índice = 0, zócalo_de_entrada = 0, texto_inicial = 'Tipos de objetos'
-				)
-		self.ejemplo_1 = Entrada(
-				self, índice = 1, zócalo_de_entrada = 1, zócalo_de_salida = 0, texto_inicial = '0',
-				etiqueta = 'Entrada númerica', validante = VALIDANTE_NUMÉRICO, proporción = '1/2'
-				)
-		self.ejemplo_2 = Entrada(
-				self, índice = 2, zócalo_de_entrada = 2, zócalo_de_salida = 1, etiqueta = 'Entrada de texto',
-				proporción = '1/2', texto_inicial = ''
-				)
-		self.ejemplo_3 = Booleana(
-				self, índice = 3, zócalo_de_entrada = 3, zócalo_de_salida = 2, texto_inicial = 'Entrada booleana',
-				indeterminado = True, valor_inicial = 1
-				)
-		self.ejemplo_4 = Desplegable(
-				self, índice = 4, zócalo_de_salida = 3, etiqueta = 'Lista desplegable', proporción = '1/2',
-				lista = ['Objeto 1', 'Objeto 2', 'Objeto 3', 'Objeto 4', 'Objeto 5']
-				)
+		self.contenido_de_salidas = [
+				Etiqueta(self, 'Salida númerica', alineado = 3, llave = 'Objeto 1', zócalo = 0),
+				Etiqueta(self, 'Salida de texto', alineado = 3, llave = 'Objeto 2', zócalo = 1),
+				Etiqueta(self, 'Salida booleana', alineado = 3, llave = 'Objeto 3', zócalo = 2),
+				Etiqueta(self, 'Salida de desplegables', alineado = 3, llave = 'Objeto 4', zócalo = 3),
+				]
+		self.contenido_de_entradas = [
+				Etiqueta(self, 'Tipos de objetos'),
+				Entrada(self, '0', 'Objeto 1', etiqueta = 'Entrada númerica', validante = VALIDANTE_NUMÉRICO, zócalo = 0),
+				Entrada(self, '', 'Objeto 2', etiqueta = 'Entrada de texto', zócalo = 1),
+				Booleana(self, 'Entrada booleana', 'Objeto 3', 1, True, zócalo = 2),
+				Desplegable(self, 'Objeto 4', ['Desplegable'])
+				]
+
+		# self.método_para_reordenar()
+
+	def método_para_reordenar(self):
+		self.respaldo = self.contenido_de_entradas.copy()
+
+		# Usa while porque for elimina los elementos hasta que el largo de a lista se reduce al índice al que debería
+		# avanzar.
+		for elemento in self.contenido_de_entradas:
+			try:
+				elemento.etiqueta.deleteLater()
+			except AttributeError:
+				pass
+			elemento.objeto.deleteLater()
+
+		self.contenido_de_entradas = []
+
+		for elemento in self.respaldo:
+			self.contenido_de_entradas.append(elemento)
+
+		self.contenido_de_entradas[0] = self.respaldo[1]
+		self.contenido_de_entradas[1] = self.respaldo[0]
+		print(self.contenido_de_entradas)
+
+		self.lista_de_alturas = [25]
+		for elemento in self.contenido_de_entradas:
+			elemento.reordenando = True
+			elemento.init_ui()
 
 	def serialización(self):
 		res = super().serialización()
-		res['Valores'] = self.lista_de_información
+		res['Valores'] = self.valores
 		return res
 
 	def deserialización(self, data, hashmap = {}):
 		super().deserialización(data, hashmap)
-		for objeto in self.lista_de_deserializamiento:
-			if objeto is not None:
-				objeto(data['Valores'][self.lista_de_deserializamiento.index(objeto)])
+		for widget in self.contenido_de_entradas:
+			widget.método_de_deserialización(data['Valores'])
 		return True

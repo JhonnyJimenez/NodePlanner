@@ -20,28 +20,24 @@ COLORES_DE_ZOCALOS = [
 		QColor("#FFeb7582"),  # 12. Zócalo de material
 		]
 
-ZOCALOS_ROMBOS = [1, 2, 3, 6, 7]
+# ZOCALOS_ROMBOS = [1, 2, 3, 6, 7]
 
 
 class NodoBaseGraficadordeZocalos(GraficosdeZocalos):
 	def __init__(self, zocalo):
 		super().__init__(zocalo)
 
-		self.zocalo = zocalo
-
-		self.isHighlighted = False
-
+	def init_ui(self):
+		self.figura = self.zocalo.forma
 		self.radio = 6.0
 		self.tamaño_rombo = self.radio
 		self.tamaño_rombo_interno = self.tamaño_rombo * 0.30
 		self.grosor_contorno = 1.0
 
-		if self.tipo_zocalo in ZOCALOS_ROMBOS:
+		if self.figura in ('Diamante', 'Rombo'):
 			self.tamaño = self.tamaño_rombo
 		else:
 			self.tamaño = self.radio
-
-		self.init_assets()
 
 	def obtener_color_para_el_zocalo(self, key):
 		if type(key) == int:
@@ -71,10 +67,10 @@ class NodoBaseGraficadordeZocalos(GraficosdeZocalos):
 		painter.setBrush(self._brush)
 		painter.setPen(self._lápiz if not self.isHighlighted else self._lápiz_highlight)
 
-		if self.tipo_zocalo in ZOCALOS_ROMBOS:
+		if self.figura in ('Rombo', 'Diamante'):
 			painter.drawPolygon(self.rombo())
 
-			if self.zocalo.rombito:
+			if self.figura == 'Diamante':
 				rombo_pequeño = (
 									QPointF(0.0, -self.tamaño_rombo_interno), QPointF(self.tamaño_rombo_interno, 0.0),
 									QPointF(0.0, self.tamaño_rombo_interno), QPointF(-self.tamaño_rombo_interno, 0.0)

@@ -9,6 +9,7 @@ from lib.nodeeditor.Conexiones import Conexion
 from lib.nodeeditor.ValidantesdeConexion import *
 Conexion.agregar_validantes_de_conexiones(invalidar_conexion_de_doble_entrada_o_salida)
 Conexion.agregar_validantes_de_conexiones(invalidar_conexiones_entre_el_mismo_nodo)
+Conexion.agregar_validantes_de_conexiones(invalidar_conexiones_a_nodos_padres)
 
 from np_constantes import *
 from np_idioma import *

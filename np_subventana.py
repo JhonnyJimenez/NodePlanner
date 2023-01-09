@@ -9,7 +9,7 @@ from lib.nodeeditor.GraficosVista import MODO_DIBUJO
 
 from np_idioma import *
 from np_enlistado_de_nodos import *
-from nodos.categorías.salidas import Salidas
+from nodos.objetos.np_utilitarios import nodos_no_disponibles, NODOS_NO_DISPONIBLES
 
 DEBUG = False
 DEBUG_CONTEXT = False
@@ -40,8 +40,11 @@ class NodePlannerSubVentana(EditordeNodos):
 	def hacer_evaluación_de_salidas(self):
 		# Evaluar todos los nodos de salida.
 		for nodo in self.escena.nodos:
-			if isinstance(nodo, Salidas):
-				nodo.evaluación()
+			for zocalo in (nodo.entradas + nodo.salidas):
+				if zocalo.Zocaloconexiones:
+					for conexion in zocalo.Zocaloconexiones:
+						nodo.datos_de_conexion_cambiados(conexion)
+			nodo.evaluación(False)
 
 	def al_restaurar_historial(self):
 		self.hacer_evaluación_de_salidas()
@@ -56,6 +59,7 @@ class NodePlannerSubVentana(EditordeNodos):
 	def init_nueva_opción_de_nodo(self):
 		self.opciones_de_nodos = {}
 		keys = list(NODEPLANNER_NODOS.keys())
+		nodos_no_disponibles(keys, NODOS_NO_DISPONIBLES)
 		keys.sort()
 		for key in keys:
 			nodo = NODEPLANNER_NODOS[key]
@@ -65,6 +69,7 @@ class NodePlannerSubVentana(EditordeNodos):
 	def init_menú_contextual_de_los_nodos(self):
 		menu_contextual = QMenu(self)
 		keys = list(NODEPLANNER_NODOS.keys())
+		nodos_no_disponibles(keys, NODOS_NO_DISPONIBLES)
 		keys.sort()
 		for key in keys:
 			menu_contextual.addAction(self.opciones_de_nodos[key])
@@ -203,10 +208,10 @@ class NodePlannerSubVentana(EditordeNodos):
 				zocalo_objetivo = nuevo_calcnodo.salidas[0]
 		return zocalo_objetivo
 
-	def finalizar_nuevo_estado_del_nodo(self, nuevo_calcnodo):
+	def finalizar_nuevo_estado_del_nodo(self, nuevo_nodo):
 		self.escena.hacer_deseleccionar_objetos()
-		nuevo_calcnodo.Nodograficas.hacer_selección()
-		nuevo_calcnodo.Nodograficas.seleccionado()
+		nuevo_nodo.Nodograficas.hacer_selección()
+		nuevo_nodo.Nodograficas.seleccionado()
 
 	def control_menu_contextual_del_nuevo_nodo(self, event):
 		if DEBUG_CONTEXT:
@@ -215,20 +220,25 @@ class NodePlannerSubVentana(EditordeNodos):
 		accion = menu_contextual.exec_(self.mapToGlobal(event.pos()))
 
 		if accion is not None:
-			nuevo_calcnodo = obtener_clase_del_codigo_op(accion.data())(self.escena)
+			nuevo_nodo = obtener_clase_del_codigo_op(accion.data())(self.escena)
 			pos_escena = self.escena.obtener_vista().mapToScene(event.pos())
-			nuevo_calcnodo.definir_posición(pos_escena.x(), pos_escena.y())
+			nuevo_nodo.definir_posición(pos_escena.x(), pos_escena.y())
 			if DEBUG_CONTEXT:
-				print("Nodo seleccionado:", nuevo_calcnodo)
+				print("Nodo seleccionado:", nuevo_nodo)
 
 			if self.escena.obtener_vista().modo == MODO_DIBUJO:
 				# Cuando se dibuja una conexion:
 				zocalo_objetivo = self.definir_zocalo_objetivo_en_el_nodo(
-					self.escena.obtener_vista().dibujado.zocalo_inicial_de_dibujado.es_salida, nuevo_calcnodo
+					self.escena.obtener_vista().dibujado.zocalo_inicial_de_dibujado.es_salida, nuevo_nodo
 					)
 				if zocalo_objetivo is not None:
 					self.escena.obtener_vista().dibujado.finalizar_dibujado_de_conexión(zocalo_objetivo.GraficosZocalos)
-				self.finalizar_nuevo_estado_del_nodo()
+				try:
+					self.finalizar_nuevo_estado_del_nodo(nuevo_nodo)
+				except:
+					print('Revisa el método finalizar_nuevo_estado_del_nodo en '
+					      'control_menu_contextual_del_nuevo_nodo en np_subventana. Originamente aunque el método pida'
+					      'un parámetro, estaba vacío.')
 
 			else:
-				self.escena.historial.almacenar_historial("Nodo %s creado" % nuevo_calcnodo.__class__.__name__)
+				self.escena.historial.almacenar_historial("Nodo %s creado" % nuevo_nodo.__class__.__name__)

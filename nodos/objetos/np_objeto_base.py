@@ -1,300 +1,243 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel
+from PyQt5.QtGui import QFont
+from nodos.objetos.np_utilitarios import tratado_de_datos
 
-from np_constantes import *
-
-DEBUG = False
-
+DEBUG = True
+ADVERTENCIA_1 = 'Esa posición ya fue escrita.'
+ADVERTENCIA_2 = 'La %s %s no existe.'
 
 class ObjetodeNodePlanner:
 	def __init__(
-			self, elemento_padre, índice = None, zócalo_de_entrada = None, zócalo_de_salida = None, etiqueta: str = None,
-			comparte_posición = False, proporción: str = '3/4', ancho: int = None, alto = None, posición_x = 0,
-			posición_y = None, texto_inicial = NOMBRE_DEL_PRODUCTO, valor_inicial = None, alineado: str | int = 2,
-			fuente = None, validante = None, indeterminado = False, lista = None, separadores = None,
-			especificación = False
+			self, elemento_padre = None, llave: str = None, fuente: QFont = None,
+			posición_y_tamaño: list = [None, None, None, None], espaciado: int = None,
+			etiqueta: str = None, proporción: str = '2/4', zócalo: int = None,
+			es_entrada: bool = True, reordenando: bool = False
 			):
 
 		self.elemento_padre = elemento_padre
-		self.comparte_posición = comparte_posición
+		self.fuente = fuente
+		self.medidas = posición_y_tamaño
+		self.espaciado = espaciado
+		self.texto_de_la_etiqueta = etiqueta
+		self.proporción = proporción
+		self.zócalo = zócalo
+		self.es_entrada = es_entrada
+		self.es_salida = not self.es_entrada
+		self.reordenando = reordenando
+		self.llave = llave
+		self.oculto = False
+		self.visible = True
+		self.deserializando = False
 
-		if type(índice) in (int, float):
-			self.índice = int(índice)
-		else:
-			self.índice = None
+		self.init_ui()
 
-		self.zócalo_de_entrada = zócalo_de_entrada
-		self.zócalo_de_salida = zócalo_de_salida
-		self.texto_inicial = texto_inicial
-		self.valor_inicial = valor_inicial
-		self.texto_etiqueta = etiqueta
-		self.validante = validante
-		self.indeterminado = indeterminado
-		self.lista = lista
-		self.separadores = separadores
-		self.especificación = especificación
-
-		self.definir_objeto()
-
-		self.autooculto = False
-		self.es_visible = True
-
-		self.fuente(fuente)
-
-		self.altura_anchura_y_posición(ancho, alto, posición_x, posición_y)
-		self.obtener_proporción(proporción)
-		self.definir_posición_y_etiqueta()
+	def init_ui(self):
+		self.indexador()
+		self.objeto = self.definir_objeto()
+		self.estilo()
+		self.definir_fuente()
+		self.definir_valores_de_geometría()
+		self.posición_y_tamaño()
+		self.enlistador()
 
 		self.configuraciones_adicionales()
 		self.señal()
 
-		self.posición_de_zócalos()
-		self.alineado(alineado)
-		self.estilo()
+		self.posicionador_del_zócalo()
+		self.contenido()
 
-		self.elemento_padre.última_altura_usada.append(
-					int(self.posición_y + self.alto + self.elemento_padre.espaciado_entre_contenidos)
-					)
-		self.elemento_padre.lista_de_anchuras.append(self.ancho)
-
-		self.elemento_padre.lista_de_contenidos.append(self)
-
-		self.contenido_del_objeto()
-		self.forma_de_deserialización()
-
+	def indexador(self):
+		if self.zócalo is not None and self.llave is not None:
+			if self.es_entrada:
+				self.elemento_padre.diccionarios['Entradas'][self.zócalo] = self.llave
+			else:
+				self.elemento_padre.diccionarios['Salidas'][self.zócalo] = self.llave
 
 	def definir_objeto(self):
-		self.objeto = self.objeto()(*self.parámetros())
-
-	def objeto(self):
+		# Aquí declaras el widget principal con sus parámetros: una etiqueta, un line edit...
 		return None
 
-	def parámetros(self):
-		return None
+	def estilo(self):
+		# Aquí declaras el stylesheet para quitarle el fondo a las etiquetas, o a los botones booleanos...
+		pass
 
-	def fuente(self, fuente):
+	def definir_fuente(self):
+		if self.fuente is None:
+			self.fuente = self.elemento_padre.fuente
+
 		try:
-			if fuente is None:
-				self.fuente = self.elemento_padre.fuente
-			else:
-				self.fuente = fuente
 			self.objeto.setFont(self.fuente)
-		except:
+		except AttributeError:
 			if DEBUG:
 				print(self.objeto.__class__.__name__, "no usa fuente.")
 
-	def altura_anchura_y_posición(self, ancho, alto, posición_x, posición_y):
-		if posición_x is None:
+	def definir_valores_de_geometría(self):
+		# Posición en x
+		if self.medidas[0] is None:
 			self.posición_x = 0
 		else:
-			self.posición_x = posición_x
+			self.posición_x = self.medidas[0]
 
-		if posición_y is None:
-			if self.comparte_posición:
-				self.posición_y = self.elemento_padre.última_altura_usada[-2]
-			else:
-				self.posición_y = self.elemento_padre.última_altura_usada[-1]
+		# Posición en y
+		if self.medidas[1] is None:
+			self.posición_y = self.elemento_padre.lista_de_alturas[-1]
 		else:
-			self.posición_y = posición_y
+			self.posición_y = self.medidas[1]
 
-		if ancho is None:
+		# Anchura
+		if self.medidas[2] is None:
 			try:
-				self.ancho = max(self.elemento_padre.lista_de_anchuras)
+				self.anchura = max(self.elemento_padre.lista_de_anchuras)
 			except ValueError:
-				self.ancho = self.elemento_padre.anchura
+				self.anchura = self.elemento_padre.anchura
 		else:
-			self.ancho = ancho
+			self.anchura = self.medidas[2]
 
-		if alto is None:
-			self.alto = self.elemento_padre.altura
+		# Altura
+		if self.medidas[3] is None:
+			self.altura = self.elemento_padre.altura
 		else:
-			self.alto = alto
+			self.altura = self.medidas[3]
 
-	def obtener_proporción(self, proporción):
-		dato = str(proporción)
-		dato_encontrado = dato.find("/")
+		# Espaciado
+		if self.espaciado is None:
+			self.espaciado = self.elemento_padre.espaciado
 
-		número_1 = ''
-		número_2 = ''
-
-		for num in dato[0:dato_encontrado]:
-			número_1 += num
-		largo_objeto = float(número_1)
-
-		for num in dato[dato_encontrado + 1:]:
-			número_2 += num
-		partes = float(número_2)
-
-		self.proporción_1 = int((self.ancho / partes) * (partes - largo_objeto))
-		self.proporción_2 = int((self.ancho / partes) * largo_objeto)
-
-	def definir_posición_y_etiqueta(self):
-		if self.texto_etiqueta == '' or self.texto_etiqueta is None:
-			self.objeto.setGeometry(self.posición_x, self.posición_y, self.ancho, self.alto)
+	def posición_y_tamaño(self):
+		if self.texto_de_la_etiqueta in ('', None):
+			self.objeto.setGeometry(self.posición_x, self.posición_y, self.anchura, self.altura)
 		else:
-			if self.texto_etiqueta[-1] != ':':
-				self.texto_sin_puntos = self.texto_etiqueta
-				self.texto_etiqueta += ':'
+			dato = self.proporción.find('/')
+
+			fracción = float(self.proporción[0:dato])
+			partes = float(self.proporción[dato + 1:])
+
+			self.anchura_de_la_etiqueta = int((self.anchura / partes) * fracción)
+			anchura_del_objeto = int((self.anchura / partes) * (partes - fracción))
+
+			if self.texto_de_la_etiqueta[-1] != ':':
+				self.texto_sin_puntos = self.texto_de_la_etiqueta
+				self.texto_con_puntos = self.texto_de_la_etiqueta + ':'
 			else:
-				self.texto_sin_puntos = self.texto_etiqueta.replace(":", "")
+				self.texto_sin_puntos = self.texto_de_la_etiqueta.replace(":", "")
+				self.texto_con_puntos = self.texto_de_la_etiqueta
 
-			self.etiqueta = QLabel(self.texto_etiqueta, self.elemento_padre)
-			self.etiqueta.setGeometry(self.posición_x, self.posición_y, self.proporción_1, self.alto)
+			self.etiqueta = QLabel(self.texto_con_puntos, self.elemento_padre)
+			self.etiqueta.setGeometry(self.posición_x, self.posición_y, self.anchura_de_la_etiqueta, self.altura)
 			self.etiqueta.setStyleSheet('padding-left: 1px; background: transparent')
 			self.etiqueta.setAlignment(Qt.AlignVCenter)
 			self.etiqueta.setFont(self.fuente)
+
 			self.objeto.setGeometry(
-					self.proporción_1 + 1,
+					self.anchura_de_la_etiqueta,
 					self.posición_y,
-					self.proporción_2 - 1,
-					self.alto
+					anchura_del_objeto,
+					self.altura
 					)
 
-	def alineado(self, alineado):
+	def enlistador(self):
+		self.elemento_padre.lista_de_alturas.append(self.posición_y + self.altura + self.espaciado)
+		self.elemento_padre.lista_de_anchuras.append(self.anchura)
+
+	def posicionador_del_zócalo(self):
+		if self.es_entrada:
+			lista = self.elemento_padre.posicionador_de_entradas
+		else:
+			lista = self.elemento_padre.posicionador_de_salidas
+
 		try:
-			if alineado in (1, 'Izquierda'):
-				self.objeto.setAlignment(Qt.AlignLeft)
-			elif alineado in (2, 'Centro'):
-				self.objeto.setAlignment(Qt.AlignCenter)
-			elif alineado in (3, 'Derecha'):
-				self.objeto.setAlignment(Qt.AlignRight)
-		except:
+			if self.zócalo is not None:
+				if lista[self.zócalo] is None or self.reordenando:
+					lista[self.zócalo] = (self.posición_y + (self.altura / 2))
+					self.reordenando = False
+				else:
+					if DEBUG:
+						print(ADVERTENCIA_1)
+		except IndexError:
 			if DEBUG:
-				print(self.objeto.__class__.__name__, "no usa alineado.")
+				print(ADVERTENCIA_2 % ('entrada' if self.es_entrada else 'salida', self.zócalo))
 
 	def configuraciones_adicionales(self):
 		pass
 
-	def posición_de_zócalos(self):
-		self.advertencia_1 = 'Esa posición ya fue escrita.'
-		self.advertencia_2 = 'La entrada %s no existe.'
-		self.advertencia_3 = 'La salida %s no existe.'
-		self.advertencia_4 = 'La posición fue reescrita.'
-
-		try:
-			if self.zócalo_de_entrada is not None:
-				if self.elemento_padre.lista_de_posiciones_de_entradas[self.zócalo_de_entrada] is None:
-					self.elemento_padre.lista_de_posiciones_de_entradas[self.zócalo_de_entrada] = (
-						self.posición_y + (self.alto / 2)
-					)
-				else:
-					if self.comparte_posición:
-						self.elemento_padre.lista_de_posiciones_de_entradas[self.zócalo_de_entrada] = (
-								self.posición_y + (self.alto / 2)
-						)
-						if DEBUG:
-							print(self.advertencia_4)
-					else:
-						if DEBUG:
-							print(self.advertencia_1)
-		except IndexError:
-				print(self.advertencia_2 % self.zócalo_de_entrada)
-
-		try:
-			if self.zócalo_de_salida is not None:
-				if self.elemento_padre.lista_de_posiciones_de_salidas[self.zócalo_de_salida] is None:
-					self.elemento_padre.lista_de_posiciones_de_salidas[self.zócalo_de_salida] = (
-						self.posición_y + (self.alto / 2)
-					)
-				else:
-					if self.comparte_posición:
-						self.elemento_padre.lista_de_posiciones_de_salidas[self.zócalo_de_salida] = (
-								self.posición_y + (self.alto / 2)
-						)
-						if DEBUG:
-							print(self.advertencia_4)
-					else:
-						if DEBUG:
-							print(self.advertencia_1)
-		except IndexError:
-				print(self.advertencia_3 % self.zócalo_de_salida)
-
-	def estilo(self):
-		pass
-
 	def señal(self):
-		# Aquí iría el signal de la texto_etiqueta... si es que hubiera una xD
 		pass
 
-	def contenido_del_objeto(self):
-		# Aquí iría el método del objeto que emite cuando se modifica algo. Las etiquetas... bueno... xD
-		pass
+	def contenido(self):
+		if self.llave is not None and self.es_entrada:
+			self.elemento_padre.valores[self.llave] = self.escribir_dato()
 
-	def forma_de_deserialización(self):
-		# Aquí iría el método con el que la deserialización pone el dato en el objeto... pero bueno... texto_etiqueta... xD
-		pass
+	def escribir_dato(self):
+		return None
 
-	# Estos métodos solo se pueden usar después del init en la clase del nodo. En el contenido dan error porque el
-	# zócalo se crea después del contenido y obviamente no se puede ocultar o mostrar algo que aún no existe.
-	def ocultar_entrada(self):
-		if self.zócalo_de_entrada is not None:
-			self.elemento_padre.nodo.entradas[self.zócalo_de_entrada].quitar_todas_las_conexiones(True)
-			self.elemento_padre.nodo.entradas[self.zócalo_de_entrada].GraficosZocalos.setVisible(False)
-		else:
-			pass
+	def obtener_dato(self):
+		return self.elemento_padre.valores.get(self.llave)
 
-	def mostrar_entrada(self):
-		if self.zócalo_de_entrada is not None:
-			self.elemento_padre.nodo.entradas[self.zócalo_de_entrada].GraficosZocalos.setVisible(True)
-		else:
-			pass
+	def ocultar_zócalo(self):
+		if self.zócalo is not None:
+			if self.es_entrada:
+				self.elemento_padre.nodo.entradas[self.zócalo].quitar_todas_las_conexiones(True)
+				self.elemento_padre.nodo.entradas[self.zócalo].GraficosZocalos.setVisible(False)
+			else:
+				self.elemento_padre.nodo.salidas[self.zócalo].quitar_todas_las_conexiones(True)
+				self.elemento_padre.nodo.salidas[self.zócalo].GraficosZocalos.setVisible(False)
 
-	def ocultar_salida(self):
-		if self.zócalo_de_salida is not None:
-			self.elemento_padre.nodo.salidas[self.zócalo_de_salida].quitar_todas_las_conexiones(True)
-			self.elemento_padre.nodo.salidas[self.zócalo_de_salida].GraficosZocalos.setVisible(False)
-		else:
-			pass
+	def mostrar_zócalo(self):
+		if self.zócalo is not None:
+			if self.es_entrada:
+				self.elemento_padre.nodo.entradas[self.zócalo].GraficosZocalos.setVisible(True)
+			else:
+				self.elemento_padre.nodo.salidas[self.zócalo].GraficosZocalos.setVisible(True)
 
-	def mostrar_salida(self):
-		if self.zócalo_de_salida is not None:
-			self.elemento_padre.nodo.salidas[self.zócalo_de_salida].GraficosZocalos.setVisible(True)
-		else:
-			pass
-
-	def ocultar_zócalos(self):
-		self.ocultar_entrada()
-		self.ocultar_salida()
-
-	def mostrar_zócalos(self):
-		self.mostrar_entrada()
-		self.mostrar_salida()
-
-	def autoocultarse(self):
-		self.ocultar_zócalos()
+	def ocultar(self):
+		self.ocultar_zócalo()
 		self.objeto.setVisible(False)
-		self.autooculto = True
-		if self.texto_etiqueta != '' and self.texto_etiqueta is not None:
+		self.oculto = True
+		if self.texto_de_la_etiqueta != '' and self.texto_de_la_etiqueta is not None:
 			self.etiqueta.setVisible(False)
-		else:
-			pass
 
-	def automostrarse(self):
-		self.mostrar_zócalos()
+	def mostrar(self):
+		self.mostrar_zócalo()
 		self.objeto.setVisible(True)
-		self.autooculto = False
-		if self.texto_etiqueta != '' and self.texto_etiqueta is not None:
+		self.oculto = False
+		if self.texto_de_la_etiqueta != '' and self.texto_de_la_etiqueta is not None:
 			self.etiqueta.setVisible(True)
-		else:
+
+	def widget_conectado(self):
+		try:
+			if self.visible and self.es_entrada and self.zócalo is not None:
+				if self.elemento_padre.nodo.entradas[self.zócalo].Zocaloconexiones != []:
+					self.objeto.setVisible(False)
+					self.visible = False
+					if self.texto_de_la_etiqueta != '' and self.texto_de_la_etiqueta is not None:
+						self.etiqueta.setGeometry(self.posición_x, self.posición_y, self.anchura, self.altura)
+						self.etiqueta.setText(self.texto_sin_puntos)
+		except IndexError:
 			pass
 
-	def ocultado_por_entrada(self):
-		if self.es_visible and self.zócalo_de_entrada is not None:
-			if self.elemento_padre.nodo.entradas[self.zócalo_de_entrada].Zocaloconexiones != []:
-				self.objeto.setVisible(False)
-				self.es_visible = False
-				if self.texto_etiqueta != '' and self.texto_etiqueta is not None:
-					self.etiqueta.setGeometry(self.posición_x, self.posición_y, self.ancho, self.alto)
-					self.etiqueta.setText(self.texto_sin_puntos)
-					self.etiqueta.setVisible(True)
+	def widget_desconectado(self):
+		try:
+			if not self.oculto:
+				if not self.visible and self.es_entrada and self.zócalo is not None:
+					if self.elemento_padre.nodo.entradas[self.zócalo].Zocaloconexiones == []:
+						self.objeto.setVisible(True)
+						self.visible = True
+						if self.texto_de_la_etiqueta != '' and self.texto_de_la_etiqueta is not None:
+							self.etiqueta.setGeometry(
+									self.posición_x, self.posición_y,
+									self.anchura_de_la_etiqueta, self.altura
+									)
+							self.etiqueta.setText(self.texto_sin_puntos)
+		except IndexError:
+			pass
 
-	def mostrado_por_entrada(self):
-		if not self.autooculto:
-			if not self.es_visible and self.zócalo_de_entrada is not None:
-				if self.elemento_padre.nodo.entradas[self.zócalo_de_entrada].Zocaloconexiones == []:
-					self.objeto.setVisible(True)
-					self.es_visible = True
-					if self.texto_etiqueta != '' and self.texto_etiqueta is not None:
-						self.etiqueta.setGeometry(self.posición_x, self.posición_y, self.proporción_1, self.alto)
-						self.etiqueta.setText(self.texto_etiqueta)
-						self.etiqueta.setVisible(True)
+	def método_de_deserialización(self, data):
+		if self.llave is not None:
+			try:
+				self.deserialización(data[self.llave])
+			except TypeError:
+				self.deserialización(tratado_de_datos(data[self.llave]))
+
+	def deserialización(self, dato):
+		pass

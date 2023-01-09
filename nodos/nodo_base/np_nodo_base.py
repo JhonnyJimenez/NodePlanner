@@ -1,20 +1,20 @@
+from lib.nodeeditor.Seriabilizador import Serializable
 from lib.nodeeditor.Nodo import Nodo
 from lib.nodeeditor.Zocalos import IZQUIERDA_ARRIBA, IZQUIERDA_CENTRO, IZQUIERDA_ABAJO
 from lib.nodeeditor.Utilidades import dump_exception
 
 from np_enlistado_de_nodos import *
-from nodos.objetos.np_utilitarios import tratado_de_datos_para_tooltip
+from nodos.objetos.np_utilitarios import tratado_de_datos
 from nodos.nodo_base.np_zocalos import ZócalosdelNodoBase
 from nodos.nodo_base.np_nodo_graficador import GraficadordelNodoBase
 from nodos.nodo_base.np_nodo_contenido import ContenidodelNodoBase
+from nodos.objetos.np_etiqueta import Etiqueta
 
 DEBUG = False
 
-imagen = "C:/Users/Maste/Downloads/icons/help (2).svg"
-
-# @registrar_nodo(NODO_BASE)
+@registrar_nodo(NODO_BASE)
 class NodoBase(Nodo):
-	icono = imagen
+	icono = "iconos/nodo base.svg"
 	codigo_op = NODO_BASE
 	titulo_op = "Nodo base"
 
@@ -22,45 +22,31 @@ class NodoBase(Nodo):
 	ClasedelContenidodeNodo = ContenidodelNodoBase
 	ClasedeZocalo = ZócalosdelNodoBase
 
-	Entradas = [0, 1, 4, 3]
+	Entradas = [1, 4, 3]
 	Salidas = [1, 4, 3, 5]
 
-	# Incluir un tipo de zócalo aquí elimina el rombito pequeño, si el tipo de nodo es un rombo.
-	Rombitos = [
-			[],  # Entradas
-			[]   # Salidas
-			]
+	FormaDeEntradas = ['Círculo', 'Círculo', 'Círculo', 'Círculo']
+	FormaDeSalidas = ['Círculo', 'Círculo', 'Círculo', 'Círculo']
 
 	def __init__(self, escena, titulo = titulo_op, entradas = Entradas, salidas = Salidas):
-
-		self.conteo_de_errores()
-		self.inicializado_de_valores(entradas, salidas)
+		# Conteo de errores:
+		self.errores_graves = 0
+		self.errores_menores = 0
 
 		self.entradas_a_ocultar = []
 		self.salidas_a_ocultar = []
+
 		super().__init__(escena, titulo, entradas, salidas)
+		self.ajustes_adicionales()
+		self.valores = self.contenido.valores
+		self.diccionarios = self.contenido.diccionarios
 		self.control_de_zócalos()
 
 		# Evaluación inicial.
 		self.marcar_indefinido()
-		# Método para poder añadir métodos antes de la evaluación en nodos instanciados a partir de este.
-		self.evaluación_inicial()
-
-	def evaluación_inicial(self):
-		self.evaluación(False)
-
-	def conteo_de_errores(self):
-		self.errores_graves = 0
-		self.errores_menores = 0
-
-	def inicializado_de_valores(self, entradas, salidas):
-		self.valores_de_entrada = []    # Para los valores que vienen de otros nodos.
-		self.valores_de_salida = []     # Para los valores que el nodo enviará o otros.
-
-		for zócalo in entradas:
-			self.valores_de_entrada.append(None)
-		for zócalo in salidas:
-			self.valores_de_salida.append(None)
+		if self.escena.deserializando is False:
+			# Método para poder añadir métodos antes de la evaluación en nodos instanciados a partir de este.
+			self.evaluación_inicial()
 
 	def init_zocalos(self, entradas, salidas, reset=True):
 		# Creación de zócalos para las entradas y salidas.
@@ -78,9 +64,10 @@ class NodoBase(Nodo):
 		contador = 0
 		for objeto in entradas:
 			zocalo = self.__class__.ClasedeZocalo(
-				nodo = self, indice = contador, posicion = self.pos_det_entradas, tipo_zocalo = objeto,
+					nodo = self, indice = contador, posicion = self.pos_det_entradas, tipo_zocalo = objeto,
 					multiconexión = self.entradas_multiconexion, cantidad_en_el_lado_actual = len(entradas),
-					es_entrada = True, rombito = False if objeto in self.__class__.Rombitos[0] else True
+					es_entrada = True,
+					forma = self.__class__.FormaDeEntradas[contador] if self.__class__.FormaDeEntradas[contador] is not None else 'Círculo'
 				)
 			contador += 1
 			self.entradas.append(zocalo)
@@ -88,9 +75,10 @@ class NodoBase(Nodo):
 		contador = 0
 		for objeto in salidas:
 			zocalo = self.__class__.ClasedeZocalo(
-				nodo = self, indice = contador, posicion = self.pos_det_salidas, tipo_zocalo = objeto,
-				multiconexión = self.salidas_multiconexion, cantidad_en_el_lado_actual = len(salidas),
-				es_entrada = False, rombito = False if objeto in self.__class__.Rombitos[1] else True
+					nodo = self, indice = contador, posicion = self.pos_det_salidas, tipo_zocalo = objeto,
+					multiconexión = self.salidas_multiconexion, cantidad_en_el_lado_actual = len(salidas),
+					es_entrada = False,
+					forma = self.__class__.FormaDeSalidas[contador] if self.__class__.FormaDeSalidas[contador] is not None else 'Círculo'
 				)
 			contador += 1
 			self.salidas.append(zocalo)
@@ -107,9 +95,9 @@ class NodoBase(Nodo):
 		techo = self.Nodograficas.altura_del_título + self.Nodograficas.márgen
 
 		if es_entrada:
-			altura = self.contenido.lista_de_posiciones_de_entradas[indice]
+			altura = self.contenido.posicionador_de_entradas[indice]
 		else:
-			altura = self.contenido.lista_de_posiciones_de_salidas[indice]
+			altura = self.contenido.posicionador_de_salidas[indice]
 
 		if altura is None:
 			altura = 0 - techo
@@ -129,12 +117,32 @@ class NodoBase(Nodo):
 				)
 		return pos_nodo.x() + pos_zocalo[0], pos_nodo.y() + pos_zocalo[1]
 
+	def ajustes_adicionales(self):
+		pass
+
+	def obtener_descendencia(self):
+		descendencia = set()
+		nodos_padres = set()
+		nodos_hijos = self.obtener_nodos_hijos()
+		for zócalo in self.entradas:
+			if zócalo.Zocaloconexiones:
+				nodo = self.obtener_entrada(zócalo.indice)
+				if nodo is not None:
+					nodos_padres.add(nodo)
+
+		for nodo in nodos_hijos:
+			descendencia.add(nodo)
+			for padre in nodos_padres:
+				padre.descendencia.add(nodo)
+
+		return descendencia
+
 	def control_de_zócalos(self):
 		for indice in self.entradas_a_ocultar:
-			self.entradas[indice].GraficosZocalos.setVisible(False)
+			self.entradas[indice].GraficosZocalos.hide()
 
 		for indice in self.salidas_a_ocultar:
-			self.salidas[indice].GraficosZocalos.setVisible(False)
+			self.salidas[indice].GraficosZocalos.hide()
 
 	def control_de_errores(self):
 		if self.errores_graves > 0:
@@ -162,9 +170,13 @@ class NodoBase(Nodo):
 		# de entrada cambiados y ese método ya trae una evaluación. Incluí un método de salidas cambiadas para
 		# forzar una evaluación al nodo que envía datos y así actualizar los tooltips.
 
+	def evaluación_inicial(self):
+		self.evaluación(False)
+
 	def datos_de_entrada_cambiados(self, conexión):
-		self.marcar_indefinido()
-		self.evaluación()
+		if self.escena.deserializando is False:
+			self.marcar_indefinido()
+			self.evaluación()
 
 	def datos_de_salida_cambiados(self):
 		self.marcar_indefinido()
@@ -172,21 +184,22 @@ class NodoBase(Nodo):
 
 	def evaluación(self, evaluar_hijos = True):
 		try:
-			self.obtención_de_datos_de_las_entradas()   # Esto tiene que ir antes de la evaluación porque si no, la
+			self.datos_de_entrada()                     # Esto tiene que ir antes de la evaluación porque si no, la
 														# evaluación solo escogerá los valores internos en nodos hijos.
-			self.valores_internos = self.contenido.lista_de_información
-			self.valores_de_evaluación()
-
+			self.valores_preevaluación = self.valores.copy()
 			evaluación = self.métodos_de_evaluación()
 
-			for elemento in self.contenido.lista_de_contenidos:     # Esto originalmente estaba en datos de conexión
-				elemento.ocultado_por_entrada()						# cambiados. Es para ocultar los widgets de entrada
-				elemento.mostrado_por_entrada()						# que tienen conexiones. Pero dado que por la
-																	# arquitectura, siempre se realiza una evaluación
-																	# cuando se conecta algo, se movió acá, junto con
-																	# el sistema que solo actualizaba las etiquetas.
+			try:
+				for elemento in self.contenido.contenido_de_entradas:   # Esto originalmente estaba en datos de conexión
+					elemento.widget_conectado()                         # cambiados. Es para ocultar los widgets de
+					elemento.widget_desconectado()                      # entrada
+			except AttributeError:                                      # que tienen conexiones. Pero dado que por la
+				pass                                                    # arquitectura siempre se realiza una evaluación
+																		# cuando se conecta algo, se movió acá junto con
+																		# el sistema que solo actualizaba las etiquetas.
 
 			self.tooltips_de_los_zocalos()
+			self.descendencia = self.obtener_descendencia()
 			self.control_de_errores()
 			if self.obtener_nodos_hijos() and evaluar_hijos is True:
 				self.evaluar_hijos()
@@ -202,14 +215,25 @@ class NodoBase(Nodo):
 			self.Nodograficas.setToolTip(str(Exception))
 			dump_exception(e)
 
-	def obtención_de_datos_de_las_entradas(self):
-		for entrada in self.entradas:
-			if entrada.Zocaloconexiones:
-				nodo = self.obtener_entrada(entrada.indice)
-				contrazocalo = self.obtener_contrazócalo(entrada.indice)
-				self.valores_de_entrada[entrada.indice] = nodo.valores_de_salida[contrazocalo.indice]
+	def datos_de_entrada(self):
+		for zócalo in self.entradas:
+			if zócalo.Zocaloconexiones:
+				contranodo = self.obtener_entrada(zócalo.indice)
+				contrazócalo = self.obtener_contrazócalo(zócalo.indice)
+				try:
+					self.valores[self.diccionarios['Entradas'][zócalo.indice]] = contranodo.valores[
+						contranodo.diccionarios['Salidas'][contrazócalo.indice]
+					]
+				except KeyError:
+					pass
 			else:
-				self.valores_de_entrada[entrada.indice] = None
+				for elemento in self.contenido.contenido_de_entradas:
+					try:
+						if elemento.llave == self.diccionarios['Entradas'][zócalo.indice]:
+							elemento.contenido()
+							break
+					except KeyError:
+						pass
 
 	def obtener_contrazócalo(self, indice = 0):
 		try:
@@ -222,27 +246,6 @@ class NodoBase(Nodo):
 			print(str(Exception))
 			return None
 
-	def valores_de_evaluación(self):
-		for elemento in self.contenido.lista_de_contenidos:
-			if elemento.zócalo_de_salida is not None:
-				try:
-					if elemento.zócalo_de_entrada is not None and self.entradas[elemento.zócalo_de_entrada].Zocaloconexiones:
-						self.valores_de_salida[elemento.zócalo_de_salida] = self.valores_de_entrada[elemento.zócalo_de_entrada]
-					else:
-						# Por defecto, los elementos que no comparten posición escriben su valor siempre.
-						if not elemento.comparte_posición:
-							self.valores_de_salida[elemento.zócalo_de_salida] = self.valores_internos[elemento.índice]
-						# Y si alguien llega aquí es porque comparte posición, en cuyo caso, solo si son visibles,
-						# sobreescribirán el dato de la salida que comparten.
-						elif not elemento.autooculto:
-							self.valores_de_salida[elemento.zócalo_de_salida] = self.valores_internos[elemento.índice]
-
-				except IndexError:
-					print('La lista de valores de salida está vacía. Eso significa que el zócalo requerido no existe.')
-			else:
-				pass
-		return self.valores_de_salida
-
 	def métodos_de_evaluación(self):
 		pass
 
@@ -253,13 +256,18 @@ class NodoBase(Nodo):
 		zócalos = self.entradas + self.salidas
 		cantidad_de_conexiones = 0
 
-		self.entradas_tratadas = tratado_de_datos_para_tooltip(self.valores_de_entrada, True)
-		self.internos_tratados = tratado_de_datos_para_tooltip(self.valores_internos, True)
-		self.salidas_tratadas = tratado_de_datos_para_tooltip(self.valores_de_salida, True)
+		self.valores_postevaluación = self.valores.copy()
+
+		for llave in self.valores_preevaluación:
+			self.valores_preevaluación[llave] = tratado_de_datos(self.valores_preevaluación[llave], True)
+
+		for llave in self.valores_postevaluación:
+			self.valores_postevaluación[llave] = tratado_de_datos(self.valores_postevaluación[llave], True)
 
 		for zócalo in zócalos:
 			if len(zócalo.Zocaloconexiones) != 0:
 				cantidad_de_conexiones += 1
+				break
 
 		# Tooltip si el nodo no está conectado a nada.
 		if cantidad_de_conexiones == 0:
@@ -267,34 +275,60 @@ class NodoBase(Nodo):
 				zócalo.GraficosZocalos.setToolTip(no_evaluado)
 		else:
 			for zócalo in self.salidas:
-				# En caso un cálculo de la evaluación de None, cosa que solo pasaría si se me pasa (espero),
-				# el tooltip me avisará.
-				if zócalo.Zocaloconexiones and self.valores_de_salida[zócalo.indice] is None:
-					zócalo.GraficosZocalos.setToolTip(error_de_cálculo)
-					self.errores_graves += 1
+				if zócalo.GraficosZocalos.isVisible():
+					# En caso un cálculo de la evaluación de None, cosa que solo pasaría si se me pasa (espero),
+					# el tooltip me avisará.
+					if zócalo.Zocaloconexiones and self.valores[self.diccionarios['Salidas'][zócalo.indice]] is None:
+						zócalo.GraficosZocalos.setToolTip(error_de_cálculo)
+						self.errores_graves += 1
 
-				# Seteo del tooltip solo en caso esté conectado el zócalo.
-				elif zócalo.Zocaloconexiones and self.valores_de_salida[zócalo.indice] is not None:
-					zócalo.GraficosZocalos.setToolTip(self.salidas_tratadas[zócalo.indice])
-				else:
-					zócalo.GraficosZocalos.setToolTip(no_evaluado)
+					# Seteo del tooltip solo en caso esté conectado el zócalo.
+					elif zócalo.Zocaloconexiones and self.valores[self.diccionarios['Salidas'][zócalo.indice]] is not None:
+						zócalo.GraficosZocalos.setToolTip(
+								self.valores_postevaluación[self.diccionarios['Salidas'][zócalo.indice]]
+								)
+					else:
+						zócalo.GraficosZocalos.setToolTip(no_evaluado)
 
 
 			for zócalo in self.entradas:
-				if zócalo.Zocaloconexiones and self.valores_de_entrada[zócalo.indice] is None:
-					zócalo.GraficosZocalos.setToolTip(error_de_cálculo)
-					self.errores_graves += 1
+				if zócalo.GraficosZocalos.isVisible():
+					try:
+						if (
+								zócalo.Zocaloconexiones
+								and self.valores_preevaluación[self.diccionarios['Entradas'][zócalo.indice]] is None
+						):
+							zócalo.GraficosZocalos.setToolTip(error_de_cálculo)
+							self.errores_graves += 1
 
-				elif zócalo.Zocaloconexiones:
-					# Aquí se muestran los valores de la salida conectada. Estamos usando la lista de valores de
-					# entrada.
-					zócalo.GraficosZocalos.setToolTip(self.entradas_tratadas[zócalo.indice])
-				else:
-					# Aquí obtenemos los valores internos.
-					for elemento in self.contenido.lista_de_contenidos:
-						if elemento.zócalo_de_entrada is not None:
-							if zócalo.indice == elemento.zócalo_de_entrada:
-								zócalo.GraficosZocalos.setToolTip(self.internos_tratados[elemento.índice])
+						elif zócalo.Zocaloconexiones:
+							# Aquí se muestran los valores de la salida conectada. Estamos usando la lista de valores de
+							# entrada.
+							zócalo.GraficosZocalos.setToolTip(
+									self.valores_preevaluación[self.diccionarios['Entradas'][zócalo.indice]]
+									)
+						else:
+							if self.valores_preevaluación[self.diccionarios['Entradas'][zócalo.indice]] is not None:
+								zócalo.GraficosZocalos.setToolTip(
+										self.valores_preevaluación[self.diccionarios['Entradas'][zócalo.indice]]
+										)
+							else:
+								zócalo.GraficosZocalos.setToolTip(error_de_cálculo)
+								self.errores_graves += 1
+					except KeyError:
+						for elemento in self.contenido.contenido_de_entradas:
+							if elemento.zócalo is None:
+								pass
+							elif isinstance(elemento, Etiqueta) and zócalo.indice == elemento.zócalo:
+								zócalo.GraficosZocalos.setToolTip(tratado_de_datos(elemento.objeto.text(), True))
+								break
+							elif zócalo.indice == elemento.zócalo:
+								zócalo.GraficosZocalos.setToolTip('El elemento asignado a la entrada %s (%s) le falta llave o se le asignó este'
+									      ' zócalo por error.' % (zócalo.indice + 1, elemento.__class__.__name__))
+								if DEBUG:
+									print('El elemento asignado a la entrada %s (%s) le falta llave o se le asignó este'
+									      ' zócalo por error.' % (zócalo.indice + 1, elemento.__class__.__name__))
+								break
 
 	def serialización(self):
 		res = super().serialización()
@@ -302,5 +336,76 @@ class NodoBase(Nodo):
 		return res
 
 	def deserialización(self, data, hashmap = {}, restaure_id = True, *args, **kwargs):
-		res = super().deserialización(data, hashmap, restaure_id)
-		return res
+		try:
+			if restaure_id: self.id = data['ID']
+			hashmap[data['ID']] = self
+
+			self.definir_posición(data['Posición X'], data['Posición Y'])
+			self.titulo = data['Título']
+
+			data['Entradas'].sort(key = lambda Zocalo: Zocalo['Índice'] + Zocalo['Posición'] * 10000)
+			data['Salidas'].sort(key = lambda Zocalo: Zocalo['Índice'] + Zocalo['Posición'] * 10000)
+			num_entradas = len(data['Entradas'])
+			num_salidas = len(data['Salidas'])
+
+			# Una forma de hacer esto es borrar los zocalos existentes. Pero cuando lo hacemos, la deserialización
+			# debe ser reescrita por cada uno de los zocalos que se definan en el constructor de un nodo...
+			# La segunda forma de hacerlo es reusar los zocalos existentes, así no se crean nuevos si no es necesario.
+
+			for Zocalo_data in data['Entradas']:
+				# Forma 1: Borrar y crear nuevos nodos.
+				# nuevo_zocalo = self.__class__.ClasedeZocalo(nodo=self, indice=Zocalo_data['Índice'],
+				#											posicion=Zocalo_data['Posición'],
+				#											tipo_zocalo=Zocalo_data['Tipo de zócalo'],
+				#											cantidad_en_el_lado_actual=num_entradas, es_entrada=True)
+				# nuevo_zocalo.deserialización(Zocalo_data, hashmap, restaure_id)
+				# self.entradas.append(nuevo_zocalo)
+
+				# Forma 2: Usar los zocalos existentes y crear los faltantes.
+				encontrado = None
+				for zocalo in self.entradas:
+					if zocalo.indice == Zocalo_data['Índice']:
+						encontrado = zocalo
+						break
+				if encontrado is None:
+					encontrado = self.__class__.ClasedeZocalo(
+						nodo = self, indice = Zocalo_data['Índice'],
+						posicion = Zocalo_data['Posición'],
+						tipo_zocalo = Zocalo_data['Tipo de zócalo'],
+						cantidad_en_el_lado_actual = num_entradas, es_entrada = True, forma = Zocalo_data['Forma']
+						)
+					self.entradas.append(encontrado)
+				encontrado.deserialización(Zocalo_data, hashmap, restaure_id)
+
+			for Zocalo_data in data['Salidas']:
+				# Forma 1: Borrar y crear nuevos nodos.
+				# nuevo_zocalo = self.__class__.ClasedeZocalo(nodo=self, indice=Zocalo_data['Índice'],
+				#											posicion=Zocalo_data['Posición'],
+				#											tipo_zocalo=Zocalo_data['Tipo de zócalo'],
+				#											cantidad_en_el_lado_actual=num_salidas, es_entrada=False)
+				# nuevo_zocalo.deserialización(Zocalo_data, hashmap, restaure_id)
+				# self.salidas.append(nuevo_zocalo)
+
+				# Forma 2: Usar los zocalos existentes y crear los faltantes.
+				encontrado = None
+				for zocalo in self.salidas:
+					if zocalo.indice == Zocalo_data['Índice']:
+						encontrado = zocalo
+						break
+				if encontrado is None:
+					encontrado = self.__class__.ClasedeZocalo(
+						nodo = self, indice = Zocalo_data['Índice'],
+						posicion = Zocalo_data['Posición'],
+						tipo_zocalo = Zocalo_data['Tipo de zócalo'],
+						cantidad_en_el_lado_actual = num_salidas, es_entrada = False, forma = Zocalo_data['Forma']
+						)
+					self.salidas.append(encontrado)
+				encontrado.deserialización(Zocalo_data, hashmap, restaure_id)
+		except Exception as e: dump_exception(e)
+
+		# También deserializa el contenido del nodo.
+		if isinstance(self.contenido, Serializable):
+			res = self.contenido.deserialización(data['Contenido'], hashmap)
+			return res
+
+		return True

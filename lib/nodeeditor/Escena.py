@@ -17,6 +17,7 @@ class InvalidFile(Exception): pass
 class Escena(Serializable):
 	def __init__(self):
 		super().__init__()
+		self.deserializando = False
 		self.nodos = []
 		self.conexiones = []
 		
@@ -206,6 +207,8 @@ class Escena(Serializable):
 		])
 	
 	def deserialización(self, data, hashmap={}, restaure_id=True, *args, **kwargs):
+		self.deserializando = True
+
 		hashmap = {}
 		
 		if restaure_id: self.id = data['ID']
@@ -257,5 +260,7 @@ class Escena(Serializable):
 		while todas_las_conexiones != []:
 			conexion = todas_las_conexiones.pop()
 			conexion.quitar()
+
+		self.deserializando = False
 		
 		return True

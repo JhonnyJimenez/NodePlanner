@@ -6,8 +6,6 @@ from nodos.nodo_base.np_nodo_contenido import ContenidodelNodoBase
 from nodos.nodo_base.np_nodo_graficador import GraficadordelNodoBase
 from nodos.objetos.np_etiqueta import Etiqueta
 
-imagen = "C:/Users/Maste/Downloads/icons/visibility.svg"
-
 
 class GraficadordelosNodosdeSalida(GraficadordelNodoBase):
 	def init_assets(self):
@@ -16,23 +14,21 @@ class GraficadordelosNodosdeSalida(GraficadordelNodoBase):
 
 
 class ContenidodelosNodosdeSalida(ContenidodelNodoBase):
-	def controles(self):
-		super().controles()
-		self.placeholder(1)
-
 	def configuraciones(self):
 		super().configuraciones()
-		self.anchura = 100
+		self.anchura = 130
 
 	def contenido(self):
-		self.ejemplo_0 = Etiqueta(
-				self, índice = 0, zócalo_de_entrada = 0, texto_inicial = 'Sin datos.'
-				)
+		self.contenido_de_salidas = [
+				]
+		self.contenido_de_entradas = [
+				Etiqueta(self, 'Sin datos.', es_entrada = True, zócalo = 0)
+				]
 
 
-# @registrar_nodo(CATEGORIA_SALIDAS)
+@registrar_nodo(CATEGORIA_SALIDAS)
 class Salidas(NodoBase):
-	icono = imagen
+	icono = "iconos/categoría salidas.svg"
 	codigo_op = CATEGORIA_SALIDAS
 	titulo_op = "Salidas"
 
@@ -41,6 +37,9 @@ class Salidas(NodoBase):
 
 	Entradas = [0]
 	Salidas = []
+
+	FormaDeEntradas = ['Círculo']
+	FormaDeSalidas = []
 
 	def __init__(self, escena, titulo = titulo_op, entradas = Entradas, salidas = Salidas):
 		super().__init__(escena, titulo, entradas, salidas)

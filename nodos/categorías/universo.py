@@ -7,8 +7,6 @@ from nodos.nodo_base.np_nodo_graficador import GraficadordelNodoBase
 from nodos.objetos.np_etiqueta import Etiqueta
 from nodos.objetos.np_entrada import Entrada, VALIDANTE_NUMÉRICO
 
-imagen = "C:/Users/Maste/Downloads/icons/star.svg"
-
 
 class GraficadordelNodoUniverso(GraficadordelNodoBase):
 	def init_assets(self):
@@ -17,31 +15,28 @@ class GraficadordelNodoUniverso(GraficadordelNodoBase):
 
 
 class ContenidodelNodoUniverso(ContenidodelNodoBase):
-	def controles(self):
-		super().controles()
-		self.placeholder(3)
-
 	def configuraciones(self):
 		super().configuraciones()
-		self.anchura = 140
+		self.anchura = 130
 
 	def contenido(self):
-		self.objeto_0 = Entrada(
-				self, índice = 0, zócalo_de_entrada = 0, zócalo_de_salida = 0, texto_inicial = '', etiqueta = 'Nombre',
-				proporción = '4/7'
-				)
-		self.objeto_1 = Etiqueta(
-				self, índice = 1, zócalo_de_salida = 0, texto_inicial = 'Universo real', comparte_posición = True
-				)
-		self.objeto_2 = Entrada(
-				self, índice = 2, zócalo_de_entrada = 1, zócalo_de_salida = 1, texto_inicial = '0',
-				etiqueta = 'Segundo inicial',  validante = VALIDANTE_NUMÉRICO, proporción = '4/7'
-				)
+		self.contenido_de_salidas = [
+				Etiqueta(self, 'Nombre', alineado = 3, llave = 'Objeto 1', zócalo = 0),
+				Etiqueta(self, 'Tiempo', alineado = 3, llave = 'Objeto 2', zócalo = 1),
+				Etiqueta(self, 'Diámetro', alineado = 3, llave = 'Diámetro', zócalo = 2),
+				]
+		self.contenido_de_entradas = [
+				Entrada(self, '', 'Objeto 1', etiqueta = 'Nombre', proporción = '3/7', zócalo = 0),
+				Entrada(
+						self, '0', 'Objeto 2', etiqueta = 'Inicio', proporción = '3/7', zócalo = 1,
+						validante = VALIDANTE_NUMÉRICO
+						)
+				]
 
 
 @registrar_nodo(NODO_UNIVERSO)
 class NodoUniverso(NodoBase):
-	icono = imagen
+	icono = "iconos/categoría universo.svg"
 	codigo_op = NODO_UNIVERSO
 	titulo_op = "Universo"
 
@@ -49,32 +44,57 @@ class NodoUniverso(NodoBase):
 	ClasedelContenidodeNodo = ContenidodelNodoUniverso
 
 	Entradas = [4, 2]
-	Salidas = [4, 2]
+	Salidas = [4, 2, 1]
+
+	FormaDeEntradas = ['Círculo', 'Círculo']
+	FormaDeSalidas = ['Círculo', 'Círculo', 'Círculo']
 
 	def __init__(self, escena, titulo = titulo_op, entradas = Entradas, salidas = Salidas):
 		super().__init__(escena, titulo, entradas, salidas)
-
-	def evaluación_inicial(self):
 		self.lista_de_bloqueos = ['Universo real', 'universo real', 'Universo Real', 'universo real', 'Realidad',
-		                          'realidad']
+		                          'realidad', 'Vida real', 'vida Real', 'vida real']
+		self.valor_seguro = ''
 		self.bloqueo_de_nombre = False
-		self.contenido.objeto_1.autoocultarse()
-		self.contenido.objeto_0.mostrar_salida()
-		self.evaluación()
 
 	def universo_real(self):
-		self.contenido.objeto_0.autoocultarse()
-		self.contenido.objeto_1.automostrarse()
+		self.contenido.contenido_de_entradas[0].ocultar()
+		self.contenido.contenido_de_entradas[0] = Etiqueta(self.contenido, texto = 'Universo real', es_entrada =
+		True, posición_y_tamaño = [None, (self.contenido.altura + self.contenido.espaciado) * len(
+				self.contenido.contenido_de_salidas), None, None], reordenando = True)
+		self.contenido.contenido_de_entradas[0].mostrar()
+
 		self.bloqueo_de_nombre = True
+
+	def universo_ficticio(self):
+		self.contenido.contenido_de_entradas[0].ocultar()
+		self.contenido.contenido_de_entradas[0] = Entrada(
+				self.contenido, self.valor_seguro, 'Objeto 1', etiqueta = 'Nombre', proporción = '3/7',
+				posición_y_tamaño = [None, (self.contenido.altura + self.contenido.espaciado) * len(
+				self.contenido.contenido_de_salidas), None, None],
+				zócalo = 0, reordenando = True
+				)
+		self.contenido.contenido_de_entradas[0].mostrar()
+		self.bloqueo_de_nombre = False
 
 	def datos_de_entrada_cambiados(self, conexión):
 		self.marcar_indefinido()
 		self.evaluación()
-		if not self.bloqueo_de_nombre and self.valores_internos[0] in self.lista_de_bloqueos:
+
+		# ¿Por qué rayos esto funciona al revés? Ni idea. Solo sé que puedes hacer Ctrl + Z y volver al estado
+		# anterior del bloqueo y que la conexión no se restaura si el valor de entrada es de los del bloqueo. Coso
+		# random
+
+		if self.bloqueo_de_nombre is False and self.valores['Objeto 1'] in self.lista_de_bloqueos:
 			self.universo_real()
+		elif self.bloqueo_de_nombre is True:
+			self.valores['Objeto 1'] = self.valor_seguro
+			self.universo_ficticio()
+		else:
+			self.valor_seguro = self.valores['Objeto 1']
 
 	def datos_de_salida_cambiados(self):
 		self.marcar_indefinido()
 		self.evaluación(False)
-		if not self.bloqueo_de_nombre and self.valores_internos[0] in self.lista_de_bloqueos:
-			self.universo_real()
+
+	def métodos_de_evaluación(self):
+		self.valores['Diámetro'] = 0

@@ -4,10 +4,9 @@ from np_enlistado_de_nodos import *
 from nodos.nodo_base.np_nodo_base import NodoBase
 from nodos.nodo_base.np_nodo_contenido import ContenidodelNodoBase
 from nodos.nodo_base.np_nodo_graficador import GraficadordelNodoBase
+from nodos.objetos.np_etiqueta import Etiqueta
 from nodos.objetos.np_entrada import Entrada, VALIDANTE_NUMÉRICO
 from nodos.objetos.np_booleana import Booleana
-
-imagen = "C:/Users/Maste/Downloads/icons/edit.svg"
 
 
 class GraficadordelosNodosdeEntrada(GraficadordelNodoBase):
@@ -17,29 +16,26 @@ class GraficadordelosNodosdeEntrada(GraficadordelNodoBase):
 
 
 class ContenidodelosNodosdeEntrada(ContenidodelNodoBase):
-	def controles(self):
-		super().controles()
-		self.placeholder(3)
-
 	def configuraciones(self):
 		super().configuraciones()
-		self.anchura = 100
+		self.anchura = 130
 
 	def contenido(self):
-		self.objeto_0 = Entrada(
-				self, índice = 0, zócalo_de_salida = 0, texto_inicial = '0', validante = VALIDANTE_NUMÉRICO
-				)
-		self.objeto_1 = Entrada(
-				self, índice = 1, zócalo_de_salida = 1, texto_inicial = ''
-				)
-		self.objeto_2 = Booleana(
-				self, índice = 2, zócalo_de_salida = 2, texto_inicial = 'Valor',
-				indeterminado = True, valor_inicial = 1
-				)
+		self.contenido_de_salidas = [
+				Etiqueta(self, 'Número', alineado = 3, llave = 'Objeto 1', zócalo = 0),
+				Etiqueta(self, 'Cadena', alineado = 3, llave = 'Objeto 2', zócalo = 1),
+				Etiqueta(self, 'Booleana', alineado = 3, llave = 'Objeto 3', zócalo = 2),
+				]
+		self.contenido_de_entradas = [
+				Entrada(self, '0', 'Objeto 1', validante = VALIDANTE_NUMÉRICO),
+				Entrada(self, '', 'Objeto 2'),
+				Booleana(self, 'Valor', 'Objeto 3', 1, True)
+				]
 
-# @registrar_nodo(CATEGORIA_ENTRADAS)
+
+@registrar_nodo(CATEGORIA_ENTRADAS)
 class NodosdeEntrada(NodoBase):
-	icono = imagen
+	icono = "iconos/categoría entradas.svg"
 	codigo_op = CATEGORIA_ENTRADAS
 	titulo_op = "Entradas"
 
@@ -48,6 +44,9 @@ class NodosdeEntrada(NodoBase):
 
 	Entradas = []
 	Salidas = [1, 4, 3]
+
+	FormaDeEntradas = []
+	FormaDeSalidas = ['Círculo', 'Círculo', 'Círculo']
 
 	def __init__(self, escena, titulo = titulo_op, entradas = Entradas, salidas = Salidas):
 		super().__init__(escena, titulo, entradas, salidas)

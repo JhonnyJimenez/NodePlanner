@@ -52,7 +52,7 @@ class GraficosdelNodo(QGraphicsItem):
 
 	def init_assets(self):
 		self._color_del_título = QColorConstants.White
-		self._fuente_del_título = QFont("Ubuntu", 9)
+		self._fuente_del_título = QFont("Ubuntu", 10)
 		
 		self._color = QColor("#7F000000")
 		self._color_seleccionado = QColor("#FFFFA637")
@@ -78,7 +78,9 @@ class GraficosdelNodo(QGraphicsItem):
 		
 	def mouseMoveEvent(self, evento):
 		super().mouseMoveEvent(evento)
+		self.actualizador_si_se_mueve_el_nodo()
 
+	def actualizador_si_se_mueve_el_nodo(self):
 		# ¡Optimízame! ¡Solo actualizo los nodos seleccionados!
 		for nodo in self.scene().escena.nodos:
 			if nodo.Nodograficas.isSelected():

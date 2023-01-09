@@ -2,14 +2,14 @@ from nodos.categorías.entradas import *
 
 
 class ContenidodelNodoCadena(ContenidodelosNodosdeEntrada):
-	def controles(self):
-		super().controles()
-		self.placeholder(1)
-
 	def contenido(self):
-		self.objeto_0 = Entrada(
-				self, índice = 0, zócalo_de_salida = 0, texto_inicial = ''
-				)
+		self.contenido_de_salidas = [
+				Etiqueta(self, 'Cadena', alineado = 3, llave = 'Objeto 1', zócalo = 0)
+				]
+		self.contenido_de_entradas = [
+				Entrada(self, '', 'Objeto 1')
+				]
+
 
 @registrar_nodo(NODO_ENTRADA_CADENA)
 class NodoCadena(NodosdeEntrada):
@@ -20,6 +20,9 @@ class NodoCadena(NodosdeEntrada):
 
 	Entradas = []
 	Salidas = [4]
+
+	FormaDeEntradas = []
+	FormaDeSalidas = ['Círculo']
 
 	def __init__(self, escena, titulo = titulo_op, entradas = Entradas, salidas = Salidas):
 		super().__init__(escena, titulo, entradas, salidas)

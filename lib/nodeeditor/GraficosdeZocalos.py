@@ -14,14 +14,16 @@ COLORES_DE_ZOCALOS =[
 class GraficosdeZocalos(QGraphicsItem):
 	def __init__(self, zocalo):
 		super().__init__(zocalo.nodo.Nodograficas)
-		
 		self.zocalo = zocalo
-		
+
 		self.isHighlighted = False
-		
+
+		self.init_ui()
+		self.init_assets()
+
+	def init_ui(self):
 		self.radio = 6.0
 		self.grosor_contorno = 1.0
-		self.init_assets()
 	
 	@property
 	def tipo_zocalo(self):

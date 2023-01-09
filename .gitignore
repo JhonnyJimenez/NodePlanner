@@ -2,4 +2,4 @@
 *.pyc
 .vscode
 .fleet
-pruebas_precision_numerica.py
+zona_de_pruebas.py

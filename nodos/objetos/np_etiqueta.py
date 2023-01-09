@@ -1,28 +1,42 @@
 from PyQt5.QtWidgets import QLabel
 from nodos.objetos.np_objeto_base import ObjetodeNodePlanner
-from nodos.objetos.np_utilitarios import tratado_de_datos_para_tooltip
+from nodos.objetos.np_utilitarios import tratado_de_datos, alineador
+from np_constantes import NOMBRE_DEL_PRODUCTO
 
 
 class Etiqueta(ObjetodeNodePlanner):
-	def objeto(self):
-		return QLabel
+	def __init__(
+			self, elemento_padre = None, texto: str = NOMBRE_DEL_PRODUCTO, llave: str = None, alineado: str | int = 2,
+			especificación: bool = False, es_entrada: bool = False, **kwargs
+			):
+		self.texto = texto
+		self.alineado = alineado
+		self.especificación = especificación  # Aún no implemento esto.
+		super().__init__(elemento_padre, llave = llave, es_entrada = es_entrada, **kwargs)
 
-	def parámetros(self):
-		return self.texto_inicial, self.elemento_padre
+	def definir_objeto(self):
+		return QLabel(self.texto, self.elemento_padre)
 
 	def estilo(self):
 		self.objeto.setStyleSheet('padding-left: 1px; background: transparent')
+		alineador(self.objeto, self.alineado)
 
-	def contenido_del_objeto(self):
-		self.elemento_padre.lista_de_información[self.índice] = self.objeto.text()
-
-	def ocultado_por_entrada(self):
-		if self.zócalo_de_entrada is not None and self.elemento_padre.nodo.entradas[self.zócalo_de_entrada].Zocaloconexiones != []:
-			texto = self.elemento_padre.nodo.valores_de_entrada
-			texto_arreglado = tratado_de_datos_para_tooltip(texto, self.especificación)
-			valor = texto_arreglado[self.zócalo_de_entrada]
+	def widget_conectado(self):
+		if (
+				self.zócalo is not None and self.es_entrada
+				and self.elemento_padre.nodo.entradas[self.zócalo].Zocaloconexiones != []
+		):
+			nodo = self.elemento_padre.nodo.obtener_entrada(self.zócalo)
+			contrazócalo = self.elemento_padre.nodo.obtener_contrazócalo(self.zócalo)
+			valor = tratado_de_datos(
+						nodo.valores[nodo.diccionarios['Salidas'][contrazócalo.indice]],
+						self.especificación
+					)
 			self.objeto.setText(valor)
 
-	def mostrado_por_entrada(self):
-		if self.zócalo_de_entrada is not None and self.elemento_padre.nodo.entradas[self.zócalo_de_entrada].Zocaloconexiones == []:
-			self.objeto.setText(self.texto_inicial)
+	def widget_desconectado(self):
+		if (
+				self.zócalo is not None and self.es_entrada
+				and self.elemento_padre.nodo.entradas[self.zócalo].Zocaloconexiones == []
+		):
+			self.objeto.setText(self.texto)

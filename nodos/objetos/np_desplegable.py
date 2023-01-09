@@ -3,37 +3,39 @@ from nodos.objetos.np_objeto_base import ObjetodeNodePlanner
 
 
 class Desplegable(ObjetodeNodePlanner):
+	def __init__(
+			self, elemento_padre = None, llave: str = None, lista = None, separadores = None,
+			elementos_visibles = 10, **kwargs
+			):
+		self.lista = lista
+		self.separadores = separadores
+		self.elementos_visibles = elementos_visibles
+		super().__init__(elemento_padre, llave = llave, **kwargs)
+
 	def definir_objeto(self):
-		self.objeto = self.objeto()(self.parámetros())
-
-	def objeto(self):
-		return QComboBox
-
-	def parámetros(self):
-		return self.elemento_padre
-
-	def configuraciones_adicionales(self):
-		if self.lista not in (None, []):
-			self.objeto.addItems(self.lista)
-
-		if self.separadores not in (None, []) and self.lista not in (None, []):
-			for separador in self.separadores:
-				self.objeto.insertSeparator(separador)
-
-		if self.valor_inicial is not None:
-			self.objeto.setMaxVisibleItems(self.valor_inicial
-			                               + (len(self.separadores) if self.separadores is not None else 0)
-			                               )
+		return QComboBox(self.elemento_padre)
 
 	def estilo(self):
 		self.objeto.setStyleSheet('combobox-popup: 0; background: #808080')
 
+	def configuraciones_adicionales(self):
+		if self.lista not in (None, []):
+			self.objeto.addItems(self.lista)
+			if self.separadores not in (None, []):
+				for separador in self.separadores:
+					self.objeto.insertSeparator(separador)
+
+		if self.elementos_visibles is not None:
+			self.objeto.setMaxVisibleItems(self.elementos_visibles
+			                               + (len(self.separadores) if self.separadores is not None else 0)
+			                               )
+
 	def señal(self):
-		self.objeto.currentTextChanged.connect(self.contenido_del_objeto)
+		self.objeto.currentTextChanged.connect(self.contenido)
 		self.objeto.currentTextChanged.connect(self.elemento_padre.nodo.datos_de_entrada_cambiados)
 
-	def contenido_del_objeto(self):
-		self.elemento_padre.lista_de_información[self.índice] = self.objeto.currentText()
+	def escribir_dato(self):
+		return self.objeto.currentText()
 
-	def forma_de_deserialización(self):
-		self.elemento_padre.lista_de_deserializamiento[self.índice] = self.objeto.setCurrentText
+	def deserialización(self, dato):
+		self.objeto.setCurrentText(dato)

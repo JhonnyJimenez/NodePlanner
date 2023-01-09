@@ -3,9 +3,9 @@ from PyQt5.QtCore import QSize, Qt, QByteArray, QDataStream, QIODevice, QMimeDat
 from PyQt5.QtGui import QPixmap, QIcon, QDrag
 
 from lib.nodeeditor.Utilidades import dump_exception
+from nodos.objetos.np_utilitarios import nodos_no_disponibles, NODOS_NO_DISPONIBLES
 
 from np_enlistado_de_nodos import *
-
 
 class Lista(QListWidget):
 	def __init__(self, parent = None):
@@ -22,6 +22,7 @@ class Lista(QListWidget):
 
 	def agregar_mis_objetos(self):
 		keys = list(NODEPLANNER_NODOS.keys())
+		nodos_no_disponibles(keys, NODOS_NO_DISPONIBLES)
 		keys.sort()
 		for key in keys:
 			nodo = obtener_clase_del_codigo_op(key)
