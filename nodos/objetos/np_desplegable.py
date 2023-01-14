@@ -5,7 +5,7 @@ from nodos.objetos.np_objeto_base import ObjetodeNodePlanner
 class Desplegable(ObjetodeNodePlanner):
 	def __init__(
 			self, elemento_padre = None, llave: str = None, lista = None, separadores = None,
-			elementos_visibles = 10, **kwargs
+			elementos_visibles = 6, **kwargs
 			):
 		self.lista = lista
 		self.separadores = separadores

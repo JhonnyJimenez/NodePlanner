@@ -26,10 +26,10 @@ class ContenidodelosNodosdeSalida(ContenidodelNodoBase):
 				]
 
 
-@registrar_nodo(CATEGORIA_SALIDAS)
+@registrar_nodo(CATEGORÍA_SALIDAS)
 class Salidas(NodoBase):
 	icono = "iconos/categoría salidas.svg"
-	codigo_op = CATEGORIA_SALIDAS
+	codigo_op = CATEGORÍA_SALIDAS
 	titulo_op = "Salidas"
 
 	ClaseGraficadeNodo = GraficadordelosNodosdeSalida

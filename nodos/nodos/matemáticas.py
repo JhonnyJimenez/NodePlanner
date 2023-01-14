@@ -1,7 +1,10 @@
-from nodos.categorías.entradas import *
+from np_enlistado_de_nodos import *
+from nodos.categorías.entradas import ContenidodelosNodosdeEntrada, NodosdeEntrada
+
 from nodos.objetos.np_etiqueta import Etiqueta
+from nodos.objetos.np_entrada import Entrada, VALIDANTE_NUMÉRICO
 from nodos.objetos.np_desplegable import Desplegable
-from nodos.objetos.np_utilitarios import operaciones_matemáticas
+from nodos.objetos.np_utilitarios import matemáticas_con_mpmath, matemáticas_nativas
 
 OPERACIONES = [
 				"Adicionar", "Sustraer", "Multiplicar", "Dividir", "Multiplicar y adicionar",
@@ -20,10 +23,10 @@ class ContenidodelNodoMatemático(ContenidodelosNodosdeEntrada):
 				Etiqueta(self, 'Resultado', alineado = 3, llave = 'Resultado', zócalo = 0)
 				]
 		self.contenido_de_entradas = [
-				Desplegable(self, 'Objeto 1', OPERACIONES, elementos_visibles = 6),
-				Entrada(self, '0.5', 'Objeto 2', validante = VALIDANTE_NUMÉRICO, zócalo = 0),
-				Entrada(self, '0.5', 'Objeto 3', validante = VALIDANTE_NUMÉRICO, zócalo = 1),
-				Entrada(self, '0.5', 'Objeto 4', validante = VALIDANTE_NUMÉRICO, zócalo = 2),
+				Desplegable(self, 'Operación', OPERACIONES),
+				Entrada(self, '0.5', 'Entrada 1', validante = VALIDANTE_NUMÉRICO, zócalo = 0),
+				Entrada(self, '0.5', 'Entrada 2', validante = VALIDANTE_NUMÉRICO, zócalo = 1),
+				Entrada(self, '0.5', 'Entrada 3', validante = VALIDANTE_NUMÉRICO, zócalo = 2),
 				]
 
 
@@ -49,7 +52,7 @@ class NodoMatemático(NodosdeEntrada):
 		self.entrada3 = self.contenido.contenido_de_entradas[3]
 
 	def métodos_de_evaluación(self):
-		operación = self.valores['Objeto 1']
+		operación = self.valores['Operación']
 
 		if operación in (
 							"Raíz cuadrada", "Inverso de raíz cuadrada", "Absoluto", "Exponencial", "Signo",
@@ -82,8 +85,8 @@ class NodoMatemático(NodosdeEntrada):
 					+ self.entrada2.posición_y
 			)
 
-		self.valores['Resultado'] = operaciones_matemáticas(
-				operación, self.valores['Objeto 2'], self.valores['Objeto 3'], self.valores['Objeto 4']
+		self.valores['Resultado'] = matemáticas_con_mpmath(
+				operación, self.valores['Entrada 1'], self.valores['Entrada 2'], self.valores['Entrada 3']
 				)
 
 		return self.valores['Resultado']

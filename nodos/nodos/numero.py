@@ -1,13 +1,16 @@
-from nodos.categorías.entradas import *
+from np_enlistado_de_nodos import *
+from nodos.categorías.entradas import ContenidodelosNodosdeEntrada, NodosdeEntrada
 
+from nodos.objetos.np_etiqueta import Etiqueta
+from nodos.objetos.np_entrada import Entrada, VALIDANTE_NUMÉRICO
 
 class ContenidodelNodoNúmero(ContenidodelosNodosdeEntrada):
 	def contenido(self):
 		self.contenido_de_salidas = [
-				Etiqueta(self, 'Número', alineado = 3, llave = 'Objeto 1', zócalo = 0)
+				Etiqueta(self, 'Número', alineado = 3, llave = 'Entrada 1', zócalo = 0)
 				]
 		self.contenido_de_entradas = [
-				Entrada(self, '0', 'Objeto 1', validante = VALIDANTE_NUMÉRICO)
+				Entrada(self, '0', 'Entrada 1', validante = VALIDANTE_NUMÉRICO)
 				]
 
 

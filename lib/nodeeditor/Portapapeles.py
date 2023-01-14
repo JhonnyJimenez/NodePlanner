@@ -75,7 +75,7 @@ class Portapapeles:
 		# Calcular el contorno delimitador de los objetos seleccionados y su centro.
 		minx, maxx, miny, maxy = 10000000, -10000000, 10000000, -10000000
 		for data_nodos in data['nodos']:
-			x, y = data_nodos['Pos_x'], data_nodos['Pos_y']
+			x, y = data_nodos['Posición X'], data_nodos['Posición Y']
 			if x < minx: minx = x
 			if x > maxx: maxx = x
 			if y < miny: miny = y

@@ -234,10 +234,11 @@ class ObjetodeNodePlanner:
 
 	def método_de_deserialización(self, data):
 		if self.llave is not None:
+			dato = data.get(self.llave)
 			try:
-				self.deserialización(data[self.llave])
+				self.deserialización(dato)
 			except TypeError:
-				self.deserialización(tratado_de_datos(data[self.llave]))
+				self.deserialización(tratado_de_datos(dato))
 
 	def deserialización(self, dato):
 		pass

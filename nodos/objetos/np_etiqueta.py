@@ -12,6 +12,7 @@ class Etiqueta(ObjetodeNodePlanner):
 		self.texto = texto
 		self.alineado = alineado
 		self.especificación = especificación  # Aún no implemento esto.
+		self.valor_recibido = None
 		super().__init__(elemento_padre, llave = llave, es_entrada = es_entrada, **kwargs)
 
 	def definir_objeto(self):
@@ -28,10 +29,8 @@ class Etiqueta(ObjetodeNodePlanner):
 		):
 			nodo = self.elemento_padre.nodo.obtener_entrada(self.zócalo)
 			contrazócalo = self.elemento_padre.nodo.obtener_contrazócalo(self.zócalo)
-			valor = tratado_de_datos(
-						nodo.valores[nodo.diccionarios['Salidas'][contrazócalo.indice]],
-						self.especificación
-					)
+			self.valor_recibido = nodo.valores[nodo.diccionarios['Salidas'][contrazócalo.indice]]
+			valor = tratado_de_datos(self.valor_recibido, self.especificación)
 			self.objeto.setText(valor)
 
 	def widget_desconectado(self):

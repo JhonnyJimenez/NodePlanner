@@ -1,13 +1,17 @@
-from nodos.categorías.entradas import *
+from np_enlistado_de_nodos import *
+from nodos.categorías.entradas import ContenidodelosNodosdeEntrada, NodosdeEntrada
+
+from nodos.objetos.np_etiqueta import Etiqueta
+from nodos.objetos.np_booleana import Booleana
 
 
 class ContenidodelNodoBooleano(ContenidodelosNodosdeEntrada):
 	def contenido(self):
 		self.contenido_de_salidas = [
-				Etiqueta(self, 'Booleana', alineado = 3, llave = 'Objeto 1', zócalo = 0),
+				Etiqueta(self, 'Booleana', alineado = 3, llave = 'Entrada 1', zócalo = 0),
 				]
 		self.contenido_de_entradas = [
-				Booleana(self, 'Valor', 'Objeto 1', 0)
+				Booleana(self, 'Valor', 'Entrada 1', 0)
 				]
 
 

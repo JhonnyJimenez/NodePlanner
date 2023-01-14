@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QLineEdit
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QRegExpValidator
 from nodos.objetos.np_objeto_base import ObjetodeNodePlanner
-from nodos.objetos.np_utilitarios import alineador, conversor_númerico
+from nodos.objetos.np_utilitarios import alineador, conversor_númerico_python, conversor_númerico_mpmath
 from np_constantes import NOMBRE_DEL_PRODUCTO
 
 VALIDANTE_NUMÉRICO = QRegExpValidator(QRegExp("^[-+]?[0-9]{1,3}(\s?[0-9]{3})*\.?[0-9]*([eE][-+]?[0-9]+)?$"))
@@ -40,7 +40,7 @@ class Entrada(ObjetodeNodePlanner):
 
 	def escribir_dato(self):
 		if self.validante == VALIDANTE_NUMÉRICO:
-			return conversor_númerico(self.objeto.text())
+			return conversor_númerico_mpmath(self.objeto.text())
 		else:
 			return self.objeto.text()
 

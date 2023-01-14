@@ -4,11 +4,12 @@ from lib.nodeeditor.Zocalos import IZQUIERDA_ARRIBA, IZQUIERDA_CENTRO, IZQUIERDA
 from lib.nodeeditor.Utilidades import dump_exception
 
 from np_enlistado_de_nodos import *
-from nodos.objetos.np_utilitarios import tratado_de_datos
 from nodos.nodo_base.np_zocalos import ZócalosdelNodoBase
 from nodos.nodo_base.np_nodo_graficador import GraficadordelNodoBase
 from nodos.nodo_base.np_nodo_contenido import ContenidodelNodoBase
+
 from nodos.objetos.np_etiqueta import Etiqueta
+from nodos.objetos.np_utilitarios import tratado_de_datos
 
 DEBUG = False
 
@@ -25,8 +26,8 @@ class NodoBase(Nodo):
 	Entradas = [1, 4, 3]
 	Salidas = [1, 4, 3, 5]
 
-	FormaDeEntradas = ['Círculo', 'Círculo', 'Círculo', 'Círculo']
-	FormaDeSalidas = ['Círculo', 'Círculo', 'Círculo', 'Círculo']
+	FormadeEntradas = ['Círculo', 'Círculo', 'Círculo', 'Círculo']
+	FormadeSalidas = ['Círculo', 'Círculo', 'Círculo', 'Círculo']
 
 	def __init__(self, escena, titulo = titulo_op, entradas = Entradas, salidas = Salidas):
 		# Conteo de errores:
@@ -37,9 +38,10 @@ class NodoBase(Nodo):
 		self.salidas_a_ocultar = []
 
 		super().__init__(escena, titulo, entradas, salidas)
-		self.ajustes_adicionales()
+		self.descendencia = set()
 		self.valores = self.contenido.valores
 		self.diccionarios = self.contenido.diccionarios
+		self.ajustes_adicionales()
 		self.control_de_zócalos()
 
 		# Evaluación inicial.
@@ -67,7 +69,7 @@ class NodoBase(Nodo):
 					nodo = self, indice = contador, posicion = self.pos_det_entradas, tipo_zocalo = objeto,
 					multiconexión = self.entradas_multiconexion, cantidad_en_el_lado_actual = len(entradas),
 					es_entrada = True,
-					forma = self.__class__.FormaDeEntradas[contador] if self.__class__.FormaDeEntradas[contador] is not None else 'Círculo'
+					forma = self.__class__.FormadeEntradas[contador] if self.__class__.FormadeEntradas[contador] is not None else 'Círculo'
 				)
 			contador += 1
 			self.entradas.append(zocalo)
@@ -78,7 +80,7 @@ class NodoBase(Nodo):
 					nodo = self, indice = contador, posicion = self.pos_det_salidas, tipo_zocalo = objeto,
 					multiconexión = self.salidas_multiconexion, cantidad_en_el_lado_actual = len(salidas),
 					es_entrada = False,
-					forma = self.__class__.FormaDeSalidas[contador] if self.__class__.FormaDeSalidas[contador] is not None else 'Círculo'
+					forma = self.__class__.FormadeSalidas[contador] if self.__class__.FormadeSalidas[contador] is not None else 'Círculo'
 				)
 			contador += 1
 			self.salidas.append(zocalo)
@@ -121,21 +123,24 @@ class NodoBase(Nodo):
 		pass
 
 	def obtener_descendencia(self):
-		descendencia = set()
-		nodos_padres = set()
+		nodos_padres = self.obtener_nodos_padres()
 		nodos_hijos = self.obtener_nodos_hijos()
-		for zócalo in self.entradas:
-			if zócalo.Zocaloconexiones:
-				nodo = self.obtener_entrada(zócalo.indice)
-				if nodo is not None:
-					nodos_padres.add(nodo)
 
 		for nodo in nodos_hijos:
-			descendencia.add(nodo)
+			self.descendencia.add(nodo)
 			for padre in nodos_padres:
 				padre.descendencia.add(nodo)
 
-		return descendencia
+		return self.descendencia
+
+	def obtener_nodos_padres(self):
+		if not self.entradas: return []
+		lista_de_nodos_padres = []
+		for ix in range(len(self.entradas)):
+			for conexion in self.entradas[ix].Zocaloconexiones:
+				nodo_padre = conexion.obtener_otros_zocalos(self.entradas[0]).nodo
+				lista_de_nodos_padres.append(nodo_padre)
+		return lista_de_nodos_padres
 
 	def control_de_zócalos(self):
 		for indice in self.entradas_a_ocultar:
@@ -320,7 +325,7 @@ class NodoBase(Nodo):
 							if elemento.zócalo is None:
 								pass
 							elif isinstance(elemento, Etiqueta) and zócalo.indice == elemento.zócalo:
-								zócalo.GraficosZocalos.setToolTip(tratado_de_datos(elemento.objeto.text(), True))
+								zócalo.GraficosZocalos.setToolTip(tratado_de_datos(elemento.valor_recibido, True))
 								break
 							elif zócalo.indice == elemento.zócalo:
 								zócalo.GraficosZocalos.setToolTip('El elemento asignado a la entrada %s (%s) le falta llave o se le asignó este'

@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QRectF, QPointF
 from lib.nodeeditor.GraficosdeZocalos import GraficosdeZocalos
 
 COLORES_DE_ZOCALOS = [
-		QColor("#FFcca6d6"),  # 0. Zócalo de entrada y salida todoterreno
+		QColor("#FFcca6d6"),  # 0. Zócalo todoterreno
 		QColor("#FF598c5c"),  # 1. Zócalo númerico
 		QColor("#FFa1a1a1"),  # 2. Zócalo temporal
 		QColor("#FFcca6d6"),  # 3. Zócalo booleano

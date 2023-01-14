@@ -1,9 +1,11 @@
+import json
 from PyQt5.QtGui import QFont
 from lib.nodeeditor.ContenidodelNodo import ContenidoDelNodo
 from nodos.objetos.np_etiqueta import Etiqueta
 from nodos.objetos.np_entrada import Entrada, VALIDANTE_NUMÉRICO
 from nodos.objetos.np_booleana import Booleana
 from nodos.objetos.np_desplegable import Desplegable
+from nodos.objetos.np_utilitarios import tratado_de_datos
 
 
 class ContenidodelNodoBase(ContenidoDelNodo):
@@ -37,17 +39,17 @@ class ContenidodelNodoBase(ContenidoDelNodo):
 
 	def contenido(self):
 		self.contenido_de_salidas = [
-				Etiqueta(self, 'Salida númerica', alineado = 3, llave = 'Objeto 1', zócalo = 0),
-				Etiqueta(self, 'Salida de texto', alineado = 3, llave = 'Objeto 2', zócalo = 1),
-				Etiqueta(self, 'Salida booleana', alineado = 3, llave = 'Objeto 3', zócalo = 2),
-				Etiqueta(self, 'Salida de desplegables', alineado = 3, llave = 'Objeto 4', zócalo = 3),
+				Etiqueta(self, 'Salida númerica', 'Entrada 1', 3, zócalo = 0),
+				Etiqueta(self, 'Salida de texto', 'Entrada 2', 3, zócalo = 1),
+				Etiqueta(self, 'Salida booleana', 'Entrada 3', 3, zócalo = 2),
+				Etiqueta(self, 'Salida de desplegables', alineado = 3, llave = 'Entrada 4', zócalo = 3),
 				]
 		self.contenido_de_entradas = [
 				Etiqueta(self, 'Tipos de objetos'),
-				Entrada(self, '0', 'Objeto 1', etiqueta = 'Entrada númerica', validante = VALIDANTE_NUMÉRICO, zócalo = 0),
-				Entrada(self, '', 'Objeto 2', etiqueta = 'Entrada de texto', zócalo = 1),
-				Booleana(self, 'Entrada booleana', 'Objeto 3', 1, True, zócalo = 2),
-				Desplegable(self, 'Objeto 4', ['Desplegable'])
+				Entrada(self, '0', 'Entrada 1', etiqueta = 'Entrada númerica', validante = VALIDANTE_NUMÉRICO, zócalo = 0),
+				Entrada(self, '', 'Entrada 2', etiqueta = 'Entrada de texto', zócalo = 1),
+				Booleana(self, 'Entrada booleana', 'Entrada 3', 1, True, zócalo = 2),
+				Desplegable(self, 'Entrada 4', ['Desplegable'])
 				]
 
 		# self.método_para_reordenar()
@@ -80,7 +82,10 @@ class ContenidodelNodoBase(ContenidoDelNodo):
 
 	def serialización(self):
 		res = super().serialización()
-		res['Valores'] = self.valores
+		datos_de_serializado = {}
+		for llave in self.valores:
+			datos_de_serializado[llave] = tratado_de_datos(self.valores[llave])
+		res['Valores'] = datos_de_serializado
 		return res
 
 	def deserialización(self, data, hashmap = {}):

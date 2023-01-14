@@ -4,6 +4,7 @@ from np_enlistado_de_nodos import *
 from nodos.nodo_base.np_nodo_base import NodoBase
 from nodos.nodo_base.np_nodo_contenido import ContenidodelNodoBase
 from nodos.nodo_base.np_nodo_graficador import GraficadordelNodoBase
+
 from nodos.objetos.np_etiqueta import Etiqueta
 from nodos.objetos.np_entrada import Entrada, VALIDANTE_NUMÉRICO
 from nodos.objetos.np_booleana import Booleana
@@ -22,21 +23,21 @@ class ContenidodelosNodosdeEntrada(ContenidodelNodoBase):
 
 	def contenido(self):
 		self.contenido_de_salidas = [
-				Etiqueta(self, 'Número', alineado = 3, llave = 'Objeto 1', zócalo = 0),
-				Etiqueta(self, 'Cadena', alineado = 3, llave = 'Objeto 2', zócalo = 1),
-				Etiqueta(self, 'Booleana', alineado = 3, llave = 'Objeto 3', zócalo = 2),
+				Etiqueta(self, 'Número', 'Entrada 1', 3, zócalo = 0),
+				Etiqueta(self, 'Cadena', 'Entrada 2', 3, zócalo = 1),
+				Etiqueta(self, 'Booleana', 'Entrada 3', 3, zócalo = 2),
 				]
 		self.contenido_de_entradas = [
-				Entrada(self, '0', 'Objeto 1', validante = VALIDANTE_NUMÉRICO),
-				Entrada(self, '', 'Objeto 2'),
-				Booleana(self, 'Valor', 'Objeto 3', 1, True)
+				Entrada(self, '0', 'Entrada 1', validante = VALIDANTE_NUMÉRICO),
+				Entrada(self, '', 'Entrada 2'),
+				Booleana(self, 'Valor', 'Entrada 3', 1, True)
 				]
 
 
-@registrar_nodo(CATEGORIA_ENTRADAS)
+@registrar_nodo(CATEGORÍA_ENTRADAS)
 class NodosdeEntrada(NodoBase):
 	icono = "iconos/categoría entradas.svg"
-	codigo_op = CATEGORIA_ENTRADAS
+	codigo_op = CATEGORÍA_ENTRADAS
 	titulo_op = "Entradas"
 
 	ClaseGraficadeNodo = GraficadordelosNodosdeEntrada

@@ -1,4 +1,6 @@
-from nodos.categorías.salidas import *
+from np_enlistado_de_nodos import *
+
+from nodos.categorías.salidas import Salidas
 
 
 @registrar_nodo(NODO_SALIDA)
