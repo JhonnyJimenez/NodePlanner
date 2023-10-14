@@ -17,11 +17,13 @@ VALIDANTE_COMPLEJO = QRegExpValidator(
 class Entrada(ObjetodeNodePlanner):
 	def __init__(
 			self, elemento_padre = None, texto: str = NOMBRE_DEL_PRODUCTO, llave: str = None, alineado: str | int = 2,
-			validante = None, **kwargs
+			validante = None, tipo_de_validante = 1, tipo: int = 1, **kwargs
 			):
 		self.texto = texto
 		self.alineado = alineado
-		self.validante = validante  # Aún no implemento esto.
+		self.validante = validante
+		self.tipo_de_validante = tipo_de_validante
+		self.tipo = tipo
 		super().__init__(elemento_padre, llave = llave, **kwargs)
 
 	def definir_objeto(self):
@@ -35,12 +37,19 @@ class Entrada(ObjetodeNodePlanner):
 			self.objeto.setValidator(self.validante)
 
 	def señal(self):
-		self.objeto.textChanged.connect(self.contenido)
-		self.objeto.textChanged.connect(self.elemento_padre.nodo.datos_de_entrada_cambiados)
+		if self.tipo == 1:
+			self.objeto.textChanged.connect(self.contenido)
+			self.objeto.textChanged.connect(self.elemento_padre.nodo.datos_de_entrada_cambiados)
+		elif self.tipo == 2:
+			self.objeto.editingFinished.connect(self.contenido)
+			self.objeto.editingFinished.connect(self.elemento_padre.nodo.datos_de_entrada_cambiados)
 
 	def escribir_dato(self):
 		if self.validante == VALIDANTE_NUMÉRICO:
-			return conversor_númerico_mpmath(self.objeto.text())
+			if self.tipo_de_validante == 2:
+				return conversor_númerico_python(self.objeto.text())
+			else:
+				return conversor_númerico_mpmath(self.objeto.text())
 		else:
 			return self.objeto.text()
 

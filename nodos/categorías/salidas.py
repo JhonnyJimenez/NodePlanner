@@ -16,7 +16,7 @@ class GraficadordelosNodosdeSalida(GraficadordelNodoBase):
 class ContenidodelosNodosdeSalida(ContenidodelNodoBase):
 	def configuraciones(self):
 		super().configuraciones()
-		self.anchura = 130
+		self.anchura = 140
 
 	def contenido(self):
 		self.contenido_de_salidas = [

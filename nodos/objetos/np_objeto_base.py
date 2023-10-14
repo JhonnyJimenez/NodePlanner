@@ -11,8 +11,8 @@ class ObjetodeNodePlanner:
 	def __init__(
 			self, elemento_padre = None, llave: str = None, fuente: QFont = None,
 			posición_y_tamaño: list = [None, None, None, None], espaciado: int = None,
-			etiqueta: str = None, proporción: str = '2/4', zócalo: int = None,
-			es_entrada: bool = True, reordenando: bool = False
+			etiqueta: str = None, con_dos_puntos: bool = True, proporción: str = '2/4', zócalo: int = None,
+			es_entrada: bool = True, reordenando: bool = False, tooltip: str = None
 			):
 
 		self.elemento_padre = elemento_padre
@@ -20,11 +20,13 @@ class ObjetodeNodePlanner:
 		self.medidas = posición_y_tamaño
 		self.espaciado = espaciado
 		self.texto_de_la_etiqueta = etiqueta
+		self.con_dos_puntos = con_dos_puntos
 		self.proporción = proporción
 		self.zócalo = zócalo
 		self.es_entrada = es_entrada
 		self.es_salida = not self.es_entrada
 		self.reordenando = reordenando
+		self.tooltip = tooltip
 		self.llave = llave
 		self.oculto = False
 		self.visible = True
@@ -40,6 +42,8 @@ class ObjetodeNodePlanner:
 		self.definir_valores_de_geometría()
 		self.posición_y_tamaño()
 		self.enlistador()
+		if self.tooltip is not None:
+			self.ayuda()
 
 		self.configuraciones_adicionales()
 		self.señal()
@@ -123,7 +127,11 @@ class ObjetodeNodePlanner:
 				self.texto_sin_puntos = self.texto_de_la_etiqueta.replace(":", "")
 				self.texto_con_puntos = self.texto_de_la_etiqueta
 
-			self.etiqueta = QLabel(self.texto_con_puntos, self.elemento_padre)
+			if self.con_dos_puntos:
+				self.etiqueta = QLabel(self.texto_con_puntos, self.elemento_padre)
+			else:
+				self.etiqueta = QLabel(self.texto_sin_puntos, self.elemento_padre)
+				
 			self.etiqueta.setGeometry(self.posición_x, self.posición_y, self.anchura_de_la_etiqueta, self.altura)
 			self.etiqueta.setStyleSheet('padding-left: 1px; background: transparent')
 			self.etiqueta.setAlignment(Qt.AlignVCenter)
@@ -139,6 +147,10 @@ class ObjetodeNodePlanner:
 	def enlistador(self):
 		self.elemento_padre.lista_de_alturas.append(self.posición_y + self.altura + self.espaciado)
 		self.elemento_padre.lista_de_anchuras.append(self.anchura)
+
+	def ayuda(self):
+		self.etiqueta.setToolTip(self.tooltip)
+		self.objeto.setToolTip(self.tooltip)
 
 	def posicionador_del_zócalo(self):
 		if self.es_entrada:
@@ -219,7 +231,7 @@ class ObjetodeNodePlanner:
 	def widget_desconectado(self):
 		try:
 			if not self.oculto:
-				if not self.visible and self.es_entrada and self.zócalo is not None:
+				if self.visible is False and self.es_entrada and self.zócalo is not None:
 					if self.elemento_padre.nodo.entradas[self.zócalo].Zocaloconexiones == []:
 						self.objeto.setVisible(True)
 						self.visible = True
@@ -228,7 +240,10 @@ class ObjetodeNodePlanner:
 									self.posición_x, self.posición_y,
 									self.anchura_de_la_etiqueta, self.altura
 									)
-							self.etiqueta.setText(self.texto_sin_puntos)
+							if self.con_dos_puntos:
+								self.etiqueta.setText(self.texto_con_puntos)
+							else:
+								self.etiqueta.setText(self.texto_sin_puntos)
 		except IndexError:
 			pass
 

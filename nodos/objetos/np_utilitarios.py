@@ -4,14 +4,179 @@ import mpmath
 from PyQt5.QtCore import Qt
 
 NODOS_NO_DISPONIBLES = [0, 1, 6, 8]
+LISTA_DE_CALENDARIOS = set()
 
+class UnidadDeMedida():
+	def __init__(self, *args, **kwargs):
+		self.llave = kwargs.get('numero')
+		self.nombre = kwargs.get('nombre')
+		self.es_absoluta = kwargs.get('es_absoluta')
+		self.no_subunidad = kwargs.get('no_subunidad', mpmath.mpf(0))
+		self.subunidades = kwargs.get('subunidades', mpmath.mpf(1))
+		self.lista_de_nombres = kwargs.get('lista_de_nombres')
 
-def tratado_de_datos(dato_a_tratar, especificación: bool = False):
+		# print("Llave:", self.llave, type(self.llave))
+		# print("Nombre:", self.nombre, type(self.nombre))
+		# print("es_absoluto:", self.es_absoluta, type(self.es_absoluta))
+		# print("no_subunidad:", self.no_subunidad, type(self.no_subunidad))
+		# print("Subunidades:", self.subunidades, type(self.subunidades))
+		# print("Lista de nombres:", self.lista_de_nombres, type(self.lista_de_nombres))
+		# print("----------------------------------------")
+			 
+	def __str__(self) -> str:
+		return self.nombre
 
-	if dato_a_tratar is None:
+class Fecha():
+	def __init__(self, *args, **kwargs):
+		self.dato_inicial = kwargs.get('inicio')
+		self.lista_de_unidades = kwargs.get('unidades')
+		# print(self.lista_de_unidades)
+		self.fechador()
+		# self.fechador_original()
+		self.fecha = str(kwargs.get('formato'))
+
+	def excepciones(self):
 		pass
 
-	elif type(dato_a_tratar) in (int, float):
+	def fechador(self):
+
+		for unidad_de_medida in self.lista_de_unidades.values():
+			unidad_actual = unidad_de_medida
+			llave = unidad_actual.llave
+			subunidad = self.lista_de_unidades[unidad_actual.no_subunidad]
+			self.lista_de_unidades[llave].unidades_superiores = []
+			
+			for unidad_revisada in self.lista_de_unidades.values():
+				if unidad_revisada.no_subunidad == llave:
+					self.lista_de_unidades[llave].unidades_superiores.append(unidad_revisada)
+
+			# self.lista_de_unidades[llave].unidad_superior = True if (len(unidades_superiores) > 1 and llave == 0) or (len(unidades_superiores) > 0 and llave != 0) else False
+
+			if llave == 0:
+				dato_de_inicio = self.dato_inicial
+			else:
+				dato_de_inicio = subunidad.resultado
+
+			self.lista_de_unidades[llave].resultado = self.divisor(dato_de_inicio, unidad_actual.subunidades)
+			self.lista_de_unidades[llave].restos = {}
+
+			for superior in self.lista_de_unidades[llave].unidades_superiores[1 if llave == 0 else 0:]:
+				self.lista_de_unidades[llave].restos[superior.llave] = self.divisor(self.lista_de_unidades[llave].resultado, superior.subunidades, devolver = 'resto')
+
+	def divisor(self, valor_a_procesar, valores_a_restar, devolver = 'resultado', contador = 1, resultado = 0):
+		if type(valores_a_restar) is list:
+			while valor_a_procesar > mpmath.mpf(0):
+				self.excepciones()
+				suma = sum(valores_a_restar)
+
+				if valor_a_procesar > suma:
+					multiplicador = mpmath.floor(mpmath.fdiv(valor_a_procesar, suma))
+					valor_a_procesar = mpmath.fsub(valor_a_procesar, mpmath.fmul(multiplicador, suma))
+					resultado += (multiplicador * len(valores_a_restar))
+				elif valor_a_procesar < valores_a_restar[contador - 1]:
+					break
+				else:
+					valor_a_procesar = mpmath.fsub(valor_a_procesar, valores_a_restar[contador - 1])
+					if contador != len(valores_a_restar):
+						contador += 1
+					else:
+						contador = 1
+					resultado += 1
+			resto = valor_a_procesar
+		else:
+			try:
+				resultado = mpmath.fdiv(valor_a_procesar, valores_a_restar)
+				resto = mpmath.fmod(valor_a_procesar, valores_a_restar)
+			except ZeroDivisionError:
+				resultado = mpmath.fdiv(valor_a_procesar, 1)
+				resto = mpmath.fmod(valor_a_procesar, 1)
+			resultado = mpmath.floor(resultado)
+			resto = mpmath.floor(resto)
+		if devolver == 'resultado':
+			return resultado
+		else:
+			return resto
+
+
+
+	# def fechador_original(self):
+	# 	for elemento in self.unidades:
+	# 		unidad = self.unidades[elemento]
+	# 		for superior in self.unidades:
+	# 			try:
+	# 				# Si es la primera subunidad (numerada con el cero por defecto) y es una unidad absoluta, entonces buscará su superior y el divisor correspondiente para comenzar su conteo. En el caso opuesto, solo devolverá el número inicial.
+	# 				if unidad.número == mpmath.mpf('0') and unidad.es_absoluta:
+	# 					if unidad.llave == self.unidades[superior].no_subunidad:
+	# 						unidad.dato = mpmath.fmod(self.inicio, self.unidades[superior].subunidades)
+	# 						break 
+	# 					else:
+	# 						unidad.dato = self.inicio
+	# 				# ----------------------------------------------------------------------------------------
+	# 				else:
+	# 					if unidad.número == mpmath.mpf('0'):
+	# 						dato_divisor = self.inicio
+	# 					else:
+	# 						dato_divisor = self.unidades[unidad.no_subunidad].división_bruta
+						
+	# 					# if not unidad.es_constante:
+	# 					# 	self.excepciones()
+	# 					# 	contador = 0
+	# 					# 	unidad.divisón_bruta = 0
+	# 					# 	while dato_divisor <= mpmath.mpf(0):
+	# 					# 		dato_divisor = mpmath.fsub(dato_divisor, unidad.subunidades[contador])
+	# 					# 		if contador != (len(unidad.subunidades) - 1):
+	# 					# 			contador += 1
+	# 					# 		else:
+	# 					# 			contador = 0
+	# 					# 		unidad.división_bruta += 1
+	# 					# else:
+	# 					unidad.división_bruta = mpmath.floor(mpmath.fdiv(dato_divisor, unidad.subunidades))
+						
+	# 					if not unidad.es_absoluta:
+	# 						if unidad.llave == self.unidades[superior].no_subunidad:
+	# 							unidad.dato = mpmath.fmod(unidad.división_bruta, self.unidades[superior].subunidades)
+	# 						else:
+	# 							unidad.dato = unidad.división_bruta
+	# 					else:
+	# 						unidad.dato = unidad.división_bruta
+	# 			except ZeroDivisionError:
+	# 				unidad.dato = mpmath.mpf('45')
+
+	def __str__(self) -> str:
+		for elemento in self.lista_de_unidades.values():
+			for superior in elemento.unidades_superiores[1 if elemento.llave == 0 else 0:]:
+				self.fecha = self.fecha.replace('%' + '%s-%s' % (elemento.llave, superior.llave), str(tratado_de_datos(elemento.restos[superior.llave])))
+			self.fecha = self.fecha.replace('%' + '%s' % elemento.llave, str(tratado_de_datos(elemento.resultado)))
+		return self.fecha
+
+# -------------------------------------------------------------------------
+
+def cambios_al_inicio(escena):
+	actualizador_de_calendaristas(escena)
+
+def actualizador_de_calendaristas(escena):
+	for nodo in escena.nodos:
+		if nodo.__class__.__name__ == 'NodoCalendarista':
+			for contenido in (
+					nodo.contenido.contenido_de_salidas
+					+ nodo.contenido.contenido_de_entradas
+			):
+				if hasattr(contenido, 'tipo') and contenido.tipo == 2:
+					contenido.contenido()
+			nodo.datos_de_entrada_cambiados()
+
+def tratado_de_datos(dato_a_tratar, especificación: bool = False, serializado = False, de_lista = False):
+	tipo = type(dato_a_tratar)
+
+	if dato_a_tratar is None:
+		if de_lista:
+			dato_a_tratar = 'Dato nulo'
+			if especificación:
+				dato_a_tratar += ' (NoneType)'
+		else:
+			pass
+
+	elif tipo in (int, float):
 		decimales, entero = math.modf(dato_a_tratar)
 
 		if dato_a_tratar > 99999999999 or len(str(decimales)) > 6:
@@ -31,14 +196,15 @@ def tratado_de_datos(dato_a_tratar, especificación: bool = False):
 			if especificación:
 				dato_a_tratar += ' (Float de Python)'
 
-	elif type(dato_a_tratar) is str:
+	elif tipo is str:
 		if dato_a_tratar != '':
 			if especificación:
 				dato_a_tratar += ' (Cadena)'
 		else:
-			dato_a_tratar = 'Cadena vacía.'
+			if not serializado:
+				dato_a_tratar = 'Cadena vacía.'
 
-	elif type(dato_a_tratar) is bool:
+	elif tipo is bool:
 		if dato_a_tratar is True:
 			dato_a_tratar = 'Verdadero'
 		else:
@@ -46,7 +212,7 @@ def tratado_de_datos(dato_a_tratar, especificación: bool = False):
 		if especificación:
 			dato_a_tratar += ' (Booleana de Python)'
 
-	elif type(dato_a_tratar) is mpmath.mpf:
+	elif tipo is mpmath.mpf:
 		decimales = mpmath.frac(dato_a_tratar)
 		dato_a_tratar = mpmath.nstr(dato_a_tratar, n = 12)
 
@@ -72,7 +238,7 @@ def tratado_de_datos(dato_a_tratar, especificación: bool = False):
 			if especificación:
 				dato_a_tratar += ' (Decimal de mpmath)'
 
-	elif type(dato_a_tratar) is Qt.CheckState:
+	elif tipo is Qt.CheckState:
 		if dato_a_tratar == 0:
 			dato_a_tratar = 'Falso'
 		if dato_a_tratar == 1:
@@ -82,12 +248,37 @@ def tratado_de_datos(dato_a_tratar, especificación: bool = False):
 		if especificación:
 			dato_a_tratar += ' (Booleana de Qt)'
 
+	elif tipo is UnidadDeMedida:
+		dato_a_tratar = str(dato_a_tratar)
+		if especificación:
+			dato_a_tratar += ' (Unidad de tiempo)'
+
+	elif tipo is Fecha:
+	# 	nombre = dato_a_tratar.nombre
+		dato_a_tratar = str(dato_a_tratar)
+		if especificación:
+			dato_a_tratar += ' (Fecha)'
+
+	elif tipo is list:
+		if len(dato_a_tratar) == 0:
+			dato_a_tratar = 'Lista vacía'
+		elif len(dato_a_tratar) == 1:
+			dato_a_tratar = tratado_de_datos(dato_a_tratar[0], especificación)
+		else:
+			dato_tratado = ''
+			contador = 0
+			for elemento in dato_a_tratar:
+				contador += 1
+				if len(dato_a_tratar) == contador:
+					dato_tratado += tratado_de_datos(elemento, especificación, de_lista = True)
+				else:
+					dato_tratado += (tratado_de_datos(elemento, especificación, de_lista = True) + '\n')
+			dato_a_tratar = dato_tratado
+
 	else:
-		dato_a_tratar = 'El tipo de datos %s no ha sido tratado.' % str(type(dato_a_tratar).__name__)
+		dato_a_tratar = 'El tipo de datos %s no ha sido tratado.' % str(tipo.__name__)
 
-	dato_tratado = dato_a_tratar
-
-	return dato_tratado
+	return dato_a_tratar
 
 def conversor_númerico_python(cadena):
 	try:
@@ -151,7 +342,10 @@ def nodos_no_disponibles(keys, lista):
 	for codigo in lista:
 		keys.remove(codigo)
 
-def matemáticas_nativas(operación, x, y, z, *args):
+def matemáticas_nativas(operación, *args):
+	x = args[0]
+	y = args[1]
+	z = args[2]
 	resultado = 0
 
 	try:
@@ -251,7 +445,10 @@ def matemáticas_nativas(operación, x, y, z, *args):
 			resultado, entero = math.modf(x)
 
 		elif operación == "Resto":
-			resultado = x % y
+			try:
+				resultado = x % y
+			except ZeroDivisionError:
+				resultado = x
 
 		elif operación == "Ciclo":
 			resultado = "Aún no implementado."
@@ -433,7 +630,10 @@ def matemáticas_con_mpmath(operación, *args):
 				resultado = mpmath.frac(x)
 
 			elif operación == "Resto":
-				resultado = mpmath.fmod(x, y)
+				try:
+					resultado = mpmath.fmod(x, y)
+				except ZeroDivisionError:
+					resultado = x
 
 			elif operación == "Ciclo":
 				resultado = "Aún no implementado."
@@ -493,7 +693,7 @@ def matemáticas_con_mpmath(operación, *args):
 					resultado = x
 			elif operación == "Multiplicar":
 				if type(x) is str and type(y) is str:
-					resultado = 0
+					resultado = mpmath.mpf('0')
 				elif type(x) is str and type(y) is mpmath.mpf:
 					resultado = x * int(y)
 				elif type(y) is str and type(x) is mpmath.mpf:
@@ -521,3 +721,5 @@ def matemáticas_con_mpmath(operación, *args):
 		resultado = mpmath.re(resultado)
 
 	return resultado
+
+# --------------------------------------------

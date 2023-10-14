@@ -9,7 +9,7 @@ from lib.nodeeditor.GraficosVista import MODO_DIBUJO
 
 from np_idioma import *
 from np_enlistado_de_nodos import *
-from nodos.objetos.np_utilitarios import nodos_no_disponibles, NODOS_NO_DISPONIBLES
+from nodos.objetos.np_utilitarios import nodos_no_disponibles, NODOS_NO_DISPONIBLES, actualizador_de_calendaristas
 
 DEBUG = False
 DEBUG_CONTEXT = False
@@ -48,6 +48,7 @@ class NodePlannerSubVentana(EditordeNodos):
 
 	def al_restaurar_historial(self):
 		self.hacer_evaluación_de_salidas()
+		actualizador_de_calendaristas(self.escena)
 
 	def leer_archivo(self, filename):
 		if super().leer_archivo(filename):

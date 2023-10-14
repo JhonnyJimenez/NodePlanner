@@ -2,4 +2,5 @@
 *.pyc
 .vscode
 .fleet
+entorno
 zona_de_pruebas.py

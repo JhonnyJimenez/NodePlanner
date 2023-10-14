@@ -22,24 +22,24 @@ class ContenidodelNodoCronista(ContenidodelNodoBase):
 
 	def contenido(self):
 		self.contenido_de_salidas = [
-				Etiqueta(self, 'Segundo inicial', 'Segundo inicial', 3, zócalo = 0)
+				
 				]
 		self.contenido_de_entradas = [
 
 				]
 
 
-@registrar_nodo(CATEGORÍA_CRONISTAS)
+@registrar_nodo(CATEGORÍA_CRONISTA)
 class NodoCronista(NodoBase):
 	icono = "iconos/categoría cronista.svg"
-	codigo_op = CATEGORÍA_CRONISTAS
-	titulo_op = "Cronistas"
+	codigo_op = CATEGORÍA_CRONISTA
+	titulo_op = "Cronista"
 
 	ClaseGraficadeNodo = GraficadordelNodoCronista
 	ClasedelContenidodeNodo = ContenidodelNodoCronista
 
 	Entradas = []
-	Salidas = [2]
+	Salidas = []
 
 	FormaDeEntradas = []
 	FormaDeSalidas = ['Círculo']
@@ -48,4 +48,4 @@ class NodoCronista(NodoBase):
 		super().__init__(escena, titulo, entradas, salidas)
 
 	def métodos_de_evaluación(self):
-		self.valores['Segundo inicial'] = mpf('0')
+		pass

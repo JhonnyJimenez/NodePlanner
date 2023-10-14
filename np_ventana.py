@@ -16,6 +16,8 @@ from np_idioma import *
 from np_subventana import NodePlannerSubVentana
 from np_lista import Lista
 
+from nodos.objetos.np_utilitarios import cambios_al_inicio
+
 # Boton de cerrado para la skin negra.
 import qss.nodeeditor_dark_resources
 
@@ -130,6 +132,9 @@ class NodePlannerVentana(Ventana):
 							editor_de_nodos.definir_título()
 							subven = self.crear_subventana(editor_de_nodos)
 							subven.show()
+
+							cambios_al_inicio(editor_de_nodos.escena)
+
 						else:
 							editor_de_nodos.close()
 		except Exception as e: dump_exception(e)

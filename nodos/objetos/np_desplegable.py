@@ -7,7 +7,7 @@ class Desplegable(ObjetodeNodePlanner):
 			self, elemento_padre = None, llave: str = None, lista = None, separadores = None,
 			elementos_visibles = 6, **kwargs
 			):
-		self.lista = lista
+		self.actualizar_lista(lista)
 		self.separadores = separadores
 		self.elementos_visibles = elementos_visibles
 		super().__init__(elemento_padre, llave = llave, **kwargs)
@@ -20,6 +20,7 @@ class Desplegable(ObjetodeNodePlanner):
 
 	def configuraciones_adicionales(self):
 		if self.lista not in (None, []):
+			self.objeto.clear()
 			self.objeto.addItems(self.lista)
 			if self.separadores not in (None, []):
 				for separador in self.separadores:
@@ -39,3 +40,6 @@ class Desplegable(ObjetodeNodePlanner):
 
 	def deserialización(self, dato):
 		self.objeto.setCurrentText(dato)
+
+	def actualizar_lista(self, lista):
+		self.lista = lista

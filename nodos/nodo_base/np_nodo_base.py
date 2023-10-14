@@ -26,8 +26,11 @@ class NodoBase(Nodo):
 	Entradas = [1, 4, 3]
 	Salidas = [1, 4, 3, 5]
 
-	FormadeEntradas = ['Círculo', 'Círculo', 'Círculo', 'Círculo']
-	FormadeSalidas = ['Círculo', 'Círculo', 'Círculo', 'Círculo']
+	FormadeEntradas = ['Círculo', 'Círculo', 'Círculo', 'Círculo', 'Circulo', 'Círculo', 'Círculo', 'Círculo', 'Círculo', 'Circulo', 'Círculo', 'Círculo', 'Círculo', 'Círculo', 'Circulo', 'Círculo', 'Círculo', 'Círculo', 'Círculo', 'Circulo']
+	FormadeSalidas = ['Círculo', 'Círculo', 'Círculo', 'Círculo', 'Circulo', 'Círculo', 'Círculo', 'Círculo', 'Círculo', 'Circulo', 'Círculo', 'Círculo', 'Círculo', 'Círculo', 'Circulo', 'Círculo', 'Círculo', 'Círculo', 'Círculo', 'Circulo']
+
+	Entradas_multiconexión = []
+	Salidas_multiconexión = []
 
 	def __init__(self, escena, titulo = titulo_op, entradas = Entradas, salidas = Salidas):
 		# Conteo de errores:
@@ -67,7 +70,8 @@ class NodoBase(Nodo):
 		for objeto in entradas:
 			zocalo = self.__class__.ClasedeZocalo(
 					nodo = self, indice = contador, posicion = self.pos_det_entradas, tipo_zocalo = objeto,
-					multiconexión = self.entradas_multiconexion, cantidad_en_el_lado_actual = len(entradas),
+					multiconexión = self.zócalo_multiconexión(self.__class__.Entradas_multiconexión, contador, self.entradas_multiconexion),
+					cantidad_en_el_lado_actual = len(entradas),
 					es_entrada = True,
 					forma = self.__class__.FormadeEntradas[contador] if self.__class__.FormadeEntradas[contador] is not None else 'Círculo'
 				)
@@ -78,12 +82,24 @@ class NodoBase(Nodo):
 		for objeto in salidas:
 			zocalo = self.__class__.ClasedeZocalo(
 					nodo = self, indice = contador, posicion = self.pos_det_salidas, tipo_zocalo = objeto,
-					multiconexión = self.salidas_multiconexion, cantidad_en_el_lado_actual = len(salidas),
+					multiconexión = self.zócalo_multiconexión(self.__class__.Salidas_multiconexión, contador, self.salidas_multiconexion),
+					cantidad_en_el_lado_actual = len(salidas),
 					es_entrada = False,
 					forma = self.__class__.FormadeSalidas[contador] if self.__class__.FormadeSalidas[contador] is not None else 'Círculo'
 				)
 			contador += 1
 			self.salidas.append(zocalo)
+
+	def zócalo_multiconexión(self, lista: list, contador: int, valor_por_defecto: bool):
+		try:
+			if lista[contador] not in (None, ''):
+				es_multiconexión = lista[contador]
+			else:
+				es_multiconexión = valor_por_defecto
+		except IndexError:
+			es_multiconexión = valor_por_defecto
+
+		return es_multiconexión
 
 	def obtener_posicion_zocalo(self, indice, posición, num_out_of = 1, *args):
 		es_entrada = args[0]
@@ -178,7 +194,7 @@ class NodoBase(Nodo):
 	def evaluación_inicial(self):
 		self.evaluación(False)
 
-	def datos_de_entrada_cambiados(self, conexión):
+	def datos_de_entrada_cambiados(self, conexión = None):
 		if self.escena.deserializando is False:
 			self.marcar_indefinido()
 			self.evaluación()
@@ -191,6 +207,7 @@ class NodoBase(Nodo):
 		try:
 			self.datos_de_entrada()                     # Esto tiene que ir antes de la evaluación porque si no, la
 														# evaluación solo escogerá los valores internos en nodos hijos.
+			self.ajustes_preevaluación()
 			self.valores_preevaluación = self.valores.copy()
 			evaluación = self.métodos_de_evaluación()
 
@@ -222,7 +239,7 @@ class NodoBase(Nodo):
 
 	def datos_de_entrada(self):
 		for zócalo in self.entradas:
-			if zócalo.Zocaloconexiones:
+			if len(zócalo.Zocaloconexiones) == 1 and zócalo.es_multiconexión is False:
 				contranodo = self.obtener_entrada(zócalo.indice)
 				contrazócalo = self.obtener_contrazócalo(zócalo.indice)
 				try:
@@ -231,6 +248,18 @@ class NodoBase(Nodo):
 					]
 				except KeyError:
 					pass
+			elif zócalo.Zocaloconexiones:
+				indexador = self.obtener_multiples_datos(zócalo.indice)
+				self.valores[self.diccionarios['Entradas'][zócalo.indice]] = []
+				listado = self.valores[self.diccionarios['Entradas'][zócalo.indice]]
+				for elemento in indexador:
+					contranodo = elemento['nodo']
+					contrazócalo = elemento['zócalo']
+					try:
+						valor = contranodo.valores[contranodo.diccionarios['Salidas'][contrazócalo.indice]]
+						listado.append(valor)
+					except KeyError:
+						listado.append('Dato perdido por error de sistema')
 			else:
 				for elemento in self.contenido.contenido_de_entradas:
 					try:
@@ -250,6 +279,20 @@ class NodoBase(Nodo):
 		except Exception:
 			print(str(Exception))
 			return None
+		
+	def obtener_multiples_datos(self, indice=0):
+		contrazócalos = []
+		for conexion in self.entradas[indice].Zocaloconexiones:
+			otro_zocalo = conexion.obtener_otros_zocalos(self.entradas[indice])
+			contrazócalos.append(
+				{'nodo': otro_zocalo.nodo,
+     			'zócalo': otro_zocalo
+				}
+			)
+		return contrazócalos
+
+	def ajustes_preevaluación(self):
+		pass
 
 	def métodos_de_evaluación(self):
 		pass

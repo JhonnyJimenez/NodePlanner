@@ -84,7 +84,7 @@ class ContenidodelNodoBase(ContenidoDelNodo):
 		res = super().serialización()
 		datos_de_serializado = {}
 		for llave in self.valores:
-			datos_de_serializado[llave] = tratado_de_datos(self.valores[llave])
+			datos_de_serializado[llave] = tratado_de_datos(self.valores[llave], serializado = True)
 		res['Valores'] = datos_de_serializado
 		return res
 
